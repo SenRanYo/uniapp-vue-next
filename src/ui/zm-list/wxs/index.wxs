@@ -1,0 +1,226 @@
+function onState(val, old, owner, instance) {
+  if (val) {
+    var state = instance.getState()
+    state.isTop = val.isTop
+    state.isBottom = val.isBottom
+    state.platform = val.platform
+    state.pulldowning = false
+    state.toTopTimestamp = val.toTopTimestamp
+    state.pulldownSpeed = val.pulldownSpeed
+    state.pulldownThreshold = val.pulldownThreshold
+    state.disablePulldownRefresh = val.disablePulldownRefresh
+    state.pulldownRefreshFinishDelay = val.pulldownRefreshFinishDelay
+  }
+}
+
+function onPulldownRefreshStatus(val, old, owner, instance) {
+  if (val === "open") openPulldownRefresh({ instance }, owner)
+  if (val === "fail") failPulldownRefresh({ instance }, owner)
+  if (val === "success") successPulldownRefresh({ instance }, owner)
+}
+
+function touchstart(event, owner) {
+  var touch = useTouch(event)
+  var state = useEventState(event)
+  state.touching = true
+  state.touchstartX = touch.touchX
+  state.touchstartY = touch.touchY
+  state.touchstartTimestamp = Date.now()
+  owner.callMethod("touchstart", touch)
+}
+
+function touchmove(event, owner) {
+  var touch = useTouch(event)
+  var state = useEventState(event)
+  var direction = useTouchmoveDirection(event)
+  state.touchmoveX = touch.touchX
+  state.touchmoveY = touch.touchY
+  if (direction === "bottom") {
+    dragPulldownRefresh(event, owner)
+
+    if (state.platform === "web" && state.isTop) {
+      event.stopPropagation()
+      if (state.toTopTimestamp < state.touchstartTimestamp) {
+        event.preventDefault()
+      }
+    }
+  }
+  owner.callMethod("touchmove", touch)
+  return ["left", "right", "top"].indexOf(direction) > -1
+}
+
+function touchend(event, owner) {
+  var touch = useTouch(event)
+  var state = useEventState(event)
+  state.touching = false
+  if (state.pulldownRefreshStatus === "wait") {
+    openPulldownRefresh(event, owner)
+  }
+  if (state.pulldownRefreshStatus === "drag") {
+    cancelPulldownRefresh(event, owner)
+  }
+  owner.callMethod("touchend", touch)
+}
+
+function touchcancel(event, owner) {
+  owner.callMethod("touchcancel", event)
+}
+
+function mousedown(event, owner) {
+  owner.callMethod("mousedown", event)
+}
+
+function mousemove(event, owner) {
+  owner.callMethod("mousemove", event)
+}
+
+function mouseup(event, owner) {
+  owner.callMethod("mouseup", event)
+}
+
+function mouseleave(event, owner) {
+  owner.callMethod("mouseleave", event)
+}
+
+function useTouch(event) {
+  var touch = event
+  if (event.touches && event.touches.length) {
+    touch = event.touches[0]
+  } else if (event.changedTouches && event.changedTouches.length) {
+    touch = event.changedTouches[0]
+  } else if (event.datail && event.datail != {}) {
+    touch = event.datail
+  }
+  return {
+    touchX: touch.clientX,
+    touchY: touch.clientY,
+  }
+}
+
+function useEventState(event) {
+  return event.instance.getState()
+}
+
+function useInstance(owner, name) {
+  return owner.selectComponent("." + name)
+}
+
+function useTouchmoveDirection(event) {
+  var touch = useTouch(event)
+  var state = useEventState(event)
+  var angx = touch.touchX - state.touchstartX
+  var angy = touch.touchY - state.touchstartY
+  var result = 0
+  if (Math.abs(angx) < 2 && Math.abs(angy) < 2) return result
+  var angle = (Math.atan2(angy, angx) * 180) / Math.PI
+  if (angle >= -135 && angle <= -45) {
+    result = "top"
+  } else if (angle > 45 && angle < 135) {
+    result = "bottom"
+  } else if ((angle >= 135 && angle <= 180) || (angle >= -180 && angle < -135)) {
+    result = "left"
+  } else if (angle >= -45 && angle <= 45) {
+    result = "right"
+  }
+  return result
+}
+
+function dragPulldownRefresh(event, owner) {
+  var touch = useTouch(event)
+  var state = useEventState(event)
+  var instance = useInstance(owner, "zm-list__touch")
+  if (state.isTop == false) return
+  if (state.disablePulldownRefresh) return
+  if (state.pulldownRefreshStatus === "open") return
+  if (state.pulldowning == false) {
+    state.pulldownStartY = touch.touchY
+  }
+  state.pulldowning = true
+  state.pulldownHeight = Math.min(Math.abs(state.pulldownStartY - touch.touchY) * state.pulldownSpeed, state.pulldownThreshold)
+  state.pulldownRefreshStatus = state.pulldownHeight === state.pulldownThreshold ? "wait" : "drag"
+  instance.requestAnimationFrame(function () {
+    instance.setStyle({
+      transition: "transform 100ms ease-out",
+      transform: "translateY(" + state.pulldownHeight + "px)",
+      "-webkit-transform": "translateY(" + state.pulldownHeight + "px)",
+    })
+  })
+  owner.callMethod("dragPulldownRefresh", state)
+}
+
+function openPulldownRefresh(event, owner) {
+  var state = useEventState(event)
+  var instance = useInstance(owner, "zm-list__touch")
+  instance.requestAnimationFrame(function () {
+    instance.setStyle({
+      transition: "transform 300ms ease-out",
+      transform: "translateY(" + state.pulldownThreshold + "px)",
+      "-webkit-transform": "translateY(" + state.pulldownThreshold + "px)",
+    })
+  })
+  state.pulldowning = false
+  state.pulldownRefreshStatus = "open"
+  owner.callMethod("openPulldownRefresh", state)
+}
+
+function cancelPulldownRefresh(event, owner) {
+  var state = useEventState(event)
+  var instance = useInstance(owner, "zm-list__touch")
+  instance.requestAnimationFrame(function () {
+    instance.setStyle({
+      transition: "transform 200ms cubic-bezier(0.19,1.64,0.42,0.72)",
+      transform: "translateY(0px)",
+      "-webkit-transform": "translateY(0px)",
+    })
+  })
+  state.pulldowning = false
+  state.pulldownRefreshStatus = "cancel"
+  owner.callMethod("cancelPulldownRefresh", state)
+}
+
+function failPulldownRefresh(event, owner) {
+  var state = useEventState(event)
+  var instance = useInstance(owner, "zm-list__touch")
+  owner.setTimeout(function () {
+    instance.requestAnimationFrame(function () {
+      instance.setStyle({
+        transition: "transform 200ms cubic-bezier(0.19,1.64,0.42,0.72)",
+        transform: "translateY(0px)",
+        "-webkit-transform": "translateY(0px)",
+      })
+    })
+    state.pulldowning = false
+    state.pulldownRefreshStatus = "fail"
+    owner.callMethod("failPulldownRefresh", state)
+  }, state.pulldownRefreshFinishDelay)
+}
+
+function successPulldownRefresh(event, owner) {
+  var state = useEventState(event)
+  var instance = useInstance(owner, "zm-list__touch")
+  owner.setTimeout(function () {
+    instance.requestAnimationFrame(function () {
+      instance.setStyle({
+        transition: "transform 200ms cubic-bezier(0.19,1.64,0.42,0.72)",
+        transform: "translateY(0px)",
+        "-webkit-transform": "translateY(0px)",
+      })
+    })
+    state.pulldowning = false
+    state.pulldownRefreshStatus = "success"
+    owner.callMethod("successPulldownRefresh", state)
+  }, state.pulldownRefreshFinishDelay)
+}
+
+module.exports = {
+  onState: onState,
+  onPulldownRefreshStatus: onPulldownRefreshStatus,
+  touchstart: touchstart,
+  touchmove: touchmove,
+  touchend: touchend,
+  touchcancel: touchcancel,
+  mousedown: mousedown,
+  mousemove: mousemove,
+  mouseup: mouseup,
+  mouseleave: mouseleave,
+}
