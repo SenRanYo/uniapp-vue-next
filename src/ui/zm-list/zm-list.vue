@@ -559,10 +559,10 @@ export default defineComponent({
     width: 100%;
 
     .load-inner {
+      padding: 15px 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 15px 0;
 
       .load-animation {
         width: 32rpx;

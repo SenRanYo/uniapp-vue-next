@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
+
 const list = ref([])
 const options = reactive({ size: 15 })
 
