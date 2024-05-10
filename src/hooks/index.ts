@@ -2,7 +2,15 @@ import { Mitt, mitt } from "@/utils/mitt"
 import { Ref, getCurrentInstance } from "vue"
 
 /**
- * 使用父组件
+ * 获取当前路由信息
+ */
+export function useCurrentRouter() {
+  const routes = getCurrentPages()
+  return routes[routes.length - 1]
+}
+
+/**
+ * 获取父组件
  * @param name 父组件的名称
  * @param r 可选的 Ref 对象
  */
@@ -25,7 +33,7 @@ export function useParent(name: string, r?: Ref) {
 }
 
 /**
- * 使用元素位置信息
+ * 获取元素位置信息
  * @param selector 元素的选择器
  * @param all 是否查询全部
  * @param ins 调用组件实例
@@ -49,7 +57,7 @@ export function useDomRect(selector: string, all: boolean = false, ins: any) {
 }
 
 /**
- * 使用事件监听
+ * 注册事件监听
  * @param name 事件名称
  * @param fun 处理函数
  */
@@ -66,7 +74,7 @@ export function useOffEvent(name: string) {
 }
 
 /**
- * 使用事件监听器
+ * 创建事件监听器
  */
 export function useEvent() {
   return new Mitt()
