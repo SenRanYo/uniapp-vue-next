@@ -3,7 +3,6 @@
     <slot></slot>
   </view>
 </template>
-
 <script setup lang="ts">
 import { useMitt, useStyle, useCurrentRouter } from "../hooks"
 const emits = defineEmits(["scroll", "scrolltoupper", "scrolltolower", "touchstart", "touchmove", "touchend"])
@@ -60,7 +59,11 @@ function onTouchmove(e: Event) {
   mitt.emit("touchmove", e)
 }
 </script>
-
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss">
 .zm-view {
   width: 100%;

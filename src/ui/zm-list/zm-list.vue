@@ -68,6 +68,7 @@ import { useStyle, useUnitToPx, useRgb, useUnit } from "../utils/style"
 const { uniPlatform } = uni.getSystemInfoSync()
 
 export default defineComponent({
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
   props: { options: { type: Object, default: () => ({}) } },
   emits: ["load", "query", "refresh", "scroll", "scrolltoupper", "scrolltolower"],
   setup(props, context) {

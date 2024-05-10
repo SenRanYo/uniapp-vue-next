@@ -1,9 +1,9 @@
 <template>
-  <view class="content">
+  <zm-view>
     <zm-list ref="listRef" :options="options" @query="handleGetData">
       <view v-for="(item, index) in list" :key="index" class="list-item">{{ index }}</view>
     </zm-list>
-  </view>
+  </zm-view>
 </template>
 
 <script setup lang="ts">
