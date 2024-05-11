@@ -1,6 +1,5 @@
 import path from "node:path"
 import dayjs from "dayjs"
-import unoCSS from "unocss/vite"
 import uni from "@dcloudio/vite-plugin-uni"
 import uniLayouts from "@uni-helper/vite-plugin-uni-layouts"
 import uniPlatform from "@uni-helper/vite-plugin-uni-platform"
@@ -18,7 +17,6 @@ export default ({ command, mode }) => {
     envDir: "./env",
     plugins: [
       uni(),
-      unoCSS(),
       uniLayouts(),
       uniPlatform(),
       vueSetupExtend(),
@@ -44,11 +42,7 @@ export default ({ command, mode }) => {
           brotliSize: true,
         }),
     ],
-    css: {
-      postcss: {
-        plugins: [],
-      },
-    },
+    css: {},
     server: {
       host: "0.0.0.0",
       hmr: true,
