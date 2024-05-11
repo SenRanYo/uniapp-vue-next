@@ -113,7 +113,7 @@ export function isBoolean(value: any): boolean {
  * @return {Boolean}
  * @example isArray(value)
  */
-export function isArray(value: any): boolean {
+export function isArray<T>(value: any): value is Array<T> {
   if (typeof Array.isArray === "function") {
     return Array.isArray(value)
   } else {

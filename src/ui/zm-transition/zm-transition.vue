@@ -1,214 +1,164 @@
 <template>
-  <view v-if="visible" class="zm-transition" :animation="animationData" :style="[style]" @click="onClick">
+  <view v-if="visible" class="zm-transition" :style="[style]" :animation="animationData" @click="onClick">
     <slot></slot>
   </view>
 </template>
 
-<script>
+<script setup lang="ts">
 import modes from "./modes"
-import weixin from "@/mixins/weixin"
-import { useStyle } from "@/utils/style"
-import { merge } from "@/utils/utils"
-import { isArray, isString } from "@/utils/check"
-export default {
-  name: "zm-transition",
-  mixins: [weixin],
-  props: {
-    show: {
-      type: Boolean,
-      default: true
-    },
-    mode: {
-      type: [String, null],
-      default: "fade"
-    },
-    zIndex: {
-      type: [String, Number],
-      default: ""
-    },
-    duration: {
-      type: [Number, String],
-      default: 300
-    },
-    penetrate: {
-      type: Boolean,
-      default: false
-    },
-    timingFunction: {
-      type: String,
-      default: "ease"
-    },
-    enterDelay: {
-      type: Number,
-      default: 0
-    },
-    leaveDelay: {
-      type: Number,
-      default: 0
-    },
-    customStyle: {
-      type: [String, Object],
-      default: ""
-    }
-  },
-  data() {
-    return {
-      timer: null,
-      config: {},
-      animation: null,
-      animationData: {},
-      styles: {},
-      visible: false,
-      noCustomStep: true
-    }
-  },
-  computed: {
-    style() {
-      let styles = {}
-      styles.zIndex = this.zIndex
-      styles.pointerEvents = this.penetrate ? "none" : "auto"
-      styles.transitionDuration = `${this.duration / 1000}s`
-      return useStyle({ ...styles, ...this.styles, ...useStyle(this.customStyle) })
-    }
-  },
-  watch: {
-    show: {
-      handler(newVal) {
-        if (newVal) {
-          this.open()
-        } else {
-          if (this.visible) {
-            setTimeout(() => this.close(), this.leaveDelay)
-          }
-        }
-      },
-      immediate: true
-    },
-    $props: {
-      handler() {
-        this.init()
-      },
-      deep: true
-    }
-  },
-  created() {
-    this.init()
-  },
-  methods: {
-    // 初始化
-    init(config = {}) {
-      this.config = {
-        delay: this.enterDelay,
-        duration: this.duration,
-        timingFunction: this.timingFunction,
-        transformOrigin: "50% 50%"
-      }
-      this.config = merge(this.config, config)
+import { useStyle } from "../hooks/"
+import { isArray, isString } from "../utils/check"
 
-      this.animation = uni.createAnimation(this.config)
-    },
-    // 执行动画
-    run(cb = () => {}) {
-      this.animationData = this.animation.export()
-      this.timer = setTimeout(() => cb(), this.config.duration)
-    },
-    // 步骤动画
-    step(params = {}, config = {}) {
-      this.isCustomStep = false
-      for (let i in params) {
-        try {
-          if (typeof params[i] === "object") {
-            this.animation[i](...params[i])
-          } else {
-            this.animation[i](params[i])
-          }
-        } catch (e) {
-          console.error(`方法 ${i} 不存在`)
-        }
-      }
-      this.animation.step(config)
-    },
-    // 开始动画
-    open() {
-      clearTimeout(this.timer)
-      this.transform = ""
-      this.visible = true
+const emits = defineEmits(["open", "opened", "close", "closed", "click"])
+const props = defineProps({
+  show: { type: Boolean, default: true },
+  mode: { type: [String, Array, null], default: "fade" },
+  zIndex: { type: [String, Number], default: "" },
+  duration: { type: Number, default: 300 },
+  penetrate: { type: Boolean, default: false },
+  timingFunction: { type: String, default: "ease" },
+  enterDelay: { type: Number, default: 0 },
+  leaveDelay: { type: Number, default: 0 },
+  customStyle: { type: [String, Object], default: "" },
+})
 
-      this.initStyle("init")
+const timer = ref()
+const styles = ref({})
+const config: any = ref({})
+const visible = ref(false)
+const animation = ref()
+const animationData = ref()
+const noCustomStep = ref(true)
 
-      this.$nextTick(() => {
-        this.timer = setTimeout(() => {
-          if (this.noCustomStep) this.initTransition("open").step()
-          setTimeout(() => this.$emit("open"), this.enterDelay)
-          this.run(() => {
-            this.$emit("opened")
-          })
-        }, 20)
-      })
-    },
-    // 关闭动画
-    close() {
-      this.$emit("close")
-      if (this.noCustomStep) this.initTransition("close").step()
-      this.$nextTick(() => {
-        this.run(() => {
-          this.visible = false
-          this.animationData = null
-          if (this.noCustomStep) this.initStyle("close")
-          this.$emit("closed")
-        })
-      })
-    },
-    // 初始化样式
-    initStyle(type = "init") {
-      this.styles = { transform: "" }
-      const build = (mode) => {
-        if (modes[mode]) {
-          const t = modes[mode][type]
-          t.forEach((i) => {
-            if (i.name === "transform") {
-              this.styles[i.name] += `${i.method}(${i.value}) `
-            } else {
-              this.styles[i.name] = i.value
-            }
-          })
-        } else {
-          console.error(`mode ${mode} 不存在`)
-        }
-      }
-      if (isArray(this.mode)) {
-        this.mode.forEach((mode) => build(mode))
-      } else if (isString(this.mode)) {
-        build(this.mode)
+const style = computed(() => {
+  let style: any = {}
+  style.zIndex = props.zIndex
+  style.pointerEvents = props.penetrate ? "none" : "auto"
+  style.transitionDuration = `${props.duration / 1000}s`
+  return useStyle({ ...style, ...styles.value, ...useStyle(props.customStyle) })
+})
+
+watch(() => props, init, { deep: true })
+watch(
+  () => props.show,
+  (state) => {
+    if (state) open()
+    else if (visible.value) {
+      setTimeout(() => close(), props.leaveDelay)
+    }
+  },
+  { immediate: true },
+)
+
+onMounted(() => init())
+
+function init(cof: any = {}) {
+  config.value = { delay: props.enterDelay, duration: props.duration, timingFunction: props.timingFunction, transformOrigin: "50% 50%", ...cof }
+  animation.value = uni.createAnimation(config.value)
+}
+
+function run(cb: Function = () => {}) {
+  animationData.value = animation.value.export()
+  timer.value = setTimeout(() => cb(), config.value.duration)
+}
+
+function step(params = {}, config = {}) {
+  noCustomStep.value = false
+  for (let i in params) {
+    try {
+      if (typeof params[i] === "object") {
+        animation.value[i](...params[i])
       } else {
-        console.error("mode 格式错误 不存在")
+        animation.value[i](params[i])
       }
-    },
-    // 初始化Transrom
-    initTransition(type) {
-      const build = (mode) => {
-        const t = modes[mode][type]
-        t.forEach((i) => {
-          const v = isArray(i.value) ? i.value : [i.value]
-          this.animation[i.method](...v)
-        })
-      }
-      if (isArray(this.mode)) {
-        this.mode.forEach((mode) => build(mode))
-      } else if (isString(this.mode)) {
-        build(this.mode)
-      } else {
-        console.error("mode 格式错误 不存在")
-      }
-      return this.animation
-    },
-    onClick() {
-      this.$emit("click")
+    } catch (e) {
+      console.error(`方法 ${i} 不存在`)
     }
   }
+  animation.value.step(config)
+}
+
+function open() {
+  clearTimeout(timer.value)
+  visible.value = true
+  initStyle("init")
+
+  const next = () => {
+    timer.value = setTimeout(() => {
+      if (noCustomStep.value) initTransition("open").step()
+      setTimeout(() => emits("open"), props.enterDelay)
+      run(() => emits("opened"))
+    }, 20)
+  }
+  nextTick(next)
+}
+
+function close() {
+  emits("close")
+  if (noCustomStep.value) initTransition("close").step()
+  const next = () => {
+    run(() => {
+      visible.value = false
+      animationData.value = null
+      if (noCustomStep.value) initStyle("close")
+      emits("closed")
+    })
+  }
+  nextTick(next)
+}
+
+function initStyle(type = "init") {
+  styles.value = { transform: "" }
+  const build = (mode: string) => {
+    if (modes[mode]) {
+      const t = modes[mode][type]
+      t.forEach((i: any) => {
+        if (i.name === "transform") {
+          styles.value[i.name] += `${i.method}(${i.value}) `
+        } else {
+          styles.value[i.name] = i.value
+        }
+      })
+    } else {
+      console.error(`mode ${mode} 不存在`)
+    }
+  }
+  if (isArray(props.mode)) {
+    props.mode.forEach((mode: string) => build(mode))
+  } else if (isString(props.mode)) {
+    build(props.mode)
+  } else {
+    console.error("mode 格式错误 不存在")
+  }
+}
+
+function initTransition(type: string) {
+  const build = (mode: string) => {
+    const t = modes[mode][type]
+    t.forEach((i: any) => {
+      const v = isArray(i.value) ? i.value : [i.value]
+      animation.value[i.method](...v)
+    })
+  }
+  if (isArray(props.mode)) {
+    props.mode.forEach((mode: string) => build(mode))
+  } else if (isString(props.mode)) {
+    build(props.mode)
+  } else {
+    console.error("mode 格式错误 不存在")
+  }
+  return animation.value
+}
+
+function onClick() {
+  emits("click")
 }
 </script>
-
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss" scoped>
 .zm-transition {
   z-index: 1;
