@@ -16,26 +16,22 @@ const props = defineProps({
 
 const mitt = useMitt()
 
-// 自定义样式
 const style = computed(() => {
   const style: any = {}
   style.background = props.background
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-// 屏幕按下
 function onTouchstart(e: Event) {
   emits("touchstart", e)
   mitt.emit("touchstart", e)
 }
 
-// 屏幕松开
 function onTouchend(e: Event) {
   emits("touchend", e)
   mitt.emit("touchend", e)
 }
 
-// 屏幕滑动
 function onTouchmove(e: Event) {
   emits("touchmove", e)
   mitt.emit("touchmove", e)
