@@ -1,7 +1,7 @@
 <template>
   <view class="view">
     <view class="test"></view>
-    <zm-tabs :list="list" :value="value"></zm-tabs>
+    <zm-tabs :list="list" v-model="value" @change="onChange"></zm-tabs>
   </view>
 </template>
 
@@ -13,7 +13,22 @@ const list = ref([
   { text: "电影卡", value: "card" },
 ])
 
-const value = ref("coupon")
+const value = ref("card")
+
+watch(
+  () => value.value,
+  (v) => {
+    console.log(v)
+  },
+)
+
+setTimeout(() => {
+  value.value = "coupon"
+}, 5000)
+
+function onChange(v) {
+  console.log(v)
+}
 </script>
 
 <style lang="scss" scoped>

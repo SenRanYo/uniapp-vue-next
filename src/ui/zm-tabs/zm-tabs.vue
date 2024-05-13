@@ -3,14 +3,14 @@
     <scroll-view :scroll-x="scrollable" enable-flex scroll-with-animation :scroll-left="scrollLeft" class="zm-tabs__scroll">
       <view class="zm-tabs__list">
         <view
-          v-for="(item, index) in list"
-          :key="index"
-          :style="[tabStyle(index)]"
+          v-for="(item, idx) in list"
+          :key="idx"
+          :style="[tabStyle(idx)]"
           class="zm-tabs__tab"
-          :class="{ 'is-active': index === innerIndex, 'is-disabled': item[disabledKey] }"
-          @click="onClickTab(index)"
+          :class="{ 'is-active': index === idx, 'is-disabled': item[disabledKey] }"
+          @click="onClickTab(idx)"
         >
-          <text class="zm-tabs__text" :style="[textStyle(index)]">{{ item[textKey] }}</text>
+          <text class="zm-tabs__text" :style="[textStyle(idx)]">{{ item[textKey] }}</text>
         </view>
         <view class="zm-tabs__line" :style="[lineStyle]"></view>
       </view>
@@ -21,9 +21,9 @@
 <script setup lang="ts">
 import { useStyle, useUnit, useColor, useElRect } from "../hooks"
 
-const emits = defineEmits(["click-tab"])
+const emits = defineEmits(["change", "update:modelValue"])
 const props = defineProps({
-  value: { type: [String, Number], default: "" },
+  modelValue: { type: [String, Number], default: "" },
   list: { type: Array, default: () => [] },
   height: { type: [String, Number], default: "" },
   sticky: { type: Boolean, default: false },
@@ -52,7 +52,7 @@ const props = defineProps({
 })
 
 const init = ref(false)
-const innerIndex = ref(0)
+const index = ref(0)
 const tabsRect: any = ref([])
 const lineRect: any = ref({})
 const scrollRect: any = ref({})
@@ -79,15 +79,15 @@ const wrapStyle = computed(() => {
 })
 
 const tabStyle = computed(() => {
-  return (index: number) => {
+  return (idx: number) => {
     return useStyle({ maxWidth: useUnit(props.tabMaxWidth) })
   }
 })
 
 const textStyle = computed(() => {
-  return (index: any) => {
+  return (idx: any) => {
     const style: any = {}
-    if (innerIndex.value === index) {
+    if (index.value === idx) {
       style.color = useColor(props.activeColor)
       style.fontSize = useUnit(props.activeSize)
       style.fontWeight = props.activeWeight
@@ -107,7 +107,7 @@ const lineStyle = computed(() => {
   style.background = useColor(props.lineColor)
   style.borderRadius = useUnit(props.lineRadius)
   style.transitionDuration = props.duration
-  const tabRect = tabsRect.value[innerIndex.value]
+  const tabRect = tabsRect.value[index.value]
   if (tabRect) {
     let left = 0
     if (props.lineWidth == "100%") {
@@ -122,22 +122,9 @@ const lineStyle = computed(() => {
   return useStyle(style)
 })
 
-watch(
-  () => props.list,
-  (val) => {
-    if (val?.length) resize()
-  },
-  { deep: true },
-)
-
-watch(
-  () => props.value,
-  (val) => {
-    const index = props.list.findIndex((item) => item[props.valueKey] === val)
-    innerIndex.value = index >= 0 ? index : 0
-  },
-  { deep: true, immediate: true },
-)
+watch(() => props.list, resize, { deep: true, immediate: true })
+watch(() => props.modelValue, onValueChange, { immediate: true })
+watch(() => index.value, onIndexChange)
 
 async function resize() {
   await nextTick()
@@ -147,13 +134,21 @@ async function resize() {
   init.value = true
 }
 
-function onClickTab(index: number) {
-  if (props.list[index][props.disabledKey]) return
-  innerIndex.value = index
-  emits("click-tab", props.list[index])
+function onClickTab(idx: number) {
+  if (index.value === idx) return
+  if (props.list[idx][props.disabledKey]) return
+  index.value = idx
 }
 
-onMounted(() => resize())
+function onValueChange(val: number) {
+  const idx = props.list.findIndex((item) => item[props.valueKey] === val)
+  index.value = idx >= 0 ? idx : 0
+}
+
+function onIndexChange() {
+  emits("change", props.list[index.value])
+  emits("update:modelValue", props.list[index.value][props.valueKey])
+}
 
 defineExpose({ resize })
 </script>
