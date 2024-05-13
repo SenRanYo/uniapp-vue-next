@@ -4,6 +4,7 @@
   </view>
 </template>
 <script setup lang="ts">
+import { colorVars } from "../config"
 import { useMitt, useStyle } from "../hooks"
 
 const emits = defineEmits(["scroll", "scrolltoupper", "scrolltolower", "touchstart", "touchmove", "touchend"])
@@ -19,6 +20,11 @@ const mitt = useMitt()
 const style = computed(() => {
   const style: any = {}
   style.background = props.background
+  style["--primary-color"] = colorVars.primary
+  style["--success-color"] = colorVars.success
+  style["--warning-color"] = colorVars.warning
+  style["--error-color"] = colorVars.error
+  style["--info-color"] = colorVars.info
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
