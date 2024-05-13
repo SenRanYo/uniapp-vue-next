@@ -1,21 +1,19 @@
 <template>
   <view class="view">
     <view class="test"></view>
-    <zm-toast ref="toast"></zm-toast>
+    <zm-tabs :list="list" :value="value"></zm-tabs>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue"
 
-const toast = ref()
-const state = ref(false)
+const list = ref([
+  { text: "优惠券", value: "coupon" },
+  { text: "电影卡", value: "card" },
+])
 
-state.value = true
-
-nextTick(() => {
-  toast.value.show({ type: "loading", content: "测试内容", duration: 3000 })
-})
+const value = ref("coupon")
 </script>
 
 <style lang="scss" scoped>

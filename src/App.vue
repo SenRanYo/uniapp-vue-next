@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { onLaunch, onShow, onHide } from "@dcloudio/uni-app"
+import { onLaunch } from "@dcloudio/uni-app"
 onLaunch(() => {
   console.log("App Launch")
 })
 </script>
-<style></style>
+<style lang="scss">
+@import "@/ui/styles/index.scss";
+</style>

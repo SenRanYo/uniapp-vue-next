@@ -174,11 +174,12 @@ export function useParent(name: string, r?: Ref) {
  * @param all 是否查询全部
  * @param ins 调用组件实例
  */
-export function useDomRect(selector: string, all: boolean = false, ins: any) {
+export function useElRect(selector: string, all: boolean = false) {
   return new Promise((resolve) => {
+    const instance = getCurrentInstance()
     uni
       .createSelectorQuery()
-      .in(ins)
+      .in(instance)
       [all ? "selectAll" : "select"](selector)
       .boundingClientRect((rect) => {
         if (all && Array.isArray(rect) && rect.length) {
