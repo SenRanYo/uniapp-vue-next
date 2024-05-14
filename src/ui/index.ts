@@ -1,30 +1,34 @@
-import { ref, nextTick, getCurrentInstance, ComponentInternalInstance } from "vue"
+import { ref, getCurrentInstance } from "vue"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app"
 
-interface View {
-  [key: string]: any
-}
-
-export async function useView() {
+export function useView() {
   const view: any = ref({})
+  const mitt: any = ref({})
   const instance: any = getCurrentInstance()
 
-  onPageScroll(({ scrollTop }) => {
-    view.value.scroll(scrollTop)
+  let onReachTopHook: Function = () => {}
+  const onReachTop = (hook: Function = () => {}) => (onReachTopHook = hook)
 
-    if (scrollTop === 0) view.value.reachTop()
-  })
-
-  onReachBottom(() => {
-    view.value.reachBottom()
-  })
-
-  await nextTick()
-  Object.keys(instance.refs).forEach((key) => {
-    if (instance.refs[key].name === "zm-view") {
-      view.value = instance.refs[key]
+  onPageScroll((options) => {
+    view.value.scroll(options)
+    if (options.scrollTop === 0) {
+      onReachTopHook()
+      view.value.reachTop()
     }
   })
 
-  const _onPageScroll = (hook: (options: Page.PageScrollOption) => void, target?: ComponentInternalInstance | null) => {}
+  onReachBottom(() => view.value.reachBottom())
+
+  Object.keys(instance.refs).forEach((key) => {
+    if (instance.refs[key].name === "zm-view") {
+      view.value = instance.refs[key]
+      mitt.value = instance.refs[key].mitt
+    }
+  })
+
+  const state = computed(() => {
+    return { view: view, mitt: mitt, onReachTop, onPageScroll, onReachBottom }
+  })
+
+  return state.value
 }
