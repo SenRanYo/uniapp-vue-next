@@ -177,23 +177,31 @@ export async function useParent(name: string, vm: ComponentInternalInstance) {
 /**
  * 获取元素位置信息
  * @param selector 元素的选择器
- * @param all 是否查询全部
+ * @param instance 调用组件实例
  */
-export function useElRect(selector: string, all: boolean = false) {
+export function useElRect(selector: string, instance: ComponentInternalInstance) {
   return new Promise((resolve) => {
-    const instance = getCurrentInstance()
     uni
       .createSelectorQuery()
       .in(instance)
-      [all ? "selectAll" : "select"](selector)
-      .boundingClientRect((rect) => {
-        if (all && Array.isArray(rect) && rect.length) {
-          resolve(rect)
-        }
-        if (!all && rect) {
-          resolve(rect)
-        }
-      })
+      .select(selector)
+      .boundingClientRect((rect) => resolve(rect))
+      .exec()
+  })
+}
+
+/**
+ * 获取多元素位置信息
+ * @param selector 元素的选择器
+ * @param instance 调用组件实例
+ */
+export function useElRects(selector: string, instance: ComponentInternalInstance) {
+  return new Promise((resolve) => {
+    uni
+      .createSelectorQuery()
+      .in(instance)
+      .selectAll(selector)
+      .boundingClientRect((rect) => resolve(rect))
       .exec()
   })
 }

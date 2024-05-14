@@ -23,6 +23,7 @@ const rect = ref()
 const isSticky = ref(false)
 const navbarHeight = ref(0)
 const view: View = inject("zm-view")
+const instance = getCurrentInstance()
 
 const style = computed(() => {
   const style: any = {}
@@ -41,7 +42,7 @@ watch(
 async function resize() {
   await nextTick()
   updateSticky()
-  rect.value = await useElRect(".zm-sticky__inner")
+  rect.value = await useElRect(".zm-sticky__inner", instance)
 }
 
 function event() {
@@ -51,7 +52,7 @@ function event() {
 }
 
 async function updateSticky() {
-  const rect: any = await useElRect(".zm-sticky")
+  const rect: any = await useElRect(".zm-sticky", instance)
   if (rect) {
     isSticky.value = rect.top <= useUnitToPx(props.offsetTop)
   }

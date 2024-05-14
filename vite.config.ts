@@ -1,7 +1,6 @@
 import path from "node:path"
 import dayjs from "dayjs"
 import uni from "@dcloudio/vite-plugin-uni"
-import uniLayouts from "@uni-helper/vite-plugin-uni-layouts"
 import uniPlatform from "@uni-helper/vite-plugin-uni-platform"
 import vueSetupExtend from "vite-plugin-vue-setup-extend"
 import autoImport from "unplugin-auto-import/vite"
@@ -17,7 +16,6 @@ export default ({ command, mode }) => {
     envDir: "./env",
     plugins: [
       uni(),
-      uniLayouts(),
       uniPlatform(),
       vueSetupExtend(),
       autoImport({

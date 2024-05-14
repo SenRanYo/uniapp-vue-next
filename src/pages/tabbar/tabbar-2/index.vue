@@ -1,21 +1,17 @@
 <template>
-  <view class="view">
-    <view style="height: 300px"></view>
-    <zm-sticky :offset-top="100">
-      <view class="dom"></view>
-    </zm-sticky>
-  </view>
+  <zm-view ref="view">
+    <view style="height: 3000px">
+      <view style="height: 300px"></view>
+      <zm-sticky :offset-top="100">
+        <view class="dom"></view>
+      </zm-sticky>
+    </view>
+  </zm-view>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import { onPageScroll } from "@dcloudio/uni-app"
-
-const value = ref("card")
-
-onPageScroll((v) => {
-  console.log(v)
-})
+import { useView } from "@/ui"
+const core = useView()
 </script>
 
 <style lang="scss" scoped>

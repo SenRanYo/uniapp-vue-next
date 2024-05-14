@@ -8,7 +8,7 @@ import { colorVars } from "../config"
 import { useMitt, useStyle } from "../hooks"
 
 defineOptions({ name: "zm-view" })
-const emits = defineEmits(["scroll", "scrolltoupper", "scrolltolower", "touchstart", "touchmove", "touchend"])
+const emits = defineEmits(["scroll", "reachTop", "reachBottom", "touchstart", "touchmove", "touchend"])
 const props = defineProps({
   scroll: { type: Boolean, default: true },
   background: { type: String, default: "" },
@@ -17,6 +17,7 @@ const props = defineProps({
 })
 
 const mitt = useMitt()
+const scrollTop = ref(0)
 
 const style = computed(() => {
   const style: any = {}
@@ -28,6 +29,22 @@ const style = computed(() => {
   style["--info-color"] = colorVars.info
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
+
+function scroll(top: number) {
+  scrollTop.value = top
+  emits("scroll", top)
+  mitt.emit("scroll", top)
+}
+
+function reachTop() {
+  emits("reachTop")
+  mitt.emit("reachTop")
+}
+
+function reachBottom() {
+  emits("reachBottom")
+  mitt.emit("reachBottom")
+}
 
 function onTouchstart(e: Event) {
   emits("touchstart", e)
@@ -45,7 +62,7 @@ function onTouchmove(e: Event) {
 }
 
 provide("zm-view", { mitt })
-defineExpose({ mitt })
+defineExpose({ name: "zm-view", mitt, scroll, reachTop, reachBottom })
 </script>
 <script lang="ts">
 export default {

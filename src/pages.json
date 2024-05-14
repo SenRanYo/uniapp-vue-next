@@ -2,35 +2,30 @@
   "pages": [
     {
       "path": "pages/tabbar/tabbar-1/index",
-      "type": "page",
       "style": {
         "navigationBarTitleText": "uni-app"
       }
     },
     {
       "path": "pages/tabbar/tabbar-2/index",
-      "type": "page",
       "style": {
         "navigationBarTitleText": "uni-app"
       }
     },
     {
       "path": "pages/tabbar/tabbar-3/index",
-      "type": "page",
       "style": {
         "navigationBarTitleText": "uni-app"
       }
     },
     {
       "path": "pages/tabbar/tabbar-4/index",
-      "type": "page",
       "style": {
         "navigationBarTitleText": "uni-app"
       }
     },
     {
       "path": "pages/tabbar/tabbar-5/index",
-      "type": "page",
       "style": {
         "navigationBarTitleText": "uni-app"
       }
