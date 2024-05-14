@@ -1,7 +1,7 @@
 import { Mitt } from "../utils/mitt"
 import { cssVars } from "../config"
-import { Ref, getCurrentInstance } from "vue"
 import { isNumber, isObject, isString, isEmpty } from "../utils/check"
+import { Ref, ComponentInternalInstance, nextTick, getCurrentInstance } from "vue"
 
 // 使用css变量
 export function useVar(name: string): string {
@@ -42,7 +42,7 @@ export function useDecoUnit(value: any, unit: string = "rpx"): string {
  * @param {string} value 单位值
  * @return {string}
  */
-export function useUnitToPx(value: any): string | number {
+export function useUnitToPx(value: any): number {
   value = useUnit(value || "0")
   if (~value.indexOf("rpx")) {
     return isNumber(value.split("rpx")[0]) ? uni.upx2px(+value.split("rpx")[0]) : value
@@ -148,23 +148,29 @@ export function useCurrentRouter() {
 /**
  * 获取父组件
  * @param name 父组件的名称
- * @param r 可选的 Ref 对象
+ * @param vm 调用组件实例
  */
-export function useParent(name: string, r?: Ref) {
-  // 获取当前组件实例
-  const instance = getCurrentInstance()
-
-  if (instance) {
-    // 获取父组件实例
-    let parent = instance.proxy?.$.parent
+export async function useParent(name: string, vm: ComponentInternalInstance) {
+  if (vm) {
+    let parent = vm.proxy?.$.parent
     if (parent) {
-      // 判断父组件的名称是否与指定名称相同
-      if (parent.type.name === name) {
-        // 将父组件的 exposed 属性赋值给 r，并返回 exposed 属性
-        r.value = parent.exposed
-        return parent.exposed
-      }
+      // parent = parent.proxy?.$
+      // console.log(vm.parent)
+      console.log(parent.proxy?.$)
+      // while (parent.type.name !== name) {
+      //   console.log(parent)
+      //   parent = parent.proxy?.$
+      //   if (!parent) return
+      // }
     }
+
+    // if (parent) {
+    //   console.log(parent.type)
+    //   // 判断父组件的名称是否与指定名称相同
+    //   if (parent.type.name === name) {
+    //     return parent.exposed
+    //   }
+    // }
   }
 }
 
@@ -172,7 +178,6 @@ export function useParent(name: string, r?: Ref) {
  * 获取元素位置信息
  * @param selector 元素的选择器
  * @param all 是否查询全部
- * @param ins 调用组件实例
  */
 export function useElRect(selector: string, all: boolean = false) {
   return new Promise((resolve) => {

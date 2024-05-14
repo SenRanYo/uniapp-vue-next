@@ -1,39 +1,27 @@
 <template>
   <view class="view">
-    <view class="test"></view>
-    <zm-tabs :list="list" v-model="value" @change="onChange"></zm-tabs>
+    <view style="height: 300px"></view>
+    <zm-sticky :offset-top="100">
+      <view class="dom"></view>
+    </zm-sticky>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue"
-
-const list = ref([
-  { text: "优惠券", value: "coupon" },
-  { text: "电影卡", value: "card" },
-])
+import { onPageScroll } from "@dcloudio/uni-app"
 
 const value = ref("card")
 
-watch(
-  () => value.value,
-  (v) => {
-    console.log(v)
-  },
-)
-
-setTimeout(() => {
-  value.value = "coupon"
-}, 5000)
-
-function onChange(v) {
+onPageScroll((v) => {
   console.log(v)
-}
+})
 </script>
 
 <style lang="scss" scoped>
-.test {
-  width: 750rpx;
+.view {
+  height: 3000px;
+  flex-shrink: 0;
 }
 
 .dom {

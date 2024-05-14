@@ -84,9 +84,12 @@ importers:
       '@dcloudio/vite-plugin-uni':
         specifier: 3.0.0-alpha-4010520240507001
         version: 3.0.0-alpha-4010520240507001(postcss@8.4.38)(rollup@4.17.2)(vite@5.2.8(@types/node@20.12.8)(sass@1.76.0)(terser@5.31.0))(vue@3.4.26(typescript@4.9.5))
-      '@uni-helper/uni-ui-types':
+      '@uni-helper/uni-app-types':
         specifier: ^0.5.13
         version: 0.5.13(typescript@4.9.5)
+      '@uni-helper/uni-ui-types':
+        specifier: ^0.5.13
+        version: 0.5.13(@uni-helper/uni-app-types@0.5.13(typescript@4.9.5))(typescript@4.9.5)
       '@uni-helper/vite-plugin-uni-components':
         specifier: ^0.0.9
         version: 0.0.9(rollup@4.17.2)
@@ -1834,6 +1837,12 @@ packages:
 
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
+
+  '@uni-helper/uni-app-types@0.5.13':
+    resolution: {integrity: sha512-NIKHv9Zof7sxsznjH+LRB2VM8ncEyfpkwRVLm7u2N1X3e1RFWvABH+bttfu+d8FIP6JzksBNOQwsyZjDnLN0fw==}
+    engines: {node: '>=14.18'}
+    peerDependencies:
+      typescript: ^4.8.0 || ^5.0.0
 
   '@uni-helper/uni-env@0.0.3':
     resolution: {integrity: sha512-K6MEnmN7Dg+NnEkfUUhjaKc/rPVY7tcGdsVUKOlC1/z2E6H6zjSSTdJg8z+sVJtZ03Ff1G/MHz2PYDyAS6gjQQ==}
@@ -8734,6 +8743,12 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
+  '@uni-helper/uni-app-types@0.5.13(typescript@4.9.5)':
+    dependencies:
+      '@dcloudio/types': 3.4.8
+      typescript: 4.9.5
+      vue3: vue@3.4.26(typescript@4.9.5)
+
   '@uni-helper/uni-env@0.0.3': {}
 
   '@uni-helper/uni-env@0.1.1(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@6.21.0(eslint@8.57.0)(typescript@4.9.5))(eslint-plugin-import@2.29.1)(eslint@9.2.0))(typescript@4.9.5)':
@@ -8748,10 +8763,12 @@ snapshots:
       - typescript
       - vitest
 
-  '@uni-helper/uni-ui-types@0.5.13(typescript@4.9.5)':
+  '@uni-helper/uni-ui-types@0.5.13(@uni-helper/uni-app-types@0.5.13(typescript@4.9.5))(typescript@4.9.5)':
     dependencies:
       '@dcloudio/types': 3.4.8
       vue3: vue@3.4.26(typescript@4.9.5)
+    optionalDependencies:
+      '@uni-helper/uni-app-types': 0.5.13(typescript@4.9.5)
     transitivePeerDependencies:
       - typescript
 

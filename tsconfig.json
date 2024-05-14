@@ -12,7 +12,7 @@
     },
     "outDir": "dist",
     "lib": ["esnext", "dom"],
-    "types": ["./vite-env.d.ts", "@dcloudio/types"]
+    "types": ["./vite-env.d.ts", "@dcloudio/types", "@uni-helper/uni-app-types"]
   },
   "vueCompilerOptions": {
     "target": 3,

@@ -1,103 +1,80 @@
 <template>
-  <view :id="_uuid" class="zm-sticky" :style="[style]">
+  <view class="zm-sticky" :style="[style]">
     <slot></slot>
   </view>
 </template>
+<script setup lang="ts">
+import { Mitt } from "../utils/mitt"
+import { useStyle, useColor, useUnitToPx, useElRect, useParent } from "../hooks"
 
-<script>
-import hook from "@/mixins/hook"
-import weixin from "@/mixins/weixin"
-import { useStyle, unitToPx, useColor } from "@/utils/style"
-export default {
-  name: "zm-sticky",
-  mixins: [hook, weixin],
-  props: {
-    zIndex: {
-      type: [String, Number],
-      default: ""
-    },
-    offsetTop: {
-      type: [String, Number],
-      default: 0
-    },
-    background: {
-      type: String,
-      default: "transparent"
-    }
-  },
-  data() {
-    return {
-      rect: null,
-      isSticky: false,
-      navbarHeight: 0
-    }
-  },
-  computed: {
-    style() {
-      const style = {}
-      style.zIndex = this.zIndex
-      style.top = unitToPx(this.offsetTop) + this.navbarHeight + "px"
-      style.background = useColor(this.background)
-      return useStyle(style)
-    }
-  },
-  watch: {
-    isSticky: {
-      handler(val) {
-        this.$emit("change", val)
-      },
-      immediate: true
-    }
-  },
-  created() {
-    this.onEvents()
-  },
-  mounted() {
-    this.update()
-  },
-  methods: {
-    async update() {
-      await this.$nextTick()
-      this.updateSticky()
-      this.rect = await this.useRect(".zm-sticky__inner")
-      this.$emit("rect", this.rect)
-      this.$emit("height", this.rect.height)
-      if (this.mitt) {
-        this.mitt.emit("zm-view.children", this)
-        this.mitt.emit("zm-sticky.rect", this.rect)
-        this.mitt.emit("zm-sticky.height", this.rect.height)
-        this.mitt.emit("zm-sticky.instance", this)
-      }
-    },
-    onEvents() {
-      const { mitt } = this.useParent("zm-view")
-      if (mitt) {
-        this.mitt = mitt
-      }
-      // 监听navbar高度
-      this.mitt.on("zm-navbar.height", (height) => {
-        this.navbarHeight = height
-      })
+interface View {
+  mitt: Mitt
+}
 
-      uni.$on("onPageScroll", ({ scrollTop }) => {
-        this.$emit("scroll", scrollTop)
-        this.updateSticky()
-      })
-    },
-    updateSticky() {
-      this.useRect(".zm-sticky").then((rect) => {
-        this.isSticky = rect.top - this.navbarHeight <= unitToPx(this.offsetTop)
-      })
-    }
+defineOptions({ name: "zm-sticky" })
+const emits = defineEmits(["change"])
+const props = defineProps({
+  zIndex: { type: [String, Number], default: "" },
+  offsetTop: { type: [String, Number], default: 0 },
+  background: { type: String, default: "transparent" },
+})
+
+const rect = ref()
+const isSticky = ref(false)
+const navbarHeight = ref(0)
+const view: View = inject("zm-view")
+
+const style = computed(() => {
+  const style: any = {}
+  style.zIndex = props.zIndex
+  style.top = useUnitToPx(props.offsetTop) + navbarHeight.value + "px"
+  style.background = useColor(props.background)
+  return useStyle(style)
+})
+
+watch(
+  () => isSticky.value,
+  (val) => emits("change", val),
+  { immediate: true },
+)
+
+async function resize() {
+  await nextTick()
+  updateSticky()
+  rect.value = await useElRect(".zm-sticky__inner")
+}
+
+function event() {
+  view.mitt.on("scroll", (e) => {
+    console.log(e)
+  })
+}
+
+async function updateSticky() {
+  const rect: any = await useElRect(".zm-sticky")
+  if (rect) {
+    isSticky.value = rect.top <= useUnitToPx(props.offsetTop)
   }
 }
-</script>
 
+onMounted(() => {
+  event()
+  resize()
+})
+
+defineExpose({ resize })
+</script>
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss" scoped>
 .zm-sticky {
   left: 0;
   width: 100%;
   position: sticky;
+
   &__inner {
     left: 0;
     width: 100%;
