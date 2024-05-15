@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { viewEmits } from "./index"
 import { colorVars } from "../config"
-import { useMitt, useStyle } from "../hooks"
+import { useMitt, useStyle, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-view" })
 
@@ -19,7 +19,9 @@ const props = defineProps({
 })
 
 const mitt = useMitt()
+const rect = ref({})
 const scrollTop = ref(0)
+const instance = getCurrentInstance()
 
 const style = computed(() => {
   const style: any = {}
@@ -31,6 +33,11 @@ const style = computed(() => {
   style["--info-color"] = colorVars.info
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
+
+async function resize() {
+  await nextTick()
+  rect.value = await useElRect(".zm-view", instance)
+}
 
 function scroll(options: Page.PageScrollOption) {
   scrollTop.value = options.scrollTop
@@ -49,7 +56,6 @@ function reachBottom() {
 }
 
 function onTouchstart(e: TouchEvent) {
-  console.log(e)
   emits("touchstart", e)
   mitt.emit("touchstart", e)
 }
@@ -64,7 +70,8 @@ function onTouchmove(e: TouchEvent) {
   mitt.emit("touchmove", e)
 }
 
-provide("zm-view", { mitt })
+onBeforeMount(() => resize())
+provide("zm-view", { mitt, rect })
 defineExpose({ name: "zm-view", mitt, scroll, reachTop, reachBottom })
 </script>
 <script lang="ts">

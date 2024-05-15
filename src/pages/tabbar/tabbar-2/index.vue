@@ -2,7 +2,7 @@
   <zm-view ref="view">
     <view style="height: 3000px">
       <view style="height: 300px"></view>
-      <zm-sticky :offset-top="100">
+      <zm-sticky>
         <view class="dom"></view>
       </zm-sticky>
     </view>
@@ -22,8 +22,9 @@ const { view, mitt, onReachTop, onPageScroll } = useView()
 
 .dom {
   margin: 30rpx;
-  width: 100rpx;
-  height: 100rpx;
+  margin-top: 0;
+  width: 120rpx;
+  height: 120rpx;
   border-radius: 12rpx;
   background-color: red;
 }

@@ -4,25 +4,20 @@
   </view>
 </template>
 <script setup lang="ts">
-import { Mitt } from "../utils/mitt"
-import { useStyle, useColor, useUnitToPx, useElRect, useParent } from "../hooks"
-
-interface View {
-  mitt: Mitt
-}
+import { stickyEmits } from "./index"
+import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-sticky" })
-const emits = defineEmits(["change"])
+const emits = defineEmits(stickyEmits)
 const props = defineProps({
   zIndex: { type: [String, Number], default: "" },
   offsetTop: { type: [String, Number], default: 0 },
   background: { type: String, default: "transparent" },
 })
 
-const rect = ref()
+const view: any = inject("zm-view", null)
 const isSticky = ref(false)
 const navbarHeight = ref(0)
-const view: View = inject("zm-view")
 const instance = getCurrentInstance()
 
 const style = computed(() => {
@@ -39,21 +34,25 @@ watch(
   { immediate: true },
 )
 
+function event() {
+  view && view.mitt.on("scroll", () => updateSticky())
+}
+
 async function resize() {
   await nextTick()
+  // #ifdef WEB
+  const head: HTMLElement = document.querySelector(".uni-page-head")
+  navbarHeight.value = head.offsetHeight
+  // #endif
   updateSticky()
-  rect.value = await useElRect(".zm-sticky__inner", instance)
 }
 
-function event() {
-  view.mitt.on("scroll", (e) => {})
-}
-
-async function updateSticky() {
-  const rect: any = await useElRect(".zm-sticky", instance)
-  if (rect) {
-    isSticky.value = rect.top <= useUnitToPx(props.offsetTop)
-  }
+function updateSticky() {
+  useElRect(".zm-sticky", instance).then((rect: any) => {
+    if (rect) {
+      isSticky.value = rect.top <= useUnitToPx(props.offsetTop)
+    }
+  })
 }
 
 onMounted(() => {
