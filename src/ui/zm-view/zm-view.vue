@@ -4,11 +4,13 @@
   </view>
 </template>
 <script setup lang="ts">
+import { viewEmits } from "./index"
 import { colorVars } from "../config"
 import { useMitt, useStyle } from "../hooks"
 
 defineOptions({ name: "zm-view" })
-const emits = defineEmits(["scroll", "reachTop", "reachBottom", "touchstart", "touchmove", "touchend"])
+
+const emits = defineEmits(viewEmits)
 const props = defineProps({
   scroll: { type: Boolean, default: true },
   background: { type: String, default: "" },
@@ -30,10 +32,10 @@ const style = computed(() => {
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-function scroll(top: number) {
-  scrollTop.value = top
-  emits("scroll", top)
-  mitt.emit("scroll", top)
+function scroll(options: Page.PageScrollOption) {
+  scrollTop.value = options.scrollTop
+  emits("scroll", options)
+  mitt.emit("scroll", options)
 }
 
 function reachTop() {
@@ -46,17 +48,18 @@ function reachBottom() {
   mitt.emit("reachBottom")
 }
 
-function onTouchstart(e: Event) {
+function onTouchstart(e: TouchEvent) {
+  console.log(e)
   emits("touchstart", e)
   mitt.emit("touchstart", e)
 }
 
-function onTouchend(e: Event) {
+function onTouchend(e: TouchEvent) {
   emits("touchend", e)
   mitt.emit("touchend", e)
 }
 
-function onTouchmove(e: Event) {
+function onTouchmove(e: TouchEvent) {
   emits("touchmove", e)
   mitt.emit("touchmove", e)
 }

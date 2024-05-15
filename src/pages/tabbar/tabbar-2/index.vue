@@ -12,11 +12,6 @@
 <script setup lang="ts">
 import { useView } from "@/ui"
 const { view, mitt, onReachTop, onPageScroll } = useView()
-
-onReachTop(() => {
-  console.log(mitt)
-  console.log(view)
-})
 </script>
 
 <style lang="scss" scoped>

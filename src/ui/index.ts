@@ -1,9 +1,11 @@
-import { ref, getCurrentInstance } from "vue"
+import { Mitt } from "./utils/mitt"
+import { ViewExpose } from "./zm-view"
+import { getCurrentInstance } from "vue"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app"
 
 export function useView() {
-  const view: any = ref({})
-  const mitt: any = ref({})
+  let mitt = ref<Mitt>()
+  let view = ref<ViewExpose>()
   const instance: any = getCurrentInstance()
 
   let onReachTopHook: Function = () => {}
@@ -19,11 +21,13 @@ export function useView() {
 
   onReachBottom(() => view.value.reachBottom())
 
-  Object.keys(instance.refs).forEach((key) => {
-    if (instance.refs[key].name === "zm-view") {
-      view.value = instance.refs[key]
-      mitt.value = instance.refs[key].mitt
-    }
+  nextTick(() => {
+    Object.keys(instance.refs).forEach((key) => {
+      if (instance.refs[key].name === "zm-view") {
+        view.value = instance.refs[key]
+        mitt.value = instance.refs[key].mitt
+      }
+    })
   })
 
   const state = computed(() => {

@@ -46,9 +46,7 @@ async function resize() {
 }
 
 function event() {
-  view.mitt.on("scroll", (e) => {
-    console.log(e)
-  })
+  view.mitt.on("scroll", (e) => {})
 }
 
 async function updateSticky() {
