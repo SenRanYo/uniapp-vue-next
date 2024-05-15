@@ -42,7 +42,7 @@ export function useDecoUnit(value: any, unit: string = "rpx"): string {
  * @param {string} value 单位值
  * @return {string}
  */
-export function useUnitToPx(value: any): number {
+export function useUnitToPx(value: any): any {
   value = useUnit(value || "0")
   if (~value.indexOf("rpx")) {
     return isNumber(value.split("rpx")[0]) ? uni.upx2px(+value.split("rpx")[0]) : value

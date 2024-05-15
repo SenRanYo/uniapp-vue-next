@@ -1,144 +1,114 @@
 <template>
   <view class="zm-tabbar" :style="[style]">
-    <view class="zm-tabbar__inner safe-area-inset-bottom" :class="{ 'zm-tabbar__inner--border': border }" :style="[innerStyle]">
+    <view class="zm-tabbar__content safe-area-inset-bottom" :class="{ 'zm-tabbar__inner--border': border }" :style="[contentStyle]">
       <slot></slot>
     </view>
     <view class="zm-tabbar__placeholder" :style="[placeholderStyle]"></view>
   </view>
 </template>
 
-<script>
-import mixin from "../mixins"
-import { isFunction } from "../utils/check"
-import { useStyle, useColor, useUnitToPx } from "../utils/style"
+<script setup lang="ts">
+import { pick } from "lodash-es"
+import { tabbarEmits } from "./index"
+import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
+
+defineOptions({ name: "zm-tabbar" })
+
+const emits = defineEmits(tabbarEmits)
+const props = defineProps({
+  modelValue: { type: [String, Number], default: "" },
+  fixed: { type: Boolean, default: false },
+  border: { type: Boolean, default: true },
+  zIndex: { type: [String, Number], default: "" },
+  activeColor: { type: String, default: "" },
+  inactiveColor: { type: String, default: "" },
+  route: { type: Boolean, default: false },
+  height: { type: [String, Number], default: "100rpx" },
+  background: { type: String, default: "#ffffff" },
+  safeAreaInsetBottom: { type: Boolean, default: true },
+  customClass: { type: String, default: "" },
+  customStyle: { type: [String, Object], default: "" },
+})
+
+const view = inject<any>("zm-view", null)
+const rect = ref<UniApp.NodeInfo>(null)
+const innerHeight = ref(0)
+const isExistFooter = ref(false)
+const safeAreaBottomHeight = ref(17)
+const instance = getCurrentInstance()
+
+const modelValue = computed({
+  get() {
+    return props.modelValue
+  },
+  set(value) {
+    changeEvent(value)
+  },
+})
+
+const style = computed(() => {
+  const style: any = {}
+  if (isExistFooter.value) style.marginTop = 0
+  return useStyle(style)
+})
+
+const contentStyle = computed(() => {
+  return useStyle({
+    height: useUnitToPx(props.height) + safeAreaBottomHeight.value + "px",
+    background: useColor(props.background),
+    ...useStyle(props.customStyle),
+  })
+})
+
+const placeholderStyle = computed(() => {
+  return useStyle({
+    height: innerHeight.value + "px",
+  })
+})
+
+async function resize() {
+  await nextTick()
+  rect.value = await useElRect(".zm-tabbar__content", instance)
+}
+
+async function changeEvent(value: string | number) {
+  emits("update:modelValue", value)
+  await nextTick()
+  emits("change", value)
+}
+
+provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, changeEvent })
+onBeforeMount(() => {})
+onMounted(() => resize())
+</script>
+<script lang="ts">
 export default {
-  name: "zm-tabbar",
-  mixins: [mixin],
-  props: {
-    value: { type: [String, Number], default: "" },
-    fixed: { type: Boolean, default: false },
-    border: { type: Boolean, default: true },
-    zIndex: { type: [String, Number], default: "" },
-    activeColor: { type: String, default: "" },
-    inactiveColor: { type: String, default: "" },
-    route: { type: Boolean, default: false },
-    height: { type: [String, Number], default: "140rpx" },
-    background: { type: String, default: "#ffffff" },
-    safeAreaInsetBottom: { type: Boolean, default: true },
-    customStyle: { type: [Object, String], default: () => ({}) }
-  },
-  data() {
-    return {
-      mitt: null,
-      rect: null,
-      childrens: [],
-      innerHeight: 0,
-      isExistFooter: false,
-      safeAreaBottomHeight: 17
-    }
-  },
-  computed: {
-    style() {
-      const style = {}
-      if (this.isExistFooter) style.marginTop = 0
-      return useStyle(style)
-    },
-    innerStyle() {
-      return useStyle({
-        height: useUnitToPx(this.height) + this.safeAreaBottomHeight + "px",
-        background: useColor(this.background),
-        ...useStyle(this.customStyle)
-      })
-    },
-    placeholderStyle() {
-      return useStyle({
-        height: this.innerHeight + "px"
-      })
-    }
-  },
-  watch: {
-    $props: {
-      handler() {
-        this.updateChildrens()
-      },
-      deep: true
-    }
-  },
-  created() {
-    this.onEvents()
-  },
-  mounted() {
-    this.resize()
-  },
-  methods: {
-    async resize() {
-      await this.$nextTick()
-      this.rect = await this.useRect(".zm-tabbar__inner")
-      this.innerHeight = this.rect?.height
-      this.$emit("rect", this.rect)
-      this.$emit("height", this.rect.height)
-      if (this.mitt) {
-        this.mitt.emit("zm-view.children", this)
-        this.mitt.emit("zm-tabbar.rect", this.rect)
-        this.mitt.emit("zm-tabbar.height", this.rect.height)
-        this.mitt.emit("zm-tabbar.instance", this)
-      }
-    },
-    onEvents() {
-      const { mitt } = this.useParent("zm-view")
-      if (mitt) {
-        this.mitt = mitt
-
-        this.mitt.on("zm-tabbar.getHeight", async () => {
-          this.rect = await this.useRect(".zm-tabbar__inner")
-          if (this.rect) this.mitt.emit("zm-tabbar.height", this.rect.height)
-        })
-
-        this.mitt.on("zm-view.children:update", (list = []) => {
-          this.isExistFooter = list.some((item) => item.$options?.name === "zm-footer")
-        })
-      }
-    },
-    handleClickTabbar(tabbar) {
-      this.$emit("input", tabbar.routeName)
-    },
-    updateValue(value) {
-      this.$emit("input", value)
-      this.$emit("change", value)
-    },
-    // 更新所有子组件
-    updateChildrens() {
-      this.childrens.forEach((children) => {
-        if (isFunction(children.init)) children.init()
-      })
-    }
-  }
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>
-
 <style lang="scss" scoped>
 .zm-tabbar {
   z-index: 1000;
   position: relative;
-  &__inner {
+
+  &__content {
     left: 0;
     right: 0;
     bottom: 0;
     display: flex;
     position: fixed;
+
     &--border::after {
       position: absolute;
       box-sizing: border-box;
       content: " ";
       pointer-events: none;
-      top: -50%;
-      right: -50%;
-      bottom: -50%;
-      left: -50%;
+      inset: -50%;
       border: 1rpx solid #ebedf0;
       transform: scale(0.5);
     }
   }
+
   &__placeholder {
     box-sizing: content-box;
   }

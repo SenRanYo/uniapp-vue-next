@@ -1,17 +1,20 @@
 <template>
   <zm-view ref="view">
-    <view style="height: 3000px">
-      <view style="height: 300px"></view>
-      <zm-sticky>
-        <view class="dom"></view>
-      </zm-sticky>
-    </view>
+    <zm-tabbar v-model="tabbar">
+      <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
+      <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>
+      <zm-tabbar-item name="tabbar3">Tabbar-3</zm-tabbar-item>
+      <zm-tabbar-item name="tabbar4">Tabbar-4</zm-tabbar-item>
+      <zm-tabbar-item name="tabbar5">Tabbar-5</zm-tabbar-item>
+    </zm-tabbar>
   </zm-view>
 </template>
 
 <script setup lang="ts">
 import { useView } from "@/ui"
 const { view, mitt, onReachTop, onPageScroll } = useView()
+
+const tabbar = ref("tabbar1")
 </script>
 
 <style lang="scss" scoped>

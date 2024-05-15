@@ -1,5 +1,5 @@
 <template>
-  <view class="zm-tabbar-item" :class="{ 'zm-tabbar-item--active': tabbarValue === name }" @click="onClickTabbar">
+  <view class="zm-tabbar-item" :class="{ 'zm-tabbar-item--active': model === name }" @click="onClick">
     <view class="zm-tabbar-item__icon" :style="[iconStyle]">
       <view class="zm-tabbar-item__icon__absolute">
         <slot name="icon">
@@ -11,94 +11,67 @@
   </view>
 </template>
 
-<script>
-import mixins from "../mixins"
-import { encodeParams, debounce } from "../utils/utils"
-import { useStyle, useUnit, useColor } from "../utils/style"
-export default {
-  name: "zm-tabbar-item",
-  mixins: [mixins],
-  props: {
-    name: { type: [String, Number], default: "" },
-    icon: { type: String, default: "" },
-    iconSize: { type: [String, Number], default: "44rpx" },
-    iconWeight: { type: [String, Number], default: "" },
-    iconPrefix: { type: String, default: "" },
-    dot: { type: Boolean, default: false },
-    badge: { type: String, default: "" },
-    route: { type: String, default: "" },
-    routeParams: { type: Object, default: () => ({}) },
-    routeType: { type: String, default: "switchTab" }
+<script setup lang="ts">
+import { useStyle, useUnit, useColor } from "../hooks"
+import { encodeParams, debounce } from "../utils//utils"
+
+const props = defineProps({
+  name: { type: String, default: "" },
+  icon: { type: String, default: "" },
+  iconSize: { type: String, default: "24px" },
+  iconWeight: { type: String, default: "normal" },
+  iconPrefix: { type: String, default: "icon" },
+  iconStyle: { type: String, default: "" },
+  tabbarValue: { type: String, default: "" },
+})
+
+const tabbar = inject("zm-tabbar", null)
+const model = computed(() => tabbar.modelValue.value)
+
+watch(
+  () => tabbar,
+  (val) => {
+    console.log(val)
   },
-  data() {
-    return {
-      tabbar: {}
-    }
-  },
-  computed: {
-    tabbarValue() {
-      return this.tabbar.value
-    },
-    iconStyle() {
-      const style = {}
-      style.height = useUnit(this.iconSize)
-      style.fontSize = useUnit(this.iconSize)
-      if (this.tabbar.value === this.name) style.color = useColor(this.tabbar.activeColor)
-      else style.color = useColor(this.tabbar.inactiveColor)
-      return useStyle(style)
-    }
-  },
-  created() {},
-  mounted() {
-    this.init()
-  },
-  methods: {
-    init() {
-      this.tabbar = this.useParent("zm-tabbar")
-      if (this.tabbar) {
-        this.tabbar.updateChildrens(this)
-        this.tabbar = this.useParent("zm-tabbar")
-        this.index = this.tabbar.childrens.indexOf(this)
-      }
-    },
-    onClickTabbar() {
-      const routes = getCurrentPages()
-      const router = routes[routes.length - 1]
-      if (this.tabbar?.route) {
-        if (!this.route) {
-          console.error("zm-tabbar-item: route is required")
-          return
-        } else if (this.route == router.route) {
-          return
-        }
-        debounce(() => {
-          uni[this.routeType]({
-            url: `/${this.route}${encodeParams(this.routeParams)}`,
-            fail: (err) => {
-              throw err
-            }
-          })
-        }, 100)
-      } else {
-        this.tabbar.updateValue(this.name || this.index)
-      }
-    }
+)
+
+const iconStyle = computed(() => {
+  const style: any = {}
+  style.height = useUnit(props.iconSize)
+  style.fontSize = useUnit(props.iconSize)
+  // if (this.tabbar.value === this.name) style.color = useColor(this.tabbar.activeColor)
+  // else style.color = useColor(this.tabbar.inactiveColor)
+  return useStyle(style)
+})
+
+function resize() {}
+
+function onClick() {
+  if (tabbar) {
+    tabbar.changeEvent(props.name)
   }
 }
-</script>
 
+onMounted(() => resize())
+</script>
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss" scoped>
 .zm-tabbar-item {
   flex: 1;
   display: flex;
-  color: #999999;
+  color: #999;
   align-items: center;
   flex-direction: column;
   justify-content: center;
 
   &--active {
-    color: var(--theme-color);
+    color: var(--primary-color);
   }
+
   &__icon {
     height: 44rpx;
     display: flex;
@@ -106,6 +79,7 @@ export default {
     align-items: center;
     margin-bottom: 4rpx;
     justify-content: center;
+
     &__absolute {
       left: 50%;
       bottom: 0;
@@ -115,8 +89,8 @@ export default {
       transform: translateX(-50%);
     }
   }
+
   &__text {
-    display: flex;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

@@ -55,10 +55,8 @@ function updateSticky() {
   })
 }
 
-onMounted(() => {
-  event()
-  resize()
-})
+onBeforeMount(() => event())
+onMounted(() => resize())
 
 defineExpose({ resize })
 </script>
