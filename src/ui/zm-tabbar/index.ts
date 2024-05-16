@@ -8,6 +8,7 @@ export const tabbarEmits = {
 
 export type TabbarEmits = typeof tabbarEmits
 export type TabbarExpose = {
+  name: "zm-tabbar"
   resize: () => void
 }
 export type TabbarInstance = InstanceType<typeof Tabbar>
