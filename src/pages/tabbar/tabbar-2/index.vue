@@ -1,5 +1,6 @@
 <template>
   <zm-view ref="view">
+    <zm-safe-area-top @height="onEvent"></zm-safe-area-top>
     <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>
@@ -17,6 +18,10 @@ const { view, mitt, onReachTop, onPageScroll } = useView()
 const tabbar = ref("tabbar1")
 
 function onChange(val) {
+  console.log(val)
+}
+
+function onEvent(val) {
   console.log(val)
 }
 </script>

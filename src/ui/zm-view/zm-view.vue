@@ -1,5 +1,5 @@
 <template>
-  <view class="zm-view" :class="[customClass]" :style="[style]" @touchend="onTouchend" @touchmove="onTouchmove" @touchstart="onTouchstart">
+  <view class="zm-view" :class="[props.customClass]" :style="[style]" @touchend="onTouchend" @touchmove="onTouchmove" @touchstart="onTouchstart">
     <slot></slot>
   </view>
 </template>
