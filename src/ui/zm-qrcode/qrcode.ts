@@ -1,4 +1,5 @@
 /* eslint-disable no-redeclare */
+// @ts-nocheck
 let QRCode = {}
 ;(function () {
   /**
@@ -356,7 +357,7 @@ let QRCode = {}
           }
         }
       }
-    }
+    },
   }
   /**
    * 填充字段
@@ -378,7 +379,7 @@ let QRCode = {}
     PATTERN100: 4,
     PATTERN101: 5,
     PATTERN110: 6,
-    PATTERN111: 7
+    PATTERN111: 7,
   }
   //---------------------------------------------------------------------
   // 工具类
@@ -427,7 +428,7 @@ let QRCode = {}
       [6, 28, 54, 80, 106, 132, 158],
       [6, 32, 58, 84, 110, 136, 162],
       [6, 26, 54, 82, 110, 138, 166],
-      [6, 30, 58, 86, 114, 142, 170]
+      [6, 30, 58, 86, 114, 142, 170],
     ],
     G15: (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
     G18: (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
@@ -608,7 +609,7 @@ let QRCode = {}
       var ratio = Math.abs((100 * darkCount) / moduleCount / moduleCount - 50) / 5
       lostPoint += ratio * 10
       return lostPoint
-    }
+    },
   }
   //---------------------------------------------------------------------
   // QRMath使用的数学工具
@@ -636,7 +637,7 @@ let QRCode = {}
       return QRMath.EXP_TABLE[n]
     },
     EXP_TABLE: new Array(256),
-    LOG_TABLE: new Array(256)
+    LOG_TABLE: new Array(256),
   }
   for (var i = 0; i < 8; i++) {
     QRMath.EXP_TABLE[i] = 1 << i
@@ -715,7 +716,7 @@ let QRCode = {}
         }
       }
       return new QRPolynomial(num, 0)
-    }
+    },
   }
 
   //---------------------------------------------------------------------
@@ -967,7 +968,7 @@ let QRCode = {}
     [19, 148, 118, 6, 149, 119],
     [18, 75, 47, 31, 76, 48],
     [34, 54, 24, 34, 55, 25],
-    [20, 45, 15, 61, 46, 16]
+    [20, 45, 15, 61, 46, 16],
   ]
 
   /**
@@ -1023,7 +1024,7 @@ let QRCode = {}
         this.buffer[bufIndex] |= 0x80 >>> this.length % 8
       }
       this.length++
-    }
+    },
   }
 
   // xzedit
@@ -1048,12 +1049,12 @@ let QRCode = {}
       context: opt.context,
       usingComponents: opt.usingComponents,
       showLoading: opt.showLoading,
-      loadingText: opt.loadingText
+      loadingText: opt.loadingText,
     }
     if (typeof opt === "string") {
       // 只编码ASCII字符串
       opt = {
-        text: opt
+        text: opt,
       }
     }
     if (opt) {
@@ -1074,7 +1075,7 @@ let QRCode = {}
       qrcodeAlgObjCache.push({
         text: this.options.text,
         correctLevel: this.options.correctLevel,
-        obj: qrCodeAlg
+        obj: qrCodeAlg,
       })
     }
     /**
@@ -1103,7 +1104,7 @@ let QRCode = {}
       if (options.showLoading) {
         uni.showLoading({
           title: options.loadingText,
-          mask: true
+          mask: true,
         })
       }
       var ctx = uni.createCanvasContext(options.canvasId, options.context)
@@ -1122,7 +1123,7 @@ let QRCode = {}
             row: row,
             col: col,
             count: count,
-            options: options
+            options: options,
           })
           ctx.setFillStyle(qrCodeAlg.modules[row][col] ? foreground : options.background)
           ctx.fillRect(Math.round(col * tileW), Math.round(row * tileH), w, h)
@@ -1178,14 +1179,14 @@ let QRCode = {}
                     if (options.showLoading) {
                       uni.hideLoading()
                     }
-                  }
+                  },
                 },
-                options.context
+                options.context,
               )
             }, options.text.length + 100)
           })
         },
-        options.usingComponents ? 0 : 150
+        options.usingComponents ? 0 : 150,
       )
     }
     createCanvas(this.options)

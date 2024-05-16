@@ -5,7 +5,9 @@
       <zm-col :span="6">1</zm-col>
       <zm-col :span="6">2</zm-col>
       <zm-col :span="6">3</zm-col>
-      <zm-col>4</zm-col>
+      <zm-col :span="24">
+        <zm-qrcode value="123"></zm-qrcode>
+      </zm-col>
     </zm-row>
     <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
