@@ -13,46 +13,57 @@
 
 <script setup lang="ts">
 import { useStyle, useUnit, useColor } from "../hooks"
-import { encodeParams, debounce } from "../utils//utils"
+import { encodeParams, debounce } from "../utils/utils"
 
+defineOptions({ name: "zm-tabbar-item" })
 const props = defineProps({
-  name: { type: String, default: "" },
+  name: { type: [String, Number], default: "" },
   icon: { type: String, default: "" },
-  iconSize: { type: String, default: "24px" },
-  iconWeight: { type: String, default: "normal" },
-  iconPrefix: { type: String, default: "icon" },
-  iconStyle: { type: String, default: "" },
-  tabbarValue: { type: String, default: "" },
+  iconSize: { type: [String, Number], default: "44rpx" },
+  iconWeight: { type: [String, Number], default: "" },
+  iconPrefix: { type: String, default: "" },
+  route: { type: String, default: "" },
+  routeParams: { type: Object, default: () => ({}) },
+  routeType: { type: String, default: "switchTab" },
 })
 
 const tabbar = inject("zm-tabbar", null)
 const model = computed(() => tabbar.modelValue.value)
 
-watch(
-  () => tabbar,
-  (val) => {
-    console.log(val)
-  },
-)
-
 const iconStyle = computed(() => {
   const style: any = {}
   style.height = useUnit(props.iconSize)
   style.fontSize = useUnit(props.iconSize)
-  // if (this.tabbar.value === this.name) style.color = useColor(this.tabbar.activeColor)
-  // else style.color = useColor(this.tabbar.inactiveColor)
+  style.color = model.value === props.name ? useColor(tabbar.activeColor) : useColor(tabbar.inactiveColor)
   return useStyle(style)
 })
 
-function resize() {}
-
 function onClick() {
   if (tabbar) {
-    tabbar.changeEvent(props.name)
+    const pages = getCurrentPages()
+    const page = pages[pages.length - 1]
+    if (tabbar.route.value) {
+      if (!props.route) {
+        console.error("zm-tabbar-item: route is required")
+        return
+      } else if (props.route == page.route) {
+        return
+      }
+      debounce(() => {
+        uni[props.routeType]({
+          url: `/${props.route}${encodeParams(props.routeParams)}`,
+          fail: (err: any) => {
+            throw err
+          },
+        })
+      }, 100)
+    } else {
+      tabbar.changeEvent(props.name)
+    }
   }
 }
 
-onMounted(() => resize())
+defineExpose({ name: "zm-tabbar-item" })
 </script>
 <script lang="ts">
 export default {

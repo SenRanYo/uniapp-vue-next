@@ -1,6 +1,6 @@
 <template>
   <zm-view ref="view">
-    <zm-tabbar v-model="tabbar">
+    <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>
       <zm-tabbar-item name="tabbar3">Tabbar-3</zm-tabbar-item>
@@ -15,6 +15,10 @@ import { useView } from "@/ui"
 const { view, mitt, onReachTop, onPageScroll } = useView()
 
 const tabbar = ref("tabbar1")
+
+function onChange(val) {
+  console.log(val)
+}
 </script>
 
 <style lang="scss" scoped>

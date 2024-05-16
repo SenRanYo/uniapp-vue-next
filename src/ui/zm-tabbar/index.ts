@@ -7,5 +7,7 @@ export const tabbarEmits = {
 }
 
 export type TabbarEmits = typeof tabbarEmits
-export type TabbarExpose = {}
+export type TabbarExpose = {
+  resize: () => void
+}
 export type TabbarInstance = InstanceType<typeof Tabbar>

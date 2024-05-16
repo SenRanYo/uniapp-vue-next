@@ -13,7 +13,6 @@ import { tabbarEmits } from "./index"
 import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-tabbar" })
-
 const emits = defineEmits(tabbarEmits)
 const props = defineProps({
   modelValue: { type: [String, Number], default: "" },
@@ -30,9 +29,7 @@ const props = defineProps({
   customStyle: { type: [String, Object], default: "" },
 })
 
-const view = inject<any>("zm-view", null)
-const rect = ref<UniApp.NodeInfo>(null)
-const innerHeight = ref(0)
+const rect = ref<UniApp.NodeInfo>({})
 const isExistFooter = ref(false)
 const safeAreaBottomHeight = ref(17)
 const instance = getCurrentInstance()
@@ -61,9 +58,7 @@ const contentStyle = computed(() => {
 })
 
 const placeholderStyle = computed(() => {
-  return useStyle({
-    height: innerHeight.value + "px",
-  })
+  return useStyle({ height: rect.value?.height + "px" })
 })
 
 async function resize() {
@@ -77,9 +72,9 @@ async function changeEvent(value: string | number) {
   emits("change", value)
 }
 
-provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, changeEvent })
-onBeforeMount(() => {})
 onMounted(() => resize())
+provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, changeEvent })
+defineExpose({ name: "zm-tabbar", resize })
 </script>
 <script lang="ts">
 export default {
