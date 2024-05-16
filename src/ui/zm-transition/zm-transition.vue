@@ -1,5 +1,5 @@
 <template>
-  <view v-if="visible" class="zm-transition" :style="[style]" :animation="animationData" @click="onClick">
+  <view v-show="visible" class="zm-transition" :class="[props.customClass]" :style="[style]" :animation="animationData" @click="onClick">
     <slot></slot>
   </view>
 </template>
@@ -7,21 +7,23 @@
 <script setup lang="ts">
 import modes from "./modes"
 import { useStyle } from "../hooks/"
+import { transitionEmits } from "./index"
 import { isArray, isString } from "../utils/check"
 
-const emits = defineEmits(["open", "opened", "close", "closed", "click"])
+const emits = defineEmits(transitionEmits)
 const props = defineProps({
-  show: { type: Boolean, default: true },
   mode: { type: [String, Array, null], default: "fade" },
   zIndex: { type: [String, Number], default: "" },
   duration: { type: Number, default: 300 },
   penetrate: { type: Boolean, default: false },
-  timingFunction: { type: String, default: "ease" },
   enterDelay: { type: Number, default: 0 },
   leaveDelay: { type: Number, default: 0 },
+  timingFunction: { type: String, default: "ease" },
+  customClass: { type: String, default: "" },
   customStyle: { type: [String, Object], default: "" },
 })
 
+const model = defineModel("show", { default: false })
 const timer = ref()
 const styles = ref({})
 const config: any = ref({})
@@ -38,11 +40,16 @@ const style = computed(() => {
   return useStyle({ ...style, ...styles.value, ...useStyle(props.customStyle) })
 })
 
-watch(() => props, init, { deep: true })
 watch(
-  () => props.show,
-  (state) => {
-    if (state) open()
+  () => props,
+  () => init(),
+  { deep: true },
+)
+
+watch(
+  () => model.value,
+  (val) => {
+    if (val) open()
     else if (visible.value) {
       setTimeout(() => close(), props.leaveDelay)
     }
@@ -50,7 +57,12 @@ watch(
   { immediate: true },
 )
 
-onMounted(() => init())
+watch(
+  () => visible.value,
+  (val) => {
+    model.value = val
+  },
+)
 
 function init(cof: any = {}) {
   config.value = { delay: props.enterDelay, duration: props.duration, timingFunction: props.timingFunction, transformOrigin: "50% 50%", ...cof }
@@ -80,17 +92,18 @@ function step(params = {}, config = {}) {
 
 function open() {
   clearTimeout(timer.value)
-  visible.value = true
   initStyle("init")
+  visible.value = true
 
-  const next = () => {
+  nextTick(() => {
     timer.value = setTimeout(() => {
       if (noCustomStep.value) initTransition("open").step()
-      setTimeout(() => emits("open"), props.enterDelay)
-      run(() => emits("opened"))
+      setTimeout(() => {
+        emits("open")
+        run(() => emits("opened"))
+      }, props.enterDelay)
     }, 20)
-  }
-  nextTick(next)
+  })
 }
 
 function close() {
@@ -147,12 +160,16 @@ function initTransition(type: string) {
   } else {
     console.error("mode 格式错误 不存在")
   }
+
   return animation.value
 }
 
 function onClick() {
   emits("click")
 }
+
+onMounted(() => init())
+defineExpose({ name: "zm-transition", open, close, step })
 </script>
 <script lang="ts">
 export default {

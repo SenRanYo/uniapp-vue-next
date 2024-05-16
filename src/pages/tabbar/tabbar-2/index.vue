@@ -6,9 +6,10 @@
       <zm-col :span="6">2</zm-col>
       <zm-col :span="6">3</zm-col>
       <zm-col :span="24">
-        <zm-qrcode value="123"></zm-qrcode>
+        <button @click="show = true">测试</button>
       </zm-col>
     </zm-row>
+    <zm-overlay v-model:show="show" ref="overlay" @click="onClickOverlay">123</zm-overlay>
     <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>
@@ -24,14 +25,15 @@
 import { useView } from "@/ui"
 const { view, mitt, onReachTop, onPageScroll } = useView()
 
+const show = ref(false)
 const tabbar = ref("tabbar1")
 
-function onChange(val) {
-  console.log(val)
-}
+function onChange(val) {}
 
-function onEvent(val) {
-  console.log(val)
+function onEvent(val) {}
+
+function onClickOverlay() {
+  show.value = !show.value
 }
 </script>
 

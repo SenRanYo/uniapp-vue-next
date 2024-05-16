@@ -1,17 +1,15 @@
 <template>
-  <view class="zm-overlay" :style="[overlayStyle]" @touchmove.prevent.stop="noop">
+  <view class="zm-overlay" :class="[props.customClass]" :style="[style]" @touchmove.prevent.stop="noop">
     <zm-transition
       mode="fade"
-      :show="show"
-      :duration="duration"
-      :timing-function="timingFunction"
+      v-model:show="visible"
+      :duration="props.duration"
       :custom-style="transitionStyle"
-      :custom-class="customClass"
-      @open="onEmit('open')"
-      @close="onEmit('close')"
-      @opened="onEmit('opened')"
-      @closed="onEmit('closed')"
-      @click="onEmit('click')"
+      @open="onOpen"
+      @close="onClose"
+      @opened="onOpened"
+      @closed="onClosed"
+      @click="onClick"
       @touchmove.prevent.stop="noop"
     >
       <slot></slot>
@@ -19,80 +17,93 @@
   </view>
 </template>
 
-<script>
-import hook from "@/mixins/hook"
-import weixin from "@/mixins/weixin"
-import { useStyle } from "@/utils/style"
+<script setup lang="ts">
+import { useStyle } from "../hooks"
+import { overlayEmits } from "./index"
+
+defineOptions({ name: "zm-overlay" })
+
+const emits = defineEmits(overlayEmits)
+const props = defineProps({
+  zIndex: { type: [Number, String], default: "" },
+  opacity: { type: [Number, String], default: "0.7" },
+  duration: { type: [Number, String], default: 300 },
+  customClass: { type: String, default: "" },
+  customStyle: { type: [Object, String], default: "" },
+})
+
+const model = defineModel("show", { default: false })
+const visible = ref(false)
+
+const style = computed(() => {
+  return useStyle({ zIndex: props.zIndex })
+})
+
+const transitionStyle = computed(() => {
+  const style: any = {}
+  style.top = 0
+  style.left = 0
+  style.width = "100%"
+  style.height = "100%"
+  style.position = "fixed"
+  style.background = `rgba(0, 0, 0, ${props.opacity})`
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
+})
+
+watch(
+  () => model.value,
+  (val) => {
+    val ? open() : close()
+  },
+  { immediate: true },
+)
+
+watch(
+  () => visible.value,
+  (val) => {
+    model.value = val
+  },
+)
+
+function open() {
+  visible.value = true
+}
+
+function close() {
+  visible.value = false
+}
+
+function onOpen() {
+  emits("open")
+}
+
+function onOpened() {
+  emits("opened")
+}
+
+function onClose() {
+  emits("close")
+}
+
+function onClosed() {
+  emits("closed")
+}
+
+function onClick(event: MouseEvent) {
+  emits("click", event)
+}
+
+function noop() {
+  return false
+}
+
+defineExpose({ name: "zm-overlay", open, close })
+</script>
+<script lang="ts">
 export default {
-  name: "zm-overlay",
-  mixins: [hook, weixin],
-  props: {
-    // 是否显示
-    show: {
-      type: Boolean,
-      default: false
-    },
-    // 元素层级
-    zIndex: {
-      type: [Number, String],
-      default: ""
-    },
-    // 透明度
-    opacity: {
-      type: [Number, String],
-      default: "0.7"
-    },
-    // 动画时长，单位毫秒
-    duration: {
-      type: [Number, String],
-      default: 300
-    },
-    // 自定义类名
-    customClass: {
-      type: String,
-      default: ""
-    },
-    // 自定义样式
-    customStyle: {
-      type: [Object, String],
-      default: () => ({})
-    }
-  },
-  data() {
-    return {
-      timingFunction: "ease-out"
-    }
-  },
-  computed: {
-    overlayStyle() {
-      const style = {}
-      style.zIndex = this.zIndex
-      return useStyle(style)
-    },
-    transitionStyle() {
-      const style = {}
-      style.top = 0
-      style.left = 0
-      style.width = "100%"
-      style.height = "100%"
-      style.position = "fixed"
-      style.background = `rgba(0, 0, 0, ${this.opacity})`
-      return useStyle({ ...style, ...useStyle(this.customStyle) })
-    }
-  },
-  methods: {
-    onEmit(name) {
-      this.$emit(name)
-      if (name === "opened") this.timingFunction = "ease-in"
-      if (name === "closed") this.timingFunction = "ease-out"
-    },
-    noop() {
-      return false
-    }
-  }
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>
-
 <style lang="scss" scoped>
 .zm-overlay {
   z-index: 14000;

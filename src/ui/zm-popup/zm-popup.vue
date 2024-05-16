@@ -4,7 +4,7 @@
     <zm-transition
       :show="visible"
       :duration="duration"
-      :mode="_mode"
+      :mode="mode"
       :timing-function="timingFunction"
       :custom-style="bodyTransitionStyle"
       @click="onClickBodyTransition"
@@ -31,274 +31,201 @@
   </view>
 </template>
 
-<script>
-import hook from "@/mixins/hook"
-import weixin from "@/mixins/weixin"
-import { useStyle, useColor, useUnit } from "@/utils/style"
-export default {
-  name: "zm-popup",
-  mixins: [hook, weixin],
-  props: {
-    // 是否显示
-    show: {
-      type: Boolean
-    },
-    // 模式
-    mode: {
-      type: String,
-      default: "bottom",
-      validator: (v) => ["top", "bottom", "left", "right", "center"].includes(v)
-    },
-    // 宽度
-    width: {
-      type: [Number, String],
-      default: ""
-    },
-    // 最大宽度
-    maxWidth: {
-      type: [Number, String],
-      default: "100vw"
-    },
-    // 高度
-    height: {
-      type: [Number, String],
-      default: ""
-    },
-    // 最大高度
-    maxHeight: {
-      type: [Number, String],
-      default: "70vh"
-    },
-    // 是否显示覆盖层
-    overlay: {
-      type: Boolean,
-      default: true
-    },
-    // 持续时间
-    duration: {
-      type: [Number, String],
-      default: 300
-    },
-    // z-index值
-    zIndex: {
-      type: [Number, String],
-      default: ""
-    },
-    // 是否显示关闭图标
-    closeable: {
-      type: Boolean,
-      default: false
-    },
-    // 关闭图标
-    closeIcon: {
-      type: String,
-      default: "cross"
-    },
-    // 关闭图标位置
-    closeIconPosition: {
-      type: String,
-      default: "",
-      validator: (v) => ["", "top-left", "top-right", "bottom-left", "bottom-right"].includes(v)
-    },
-    // 背景
-    background: {
-      type: [String, null],
-      default: "#ffffff"
-    },
-    // 圆角值
-    borderRadius: {
-      type: [Number, String],
-      default: "16rpx"
-    },
-    // 是否在点击覆盖层时关闭
-    closeOnClickOverlay: {
-      type: Boolean,
-      default: true
-    },
-    // 安全区域插入顶部
-    safeAreaInsetTop: {
-      type: Boolean
-    },
-    // 安全区域插入底部
-    safeAreaInsetBottom: {
-      type: Boolean,
-      default: true
-    },
-    // 覆盖层样式
-    overlayStyle: {
-      type: [Object, String],
-      default: ""
-    },
-    // 自定义类名
-    customClass: {
-      type: String,
-      default: ""
-    },
-    // 自定义样式
-    customStyle: {
-      type: [Object, String],
-      default: ""
+<script setup lang="ts">
+import { popupEmits } from "./index"
+import { useStyle, useColor, useUnit } from "../hooks"
+
+defineOptions({ name: "zm-view" })
+
+const emits = defineEmits(popupEmits)
+const props = defineProps({
+  mode: { type: String, default: "bottom", validator: (v: string) => ["top", "bottom", "left", "right", "center"].includes(v) },
+  width: { type: [Number, String], default: "" },
+  maxWidth: { type: [Number, String], default: "100vw" },
+  height: { type: [Number, String], default: "" },
+  maxHeight: { type: [Number, String], default: "70vh" },
+  overlay: { type: Boolean, default: true },
+  duration: { type: [Number, String], default: 300 },
+  zIndex: { type: [Number, String], default: "" },
+  closeable: { type: Boolean, default: false },
+  closeIcon: { type: String, default: "cross" },
+  closeIconPosition: { type: String, default: "", validator: (v: string) => ["", "top-left", "top-right", "bottom-left", "bottom-right"].includes(v) },
+  background: { type: [String, null], default: "#ffffff" },
+  borderRadius: { type: [Number, String], default: "16rpx" },
+  closeOnClickOverlay: { type: Boolean, default: true },
+  safeAreaInsetTop: { type: Boolean },
+  safeAreaInsetBottom: { type: Boolean, default: true },
+  overlayStyle: { type: [Object, String], default: "" },
+  customClass: { type: String, default: "" },
+  customStyle: { type: [Object, String], default: "" },
+})
+
+const model = defineModel("show", { default: false })
+const action = ref("show")
+const visible = ref(false)
+const timingFunction = ref("ease-out")
+
+const mode = computed(() => {
+  const modes = { top: "slide-bottom", left: "slide-left", right: "slide-right", bottom: "slide-top", center: "fade-zoom" }
+  return modes[props.mode]
+})
+
+const style = computed(() => {
+  return useStyle({ zIndex: props.zIndex })
+})
+
+const bodyTransitionStyle = computed(() => {
+  const style: any = {}
+  const modes = {
+    top: { left: 0, right: 0, top: 0 },
+    left: { top: 0, left: 0, bottom: 0 },
+    right: { top: 0, right: 0, bottom: 0 },
+    bottom: { bottom: 0, left: 0, right: 0 },
+    center: { top: 0, left: 0, right: 0, bottom: 0, alignItems: "center", justifyContent: "center" },
+  }
+  style.display = "flex"
+  style.position = "fixed"
+  return useStyle({ ...style, ...modes[props.mode] })
+})
+
+const closeStyle = computed(() => {
+  const modes = {
+    top: { bottom: "24rpx", right: "24rpx" },
+    left: { top: "24rpx", right: "24rpx" },
+    right: { top: "24rpx", left: "24rpx" },
+    bottom: { top: "24rpx", right: "24rpx" },
+    center: { top: "24rpx", right: "24rpx" },
+  }
+  const positions = {
+    "top-left": { top: "24rpx", left: "24rpx" },
+    "top-right": { top: "24rpx", right: "24rpx" },
+    "bottom-left": { bottom: "24rpx", left: "24rpx" },
+    "bottom-right": { bottom: "24rpx", right: "24rpx" },
+  }
+  return useStyle(props.closeIconPosition ? positions[props.closeIconPosition] : modes[props.mode || "top"])
+})
+
+const bodyStyle = computed(() => {
+  const style: any = {}
+  const radius = useUnit(props.borderRadius)
+  const sizes = { top: { width: "100%" }, left: { height: "100%" }, right: { height: "100%" }, bottom: { width: "100%" }, center: {} }
+  if (radius) {
+    const rects = {
+      top: `0 0 ${radius} ${radius}`,
+      left: `0 ${radius} ${radius} 0`,
+      right: `${radius} 0 0 ${radius}`,
+      bottom: `${radius} ${radius} 0 0`,
+      center: radius,
     }
+    style.borderRadius = rects[props.mode]
+  }
+  style.background = useColor(props.background)
+  return useStyle({ ...style, ...sizes[props.mode], ...useStyle(props.customStyle) })
+})
+
+const scrollViewStyle = computed(() => {
+  return useStyle({
+    width: useUnit(props.width),
+    height: useUnit(props.height),
+    maxWidth: useUnit(props.maxWidth),
+    maxHeight: useUnit(props.maxHeight),
+  })
+})
+
+watch(
+  () => model.value,
+  (val) => {
+    if (val) open()
+    else close("show")
   },
-  data() {
-    return {
-      action: "show",
-      visible: false,
-      timingFunction: "ease-out"
-    }
+  { immediate: true },
+)
+
+watch(
+  () => visible.value,
+  (val) => {
+    model.value = val
   },
-  computed: {
-    // 弹出方向
-    _mode() {
-      const modes = { top: "slide-bottom", left: "slide-left", right: "slide-right", bottom: "slide-top", center: "fade-zoom" }
-      return modes[this.mode]
-    },
-    // 容器样式
-    style() {
-      return useStyle({
-        zIndex: this.zIndex
-      })
-    },
-    // body过渡样式
-    bodyTransitionStyle() {
-      const style = {}
-      const modes = {
-        top: { left: 0, right: 0, top: 0 },
-        left: { top: 0, left: 0, bottom: 0 },
-        right: { top: 0, right: 0, bottom: 0 },
-        bottom: { bottom: 0, left: 0, right: 0 },
-        center: { top: 0, left: 0, right: 0, bottom: 0, alignItems: "center", justifyContent: "center" }
-      }
-      style.display = "flex"
-      style.position = "fixed"
-      return useStyle({ ...style, ...modes[this.mode] })
-    },
-    // 关闭按钮样式
-    closeStyle() {
-      const modes = {
-        top: { bottom: "24rpx", right: "24rpx" },
-        left: { top: "24rpx", right: "24rpx" },
-        right: { top: "24rpx", left: "24rpx" },
-        bottom: { top: "24rpx", right: "24rpx" },
-        center: { top: "24rpx", right: "24rpx" }
-      }
-      const positions = {
-        "top-left": { top: "24rpx", left: "24rpx" },
-        "top-right": { top: "24rpx", right: "24rpx" },
-        "bottom-left": { bottom: "24rpx", left: "24rpx" },
-        "bottom-right": { bottom: "24rpx", right: "24rpx" }
-      }
-      return useStyle(this.closeIconPosition ? positions[this.closeIconPosition] : modes[this.mode || "top"])
-    },
-    // body样式
-    bodyStyle() {
-      const style = {}
-      const radius = useUnit(this.borderRadius)
-      const sizes = { top: { width: "100%" }, left: { height: "100%" }, right: { height: "100%" }, bottom: { width: "100%" }, center: {} }
-      if (radius) {
-        const rects = {
-          top: `0 0 ${radius} ${radius}`,
-          left: `0 ${radius} ${radius} 0`,
-          right: `${radius} 0 0 ${radius}`,
-          bottom: `${radius} ${radius} 0 0`,
-          center: radius
-        }
-        style.borderRadius = rects[this.mode]
-      }
-      style.background = useColor(this.background)
-      return useStyle({ ...style, ...sizes[this.mode], ...useStyle(this.customStyle) })
-    },
-    // scrollView样式
-    scrollViewStyle() {
-      return useStyle({
-        width: useUnit(this.width),
-        height: useUnit(this.height),
-        maxWidth: useUnit(this.maxWidth),
-        maxHeight: useUnit(this.maxHeight)
-      })
-    }
-  },
-  watch: {
-    show: {
-      handler(v) {
-        if (v) this.open()
-        else this.close("show")
-      },
-      immediate: true
-    },
-    visible: {
-      handler(v) {
-        this.$emit("update:show", v)
-      }
-    }
-  },
-  created() {},
-  mounted() {},
-  methods: {
-    open() {
-      if (this.visible) return
-      this.timingFunction = "ease-out"
-      this.visible = true
-    },
-    close(action = "show") {
-      if (this.visible) {
-        const _close = () => {
-          this.timingFunction = "ease-in"
-          this.action = action
-          this.visible = false
-        }
-        _close()
-      }
-    },
-    onOpen() {
-      this.$emit("open")
-    },
-    onOpened() {
-      this.$emit("opened")
-    },
-    onClose() {
-      this.$emit("close", this.action)
-    },
-    onClosed() {
-      this.$emit("closed", this.action)
-    },
-    onClickClose(event) {
-      this.close("close")
-      this.$emit("click-close", event)
-    },
-    onClickBodyTransition(event) {
-      if (this.mode === "center") {
-        this.onClickOverlay(event)
-      }
-    },
-    onClickBody(event) {
-      this.$emit("click", event)
-    },
-    onClickOverlay(event) {
-      if (this.closeOnClickOverlay) {
-        this.close("overlay")
-        this.$emit("click-overlay", event)
-      }
-    },
-    noop() {
-      return false
-    }
+)
+
+function open() {
+  if (visible.value) return
+  timingFunction.value = "ease-out"
+  visible.value = true
+}
+
+function close(a = "show") {
+  if (this.visible) {
+    timingFunction.value = "ease-in"
+    action.value = a
+    visible.value = false
   }
 }
-</script>
 
+function onOpen() {
+  this.$emit("open")
+}
+
+function onOpened() {
+  this.$emit("opened")
+}
+
+function onClose() {
+  this.$emit("close", this.action)
+}
+
+function onClosed() {
+  this.$emit("closed", this.action)
+}
+
+function onClickClose(event) {
+  this.close("close")
+  this.$emit("click-close", event)
+}
+
+function onClickBodyTransition(event) {
+  if (this.mode === "center") {
+    this.onClickOverlay(event)
+  }
+}
+
+function onClickBody(event) {
+  this.$emit("click", event)
+}
+
+function onClickOverlay(event) {
+  if (this.closeOnClickOverlay) {
+    this.close("overlay")
+    this.$emit("click-overlay", event)
+  }
+}
+
+function noop() {
+  return false
+}
+
+defineExpose({ name: "zm-popup", open, close })
+</script>
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss" scoped>
 .zm-popup {
   z-index: 14000;
   position: relative;
+
   &__close {
     z-index: 1;
     position: absolute;
   }
+
   &__body {
     display: flex;
     position: relative;
     flex-direction: column;
+
     &__content {
       overflow: hidden;
     }
