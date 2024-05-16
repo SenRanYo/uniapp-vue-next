@@ -1,118 +1,70 @@
 <template>
-  <view class="zm-row" :style="[wrapStyle]"><slot></slot></view>
+  <view class="zm-row" :style="[style]"><slot></slot></view>
 </template>
 
-<script>
-import mixins from "../mixins"
-import { isFunction } from "../utils/check"
-import { useStyle, useUnitToPx } from "../utils/style"
-export default {
-  name: "zm-row",
-  mixins: [mixins],
-  props: {
-    gap: {
-      type: [String, Number],
-      default: ""
-    },
-    // 列间隔
-    colGap: {
-      type: [String, Number],
-      default: ""
-    },
-    // 行间隔
-    rowGap: {
-      type: [String, Number],
-      default: ""
-    },
-    // 水平排列方式
-    justify: {
-      type: String,
-      default: ""
-    },
-    // 垂直排列方式
-    align: {
-      type: String,
-      default: ""
-    },
-    // 自定义类名
-    customClass: {
-      type: [String, Array],
-      default: ""
-    },
-    // 自定义样式
-    customStyle: {
-      type: [Object, String],
-      default: ""
-    }
-  },
-  data() {
-    return {
-      width: 0,
-      childrens: []
-    }
-  },
-  computed: {
-    wrapStyle() {
-      let style = {}
-      style.margin = `-${useUnitToPx(this.gap || this.rowGap) / 2}px -${useUnitToPx(this.gap || this.colGap) / 2}px`
-      switch (this.justify) {
-        case "start":
-        case "end":
-          style.justifyContent = `flex-${this.justify}`
-          break
-        case "around":
-        case "between":
-          style.justifyContent = `space-${this.justify}`
-          break
-        default:
-          style.justifyContent = this.justify
-          break
-      }
-      switch (this.align) {
-        case "start":
-        case "end":
-          style.alignItems = `flex-${this.align}`
-          break
-        default:
-          style.alignItems = this.align
-          break
-      }
-      return useStyle({ ...style, ...useStyle(this.customStyle) })
-    }
-  },
-  watch: {
-    $props: {
-      handler() {
-        this.updateChildrens()
-      },
-      deep: true
-    }
-  },
-  mounted() {
-    this.init()
-  },
-  methods: {
-    async init() {
-      await this.$nextTick()
-      const { width } = await this.useRect(".zm-row")
-      this.width = width
-    },
-    // 设置子组件
-    setChildren(instance) {
-      const index = this.childrens.findIndex((item) => item === instance)
-      index >= 0 ? this.childrens.splice(index, 1, instance) : this.childrens.push(instance)
-    },
-    // 更新所有子组件
-    updateChildrens() {
-      this.childrens.forEach((children) => {
-        if (isFunction(children.update)) children.update()
-      })
-    }
+<script setup lang="ts">
+import { pick } from "lodash-es"
+import { useStyle, useUnitToPx, useElRect } from "../hooks"
+
+defineOptions({ name: "zm-row" })
+
+const props = defineProps({
+  gap: { type: [String, Number], default: "" },
+  colGap: { type: [String, Number], default: "" },
+  rowGap: { type: [String, Number], default: "" },
+  align: { type: String, default: "" },
+  justify: { type: String, default: "" },
+  customClass: { type: String, default: "" },
+  customStyle: { type: [String, Object], default: "" },
+})
+
+const rect = ref<UniApp.NodeInfo>({})
+const instance = getCurrentInstance()
+
+const style = computed(() => {
+  const style: any = {}
+  style.margin = `-${useUnitToPx(props.gap || props.rowGap) / 2}px -${useUnitToPx(props.gap || props.colGap) / 2}px`
+  switch (props.justify) {
+    case "start":
+    case "end":
+      style.justifyContent = `flex-${props.justify}`
+      break
+    case "around":
+    case "between":
+      style.justifyContent = `space-${props.justify}`
+      break
+    default:
+      style.justifyContent = props.justify
+      break
   }
+  switch (props.align) {
+    case "start":
+    case "end":
+      style.alignItems = `flex-${props.align}`
+      break
+    default:
+      style.alignItems = props.align
+      break
+  }
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
+})
+
+function resize() {
+  nextTick(async () => {
+    rect.value = await useElRect(".zm-row", instance)
+  })
+}
+
+onMounted(() => resize())
+provide("zm-row", { ...pick(toRefs(props), ["gap", "colGap", "rowGap"]) })
+defineExpose({ name: "zm-row", resize })
+</script>
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>
-
-<style lang="scss" scoped>
+<style lang="scss">
 .zm-row {
   display: flex;
   flex-wrap: wrap;
