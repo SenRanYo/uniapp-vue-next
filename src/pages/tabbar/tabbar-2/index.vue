@@ -1,6 +1,6 @@
 <template>
   <zm-view ref="view">
-    <zm-safe-area-top @height="onEvent"></zm-safe-area-top>
+    <zm-safe-area-top></zm-safe-area-top>
     <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>
@@ -8,6 +8,7 @@
       <zm-tabbar-item name="tabbar4">Tabbar-4</zm-tabbar-item>
       <zm-tabbar-item name="tabbar5">Tabbar-5</zm-tabbar-item>
     </zm-tabbar>
+    <zm-safe-area-bottom @height="onEvent"></zm-safe-area-bottom>
   </zm-view>
 </template>
 
