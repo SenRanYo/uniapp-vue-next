@@ -19,37 +19,12 @@
 </template>
 
 <script setup lang="ts">
+import { tabsProps, tabsEmits } from "./index"
 import { useStyle, useUnit, useColor, useElRect } from "../hooks"
 
-const emits = defineEmits(["change", "update:modelValue"])
-const props = defineProps({
-  modelValue: { type: [String, Number], default: "" },
-  list: { type: Array, default: () => [] },
-  height: { type: [String, Number], default: "" },
-  sticky: { type: Boolean, default: false },
-  scrollable: { type: Boolean, default: false },
-  activeSize: { type: [String, Number], default: "" },
-  activeColor: { type: String, default: "" },
-  activeWeight: { type: [String, Number], default: "" },
-  inactiveSize: { type: [String, Number], default: "" },
-  inactiveColor: { type: String, default: "" },
-  inactiveWeight: { type: [String, Number], default: "" },
-  lineColor: { type: String, default: "" },
-  lineWidth: { type: [String, Number], default: "" },
-  lineHeight: { type: [String, Number], default: "" },
-  lineRadius: { type: [String, Number], default: "" },
-  tabMaxWidth: { type: [String, Number], default: "" },
-  background: { type: String, default: "" },
-  duration: { type: [String, Number], default: "" },
-  offsetTop: { type: [String, Number], default: "0" },
-  borderBottom: { type: Boolean, default: false },
-  zIndex: { type: [String, Number], default: "" },
-  textKey: { type: String, default: "text" },
-  valueKey: { type: String, default: "value" },
-  disabledKey: { type: String, default: "disabled" },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [Object, String], default: "" },
-})
+defineOptions({ name: "zm-tabs" })
+const emits = defineEmits(tabsEmits)
+const props = defineProps(tabsProps)
 
 const init = ref(false)
 const index = ref(0)
@@ -57,6 +32,7 @@ const tabsRect: any = ref([])
 const lineRect: any = ref({})
 const scrollRect: any = ref({})
 const scrollLeft = ref(0)
+const instance = getCurrentInstance()
 
 const wrapClass = computed(() => {
   const list = []
@@ -128,9 +104,9 @@ watch(() => index.value, onIndexChange)
 
 async function resize() {
   await nextTick()
-  tabsRect.value = await useElRect(".zm-tabs__tab", true)
-  lineRect.value = await useElRect(".zm-tabs__line")
-  scrollRect.value = await useElRect(".zm-tabs__scroll")
+  tabsRect.value = await useElRect(".zm-tabs__tab", instance)
+  lineRect.value = await useElRect(".zm-tabs__line", instance)
+  scrollRect.value = await useElRect(".zm-tabs__scroll", instance)
   init.value = true
 }
 
@@ -146,11 +122,11 @@ function onValueChange(val: number) {
 }
 
 function onIndexChange() {
-  emits("change", props.list[index.value])
+  emits("change", props.list[index.value] as object)
   emits("update:modelValue", props.list[index.value][props.valueKey])
 }
 
-defineExpose({ resize })
+defineExpose({ name: "zm-tabs", resize })
 </script>
 <script lang="ts">
 export default {
