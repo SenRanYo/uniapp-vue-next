@@ -4,18 +4,14 @@
   </view>
 </template>
 <script setup lang="ts">
-import { stickyEmits } from "./index"
+import { stickyEmits, stickyProps } from "./index"
 import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-sticky" })
 const emits = defineEmits(stickyEmits)
-const props = defineProps({
-  zIndex: { type: [String, Number], default: "" },
-  offsetTop: { type: [String, Number], default: 0 },
-  background: { type: String, default: "transparent" },
-})
+const props = defineProps(stickyProps)
 
-const view: any = inject("zm-view", null)
+const view = inject<any>("zm-view", null)
 const isSticky = ref(false)
 const navbarHeight = ref(0)
 const instance = getCurrentInstance()
@@ -57,8 +53,7 @@ function updateSticky() {
 
 onBeforeMount(() => event())
 onMounted(() => resize())
-
-defineExpose({ resize })
+defineExpose({ name: "zm-sticky", resize })
 </script>
 <script lang="ts">
 export default {
