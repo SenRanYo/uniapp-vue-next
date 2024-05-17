@@ -15,27 +15,13 @@
 <script setup lang="ts">
 import QRCode from "./qrcode"
 import { uuid } from "../utils/utils"
-import { qrcodeEmits } from "./index"
+import { qrcodeEmits, qrcodeProps } from "./index"
 import { useStyle, useUnit, useUnitToPx } from "../utils/style"
 
 defineOptions({ name: "zm-qrcode" })
 
 const emits = defineEmits(qrcodeEmits)
-const props = defineProps({
-  show: { type: Boolean, default: true },
-  size: { type: Number, default: 200 },
-  value: { type: [String, null], default: "" },
-  background: { type: String, default: "#ffffff" },
-  foreground: { type: String, default: "#000000" },
-  pdground: { type: String, default: "#000000" },
-  icon: { type: String, default: "" },
-  iconSize: { type: Number, default: 40 },
-  lv: { type: Number, default: 3 },
-  auto: { type: Boolean, default: true },
-  loadingText: { type: String, default: "二维码生成中..." },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [String, Object], default: "" },
-})
+const props = defineProps(qrcodeProps)
 
 const id = ref(uuid())
 const result = ref()
@@ -80,7 +66,7 @@ async function makeCode() {
       pdground: props.pdground, // 定位角点颜色
       correctLevel: props.lv, // 容错级别
       image: props.icon, // 二维码图标
-      imageSize: props.iconSize, // 二维码图标大小
+      imageSize: useUnitToPx(props.iconSize), // 二维码图标大小
       success: (res: any) => {
         result.value = res
         isSuccess.value = true
