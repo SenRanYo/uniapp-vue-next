@@ -19,19 +19,12 @@
 
 <script setup lang="ts">
 import { useStyle } from "../hooks"
-import { overlayEmits } from "./index"
+import { overlayEmits, overlayProps } from "./index"
 
 defineOptions({ name: "zm-overlay" })
 
 const emits = defineEmits(overlayEmits)
-const props = defineProps({
-  show: { type: Boolean, default: false },
-  zIndex: { type: [Number, String], default: "" },
-  opacity: { type: [Number, String], default: "0.7" },
-  duration: { type: [Number, String], default: 300 },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [Object, String], default: "" },
-})
+const props = defineProps(overlayProps)
 
 const visible = ref(false)
 
@@ -60,9 +53,7 @@ watch(
 
 watch(
   () => visible.value,
-  (val) => {
-    emits("update:show", val)
-  },
+  (val) => emits("update:show", val),
 )
 
 function open() {

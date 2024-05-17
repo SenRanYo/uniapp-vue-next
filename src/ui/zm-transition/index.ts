@@ -15,7 +15,7 @@ export const transitionProps = {
    */
   zIndex: { type: [String, Number], default: "" },
   /**
-   * @description 过度时间
+   * @description 过渡时间
    */
   duration: { type: Number, default: 300 },
   /**
