@@ -3,17 +3,13 @@
 </template>
 
 <script setup lang="ts">
-import { safeAreaTopEmits } from "./index"
+import { safeAreaTopEmits, safeAreaTopProps } from "./index"
 import { useColor, useStyle } from "../hooks"
 
 defineOptions({ name: "zm-safe-area-top" })
 
 const emits = defineEmits(safeAreaTopEmits)
-const props = defineProps({
-  background: { type: String, default: "" },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [String, Object], default: "" },
-})
+const props = defineProps(safeAreaTopProps)
 
 const height = ref(0)
 const style = computed(() => {
