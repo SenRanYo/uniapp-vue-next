@@ -32,7 +32,9 @@ const { view, mitt, onReachTop, onPageScroll } = useView()
 const show = ref(false)
 const tabbar = ref("tabbar1")
 
-function onChange(val) {}
+function onChange(val) {
+  console.log(val)
+}
 
 function onEvent(val) {}
 

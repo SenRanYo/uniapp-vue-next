@@ -9,25 +9,12 @@
 
 <script setup lang="ts">
 import { pick } from "lodash-es"
-import { tabbarEmits } from "./index"
+import { tabbarEmits, tabbarProps } from "./index"
 import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-tabbar" })
 const emits = defineEmits(tabbarEmits)
-const props = defineProps({
-  modelValue: { type: [String, Number], default: "" },
-  fixed: { type: Boolean, default: false },
-  border: { type: Boolean, default: true },
-  zIndex: { type: [String, Number], default: "" },
-  activeColor: { type: String, default: "" },
-  inactiveColor: { type: String, default: "" },
-  route: { type: Boolean, default: false },
-  height: { type: [String, Number], default: "100rpx" },
-  background: { type: String, default: "#ffffff" },
-  safeAreaInsetBottom: { type: Boolean, default: true },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [String, Object], default: "" },
-})
+const props = defineProps(tabbarProps)
 
 const rect = ref<UniApp.NodeInfo>({})
 const isExistFooter = ref(false)
