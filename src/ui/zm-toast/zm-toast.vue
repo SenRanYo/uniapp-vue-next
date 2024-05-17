@@ -20,6 +20,8 @@
 import { isImage } from "../utils/check"
 import { useStyle, useUnit } from "../utils/style"
 
+defineOptions({ name: "zm-toast" })
+
 const timer = ref()
 const visible = ref(false)
 const icons = ref({ await: "clock", fail: "clear", success: "checked" })
@@ -111,7 +113,7 @@ function onClosed() {
   useOptions.value = baseOptions.value
 }
 
-defineExpose({ show, hide })
+defineExpose({ name: "zm-toast", show, hide })
 </script>
 <script lang="ts">
 export default {
