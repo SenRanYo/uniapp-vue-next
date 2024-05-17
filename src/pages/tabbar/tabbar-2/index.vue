@@ -2,8 +2,10 @@
   <zm-view ref="view">
     <zm-safe-area-top></zm-safe-area-top>
     <zm-row justify="end">
-      <zm-col :span="6">1</zm-col>
-      <zm-col :span="6">2</zm-col>
+      <zm-col :span="12">
+        <zm-text-highlight text="这是一段文本内容" match="文本"></zm-text-highlight>
+      </zm-col>
+      <zm-col :span="12">2</zm-col>
       <zm-col :span="6">3</zm-col>
       <zm-col :span="24">
         <button @click="show = true">测试</button>

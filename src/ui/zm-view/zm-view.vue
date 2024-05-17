@@ -60,7 +60,6 @@ function reachBottom() {
 }
 
 function onTouchstart(e: any) {
-  console.log(e)
   emits("touchstart", e)
   mitt.emit("touchstart", e)
 }

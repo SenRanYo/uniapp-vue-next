@@ -1,5 +1,5 @@
 <template>
-  <view class="zm-text-highlight" :style="[style]" :class="[customClass]">
+  <view class="zm-text-highlight" :style="[style]" :class="[props.customClass]">
     <text v-for="(item, index) in list" :key="index" :style="[textStyle(item)]" class="zm-text-highlight__text" :class="{ 'is-matched': text && item.matched }">
       {{ item.text }}
     </text>
@@ -8,21 +8,12 @@
 
 <script setup lang="ts">
 import { isNoEmpty } from "../utils/check"
+import { textHighlightProps } from "./index"
 import { useStyle, useColor, useUnit } from "../hooks"
 
-const props = defineProps({
-  text: { type: String, default: "" },
-  match: { type: String, default: "" },
-  color: { type: String, default: "" },
-  textRow: { type: [String, Number], default: "2" },
-  fontSize: { type: [String, Number], default: "" },
-  fontWeight: { type: [String, Number], default: "" },
-  lineHeight: { type: [String, Number], default: "" },
-  highlightColor: { type: String, default: "var(--theme-color)" },
-  customStyle: { type: [Object, String], default: "" },
-  customClass: { type: String, default: "" },
-})
+defineOptions({ name: "zm-text-highlight" })
 
+const props = defineProps(textHighlightProps)
 const list = ref([])
 
 const style = computed(() => {
@@ -43,16 +34,12 @@ const textStyle = computed(() => {
   }
 })
 
-watch(() => props.text, handleSplit, { immediate: true })
-watch(() => props.match, handleSplit, { immediate: true })
+watch(() => props.text, match, { immediate: true })
+watch(() => props.match, match, { immediate: true })
 
-function update() {
-  handleSplit()
-}
-
-function handleSplit() {
+function match() {
   const escapeRegExp = (val: string) => {
-    return val.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") // $& 表示匹配的整个字符串
+    return val.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   }
   if (props.text && isNoEmpty(props.match)) {
     const escapedMatch = escapeRegExp(props.match)
@@ -65,7 +52,7 @@ function handleSplit() {
   }
 }
 
-defineExpose({ update })
+defineExpose({ name: "zm-text-highlight", match })
 </script>
 <script lang="ts">
 export default {
@@ -80,5 +67,9 @@ export default {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+
+  &__text.is-matched {
+    color: var(--primary-color);
+  }
 }
 </style>
