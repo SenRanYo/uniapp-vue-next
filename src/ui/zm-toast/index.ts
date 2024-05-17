@@ -1,6 +1,15 @@
 import Toast from "./zm-toast.vue"
 
-export const toastProps = {}
+export const toastProps = {
+  /**
+   * @description 自定义类名
+   */
+  customClass: { type: String, default: "" },
+  /**
+   * @description 自定义样式
+   */
+  customStyle: { type: [String, Object], default: "" },
+}
 export const toastEmits = {}
 
 export type ToastOptions = {

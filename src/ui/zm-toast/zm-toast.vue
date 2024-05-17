@@ -1,6 +1,6 @@
 <template>
   <zm-transition :show="visible" :duration="200" :z-index="16000" :penetrate="!useOptions.mask" :custom-style="transitionStyle" @closed="onClosed">
-    <view class="zm-toast" :style="[style]">
+    <view class="zm-toast" :class="[props.customClass]" :style="[style]">
       <slot>
         <view class="default-slot">
           <view v-if="isShowIcon" class="toast-icon">
@@ -18,12 +18,13 @@
 
 <script setup lang="ts">
 import { isImage } from "../utils/check"
-import { ToastOptions } from "./index"
 import { useStyle, useUnit } from "../utils/style"
+import { toastProps, ToastOptions } from "./index"
 
 defineOptions({ name: "zm-toast" })
 
-const timer = ref()
+const props = defineProps(toastProps)
+const timer = ref(null)
 const visible = ref(false)
 const icons = ref({ await: "clock", fail: "clear", success: "checked" })
 const useOptions = ref<ToastOptions>({})
@@ -51,7 +52,7 @@ const style = computed(() => {
     style.maxWidth = useUnit(useOptions.value.width) || "150rpx"
     style["aspect-ratio"] = "1 / 1"
   }
-  return style
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 const isShowIcon = computed(() => useOptions.value.icon || ["loading", "await", "success", "fail"].includes(useOptions.value.type))
 const imageStyle = computed(() => useStyle({ width: useUnit(useOptions.value.iconSize), height: useUnit(useOptions.value.iconSize) }))
@@ -70,11 +71,11 @@ const transitionStyle = computed(() => {
   }
   if (useOptions.value.position === "top") {
     style["align-items"] = "flex-start"
-    style["padding-top"] = `${useOptions.value.offset}rpx`
+    style["padding-top"] = `${useUnit(useOptions.value.offset)}rpx`
   }
   if (useOptions.value.position === "bottom") {
     style["align-items"] = "flex-end"
-    style["padding-bottom"] = `${useOptions.value.offset}rpx`
+    style["padding-bottom"] = `${useUnit(useOptions.value.offset)}rpx`
   }
   return style
 })
