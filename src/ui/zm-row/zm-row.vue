@@ -1,5 +1,5 @@
 <template>
-  <view class="zm-row" :style="[style]"><slot></slot></view>
+  <view class="zm-row" :class="[props.customClass]" :style="[style]"><slot></slot></view>
 </template>
 
 <script setup lang="ts">

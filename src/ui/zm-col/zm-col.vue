@@ -1,22 +1,15 @@
 <template>
-  <view class="zm-col" :style="[style]"><slot></slot></view>
+  <view class="zm-col" :class="[props.customClass]" :style="[style]"><slot></slot></view>
 </template>
 
 <script setup lang="ts">
+import { colProps } from "./index"
 import { isNumber, isString, isNoEmpty } from "../utils/check"
 import { useStyle, useUnit, useUnitToPx } from "../hooks"
 
 defineOptions({ name: "zm-col" })
 
-const props = defineProps({
-  span: { type: Number, default: 24 },
-  align: { type: String, default: "" },
-  justify: { type: String, default: "" },
-  offset: { type: Number, default: 0 },
-  customClass: { type: [String, Array], default: "" },
-  customStyle: { type: [Object, String], default: "" },
-})
-
+const props = defineProps(colProps)
 const row = inject("zm-row", null)
 
 const style = computed(() => {
