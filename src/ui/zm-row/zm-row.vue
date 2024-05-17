@@ -4,20 +4,12 @@
 
 <script setup lang="ts">
 import { pick } from "lodash-es"
+import { rowProps } from "./index"
 import { useStyle, useUnitToPx, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-row" })
 
-const props = defineProps({
-  gap: { type: [String, Number], default: "" },
-  colGap: { type: [String, Number], default: "" },
-  rowGap: { type: [String, Number], default: "" },
-  align: { type: String, default: "" },
-  justify: { type: String, default: "" },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [String, Object], default: "" },
-})
-
+const props = defineProps(rowProps)
 const rect = ref<UniApp.NodeInfo>({})
 const instance = getCurrentInstance()
 
