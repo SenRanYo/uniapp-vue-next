@@ -18,6 +18,7 @@
 
 <script setup lang="ts">
 import { isImage } from "../utils/check"
+import { ToastOptions } from "./index"
 import { useStyle, useUnit } from "../utils/style"
 
 defineOptions({ name: "zm-toast" })
@@ -25,11 +26,12 @@ defineOptions({ name: "zm-toast" })
 const timer = ref()
 const visible = ref(false)
 const icons = ref({ await: "clock", fail: "clear", success: "checked" })
-const useOptions = ref({
+const useOptions = ref<ToastOptions>({})
+const baseOptions = ref<ToastOptions>({
   type: "default",
   background: "rgba(51, 51, 51, 1)",
   position: "middle",
-  offset: 0,
+  offset: 150,
   width: "",
   icon: "",
   iconSize: "70rpx",
@@ -37,19 +39,6 @@ const useOptions = ref({
   content: "",
   mask: false,
   duration: 2000,
-})
-const baseOptions = ref({
-  type: "default", // loading-加载中的状态，await-等待的状态，success-成功的状态，fail-失败的状态，default-默认的状态
-  background: "rgba(51, 51, 51, 1)", // 是否显示背景
-  position: "middle", // middle-居中的状态，top-顶部的状态，bottom-底部的状态
-  offset: 150, // 偏移量
-  width: "", // 宽度
-  icon: "", // 图标
-  iconSize: "70rpx", // 图标大小
-  iconPrefix: "zm-icon", // 图标前缀
-  content: "", // 内容
-  mask: false, // 是否启用遮罩，防止点击穿透
-  duration: 2000, // 持续时间
 })
 
 const style = computed(() => {
