@@ -7,29 +7,16 @@
 <script setup lang="ts">
 import modes from "./modes"
 import { useStyle } from "../hooks/"
-import { transitionEmits } from "./index"
 import { isArray, isString } from "../utils/check"
+import { transitionEmits, transitionProps } from "./index"
 
 defineOptions({ name: "zm-transition" })
-
 const emits = defineEmits(transitionEmits)
-const props = defineProps({
-  show: { type: Boolean, default: false },
-  mode: { type: [String, Array, null], default: "fade" },
-  zIndex: { type: [String, Number], default: "" },
-  duration: { type: Number, default: 300 },
-  penetrate: { type: Boolean, default: false },
-  enterDelay: { type: Number, default: 0 },
-  leaveDelay: { type: Number, default: 0 },
-  enterTimingFunction: { type: String, default: "ease-out" },
-  leaveTimingFunction: { type: String, default: "ease-in" },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [String, Object], default: "" },
-})
+const props = defineProps(transitionProps)
 
 const timer = ref()
 const styles = ref({})
-const config: any = ref({})
+const config = ref<any>({})
 const visible = ref(false)
 const animation = ref()
 const animationData = ref()
@@ -56,9 +43,7 @@ watch(
 
 watch(
   () => visible.value,
-  (val) => {
-    emits("update:show", val)
-  },
+  (val) => emits("update:show", val),
 )
 
 function init(cof: any = {}) {
