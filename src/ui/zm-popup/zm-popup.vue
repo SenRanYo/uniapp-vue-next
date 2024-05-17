@@ -3,9 +3,8 @@
     <zm-overlay v-if="overlay" :show="visible" :duration="duration" :custom-style="overlayStyle" @click="onClickOverlay"></zm-overlay>
     <zm-transition
       :show="visible"
-      :duration="duration"
       :mode="mode"
-      :timing-function="timingFunction"
+      :duration="duration"
       :custom-style="bodyTransitionStyle"
       @click="onClickBodyTransition"
       @open="onOpen"
@@ -39,6 +38,7 @@ defineOptions({ name: "zm-view" })
 
 const emits = defineEmits(popupEmits)
 const props = defineProps({
+  show: { type: Boolean, default: false },
   mode: { type: String, default: "bottom", validator: (v: string) => ["top", "bottom", "left", "right", "center"].includes(v) },
   width: { type: [Number, String], default: "" },
   maxWidth: { type: [Number, String], default: "100vw" },
@@ -60,10 +60,8 @@ const props = defineProps({
   customStyle: { type: [Object, String], default: "" },
 })
 
-const model = defineModel("show", { default: false })
 const action = ref("show")
 const visible = ref(false)
-const timingFunction = ref("ease-out")
 
 const mode = computed(() => {
   const modes = { top: "slide-bottom", left: "slide-left", right: "slide-right", bottom: "slide-top", center: "fade-zoom" }
@@ -133,7 +131,7 @@ const scrollViewStyle = computed(() => {
 })
 
 watch(
-  () => model.value,
+  () => props.show,
   (val) => {
     if (val) open()
     else close("show")
@@ -144,59 +142,57 @@ watch(
 watch(
   () => visible.value,
   (val) => {
-    model.value = val
+    emits("update:show", val)
   },
 )
 
 function open() {
   if (visible.value) return
-  timingFunction.value = "ease-out"
   visible.value = true
 }
 
 function close(a = "show") {
-  if (this.visible) {
-    timingFunction.value = "ease-in"
+  if (visible.value) {
     action.value = a
     visible.value = false
   }
 }
 
 function onOpen() {
-  this.$emit("open")
+  emits("open")
 }
 
 function onOpened() {
-  this.$emit("opened")
+  emits("opened")
 }
 
 function onClose() {
-  this.$emit("close", this.action)
+  emits("close", action.value)
 }
 
 function onClosed() {
-  this.$emit("closed", this.action)
+  emits("closed", action.value)
 }
 
-function onClickClose(event) {
-  this.close("close")
-  this.$emit("click-close", event)
+function onClickClose(event: MouseEvent) {
+  close("close")
+  emits("click-close", event)
 }
 
-function onClickBodyTransition(event) {
-  if (this.mode === "center") {
-    this.onClickOverlay(event)
+function onClickBodyTransition(event: MouseEvent) {
+  if (mode.value === "center") {
+    onClickOverlay(event)
   }
 }
 
-function onClickBody(event) {
-  this.$emit("click", event)
+function onClickBody(event: MouseEvent) {
+  emits("click", event)
 }
 
-function onClickOverlay(event) {
-  if (this.closeOnClickOverlay) {
-    this.close("overlay")
-    this.$emit("click-overlay", event)
+function onClickOverlay(event: MouseEvent) {
+  if (props.closeOnClickOverlay) {
+    close("overlay")
+    emits("click-overlay", event)
   }
 }
 

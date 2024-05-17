@@ -1,6 +1,8 @@
 import Transition from "./zm-transition.vue"
+import { isBoolean } from "../utils/check"
 
 export const transitionEmits = {
+  "update:show": (show: boolean) => isBoolean(show),
   open: () => true,
   opened: () => true,
   close: () => true,

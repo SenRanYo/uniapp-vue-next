@@ -25,6 +25,7 @@ defineOptions({ name: "zm-overlay" })
 
 const emits = defineEmits(overlayEmits)
 const props = defineProps({
+  show: { type: Boolean, default: false },
   zIndex: { type: [Number, String], default: "" },
   opacity: { type: [Number, String], default: "0.7" },
   duration: { type: [Number, String], default: 300 },
@@ -32,7 +33,6 @@ const props = defineProps({
   customStyle: { type: [Object, String], default: "" },
 })
 
-const model = defineModel("show", { default: false })
 const visible = ref(false)
 
 const style = computed(() => {
@@ -51,7 +51,7 @@ const transitionStyle = computed(() => {
 })
 
 watch(
-  () => model.value,
+  () => props.show,
   (val) => {
     val ? open() : close()
   },
@@ -61,7 +61,7 @@ watch(
 watch(
   () => visible.value,
   (val) => {
-    model.value = val
+    emits("update:show", val)
   },
 )
 

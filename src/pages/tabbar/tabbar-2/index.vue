@@ -9,7 +9,9 @@
         <button @click="show = true">测试</button>
       </zm-col>
     </zm-row>
-    <zm-overlay v-model:show="show" ref="overlay" @click="onClickOverlay">123</zm-overlay>
+    <zm-popup v-model:show="show" ref="popup">
+      <view style="height: 200px; background: #ccc"></view>
+    </zm-popup>
     <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>

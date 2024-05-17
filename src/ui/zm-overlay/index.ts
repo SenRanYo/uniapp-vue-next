@@ -1,6 +1,8 @@
 import Overlay from "./zm-overlay.vue"
+import { isBoolean } from "../utils/check"
 
 export const overlayEmits = {
+  "update:show": (show: boolean) => isBoolean(show),
   open: () => true,
   opened: () => true,
   close: () => true,
