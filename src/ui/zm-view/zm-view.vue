@@ -1,22 +1,26 @@
 <template>
-  <view class="zm-view" :class="[props.customClass]" :style="[style]" @touchend="onTouchend" @touchmove="onTouchmove" @touchstart="onTouchstart">
+  <view
+    class="zm-view"
+    :class="[props.customClass]"
+    :style="[style]"
+    @touchend="onTouchend"
+    @touchmove="onTouchmove"
+    @touchstart="onTouchstart"
+    @mousedown="onMousedown"
+    @mouseup="onMouseup"
+  >
     <slot></slot>
   </view>
 </template>
 <script setup lang="ts">
-import { viewEmits } from "./index"
 import { colorVars } from "../config"
+import { viewEmits, viewProps } from "./index"
 import { useMitt, useStyle, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-view" })
 
 const emits = defineEmits(viewEmits)
-const props = defineProps({
-  scroll: { type: Boolean, default: true },
-  background: { type: String, default: "" },
-  customClass: { type: String, default: "" },
-  customStyle: { type: [String, Object], default: "" },
-})
+const props = defineProps(viewProps)
 
 const mitt = useMitt()
 const rect = ref({})
@@ -55,19 +59,30 @@ function reachBottom() {
   mitt.emit("reachBottom")
 }
 
-function onTouchstart(e: TouchEvent) {
+function onTouchstart(e: any) {
+  console.log(e)
   emits("touchstart", e)
   mitt.emit("touchstart", e)
 }
 
-function onTouchend(e: TouchEvent) {
+function onTouchend(e: any) {
   emits("touchend", e)
   mitt.emit("touchend", e)
 }
 
-function onTouchmove(e: TouchEvent) {
+function onTouchmove(e: any) {
   emits("touchmove", e)
   mitt.emit("touchmove", e)
+}
+
+function onMousedown(e: any) {
+  emits("mousedown", e)
+  mitt.emit("mousedown", e)
+}
+
+function onMouseup(e: any) {
+  emits("mouseup", e)
+  mitt.emit("mouseup", e)
 }
 
 onBeforeMount(() => resize())
