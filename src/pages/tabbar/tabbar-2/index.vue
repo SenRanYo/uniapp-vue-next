@@ -6,13 +6,15 @@
         <zm-text-highlight text="这是一段文本内容" match="文本"></zm-text-highlight>
       </zm-col>
       <zm-col :span="12">2</zm-col>
-      <zm-col :span="6">3</zm-col>
+      <zm-col :span="24">
+        <zm-number-roll :value="count" font-size="32rpx" color="success"></zm-number-roll>
+      </zm-col>
       <zm-col :span="24">
         <button @click="show = true">测试</button>
       </zm-col>
     </zm-row>
     <zm-popup v-model:show="show" ref="popup">
-      <view style="height: 200px; background: #ccc"></view>
+      <view style="height: 200px; background: green"></view>
     </zm-popup>
     <zm-tabbar v-model="tabbar" @change="onChange">
       <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
@@ -30,6 +32,7 @@ import { useView } from "@/ui"
 const { view, mitt, onReachTop, onPageScroll } = useView()
 
 const show = ref(false)
+const count = ref(0)
 const tabbar = ref("tabbar1")
 
 function onChange(val) {
@@ -41,6 +44,10 @@ function onEvent(val) {}
 function onClickOverlay() {
   show.value = !show.value
 }
+
+setTimeout(() => {
+  count.value = 100
+}, 2000)
 </script>
 
 <style lang="scss" scoped>
