@@ -5,7 +5,9 @@
       <zm-col :span="12">
         <zm-text-highlight text="这是一段文本内容" match="文本"></zm-text-highlight>
       </zm-col>
-      <zm-col :span="12">2</zm-col>
+      <zm-col :span="12">
+        <zm-icon name="close"></zm-icon>
+      </zm-col>
       <zm-col :span="24">
         <zm-number-roll :value="count" font-size="32rpx" color="success"></zm-number-roll>
       </zm-col>
