@@ -71,11 +71,11 @@ function onClick(event: TouchEvent) {
 }
 
 function onTouchStart() {
-  this.isHover = true
+  isHover.value = true
 }
 
 function onTouchEnd() {
-  this.isHover = false
+  isHover.value = false
 }
 
 defineExpose({ name: "zm-icon" })

@@ -99,7 +99,7 @@ export const navbarProps = {
   customStyle: { type: [String, Object], default: "" },
 }
 export const navbarEmits = {
-  rect: (rect: UniApp.NodeInfo) => true,
+  height: (height: number) => true,
 }
 
 export type NavbarEmits = typeof navbarEmits

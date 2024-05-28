@@ -15,17 +15,18 @@
         <button @click="show = true">测试</button>
       </zm-col>
     </zm-row>
+    <zm-safe-area-bottom @height="onEvent"></zm-safe-area-bottom>
+
     <zm-popup v-model:show="show" ref="popup">
       <view style="height: 200px; background: green"></view>
     </zm-popup>
-    <zm-tabbar v-model="tabbar" @change="onChange">
-      <zm-tabbar-item name="tabbar1">Tabbar-1</zm-tabbar-item>
-      <zm-tabbar-item name="tabbar2">Tabbar-2</zm-tabbar-item>
-      <zm-tabbar-item name="tabbar3">Tabbar-3</zm-tabbar-item>
-      <zm-tabbar-item name="tabbar4">Tabbar-4</zm-tabbar-item>
-      <zm-tabbar-item name="tabbar5">Tabbar-5</zm-tabbar-item>
+    <zm-tabbar v-model="tabbar" route>
+      <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
+      <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
+      <zm-tabbar-item name="3" icon="bag-o" route="/pages/tabbar/tabbar-3/index">Tabbar-3</zm-tabbar-item>
+      <zm-tabbar-item name="4" icon="thumb-circle-o" route="/pages/tabbar/tabbar-4/index">Tabbar-4</zm-tabbar-item>
+      <zm-tabbar-item name="5" icon="user-circle-o" route="/pages/tabbar/tabbar-5/index">Tabbar-5</zm-tabbar-item>
     </zm-tabbar>
-    <zm-safe-area-bottom @height="onEvent"></zm-safe-area-bottom>
   </zm-view>
 </template>
 
@@ -35,7 +36,7 @@ const { view, mitt, onReachTop, onPageScroll } = useView()
 
 const show = ref(false)
 const count = ref(0)
-const tabbar = ref("tabbar1")
+const tabbar = ref("2")
 
 function onChange(val) {
   console.log(val)

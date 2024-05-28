@@ -26,21 +26,153 @@
 <script setup lang="ts">
 import { useRgb } from "../utils/style"
 import { navbarEmits, navbarProps } from "./index"
-import { useStyle, useUnit, useUnitToPx } from "../hooks"
+import { useStyle, useUnit, useUnitToPx, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-navbar" })
+const emits = defineEmits(navbarEmits)
+const props = defineProps(navbarProps)
 
 const systemInfo = uni.getSystemInfoSync()
 // #ifdef MP-WEIXIN || MP-BAIDU || MP-TOUTIAO || MP-QQ
 const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
 // #endif
+const instance = getCurrentInstance()
+const view = inject<any>("zm-view", null)
 const rect = ref<UniApp.NodeInfo>({})
-const bRgb = ref({})
+const bRgb = ref<any>({})
 const route = ref("")
 const routes = ref([])
 const scrollTop = ref(0)
 const statusBarHeight = systemInfo.statusBarHeight
 
+const backIcon = computed(() => {
+  return routes.value.length == 1 ? "wap-home-o" : props.backIconName
+})
+const innerStyle = computed(() => {
+  const { r, g, b } = bRgb.value
+  return useStyle({
+    zIndex: props.zIndex,
+    background: props.gradient ? `rgba(${r},${g},${b},${scrollTop.value / useUnitToPx(props.gradientHeigt)})` : props.background,
+    ...useStyle(props.customStyle),
+  })
+})
+const contentStyle = computed(() => {
+  const style: any = {}
+  style.height = navbarHeight.value + "px"
+  style.marginTop = statusBarHeight + "px"
+  style.paddingLeft = useUnit(props.padding)
+  style.paddingRight = useUnit(props.padding)
+  // #ifdef MP
+  if (systemInfo.deviceType !== "pc") {
+    style.marginRight = systemInfo.windowWidth - menuButtonInfo.left + "px"
+  }
+  // #endif
+  if (props.height) style.alignItems = "flex-start"
+  return useStyle(style)
+})
+const backTextStyle = computed(() => {
+  const style: any = {}
+  style.color = props.backTextColor
+  style.fontSize = props.backTextSize
+  return useStyle(style)
+})
+// 导航中间的标题的样式
+const titleStyle = computed(() => {
+  let style: any = {}
+  if (props.titleCenter) {
+    // #ifndef MP
+    style.left = (systemInfo.windowWidth - useUnitToPx(props.titleWidth)) / 2 + "px"
+    style.right = (systemInfo.windowWidth - useUnitToPx(props.titleWidth)) / 2 + "px"
+    // #endif
+    // #ifdef MP
+    // 此处是为了让标题显示区域即使在小程序有右侧胶囊的情况下也能处于屏幕的中间，是通过绝对定位实现的
+    let rightButtonWidth = systemInfo.windowWidth - menuButtonInfo.left
+    style.left = (systemInfo.windowWidth - useUnitToPx(props.titleWidth)) / 2 + "px"
+    style.right = rightButtonWidth - (systemInfo.windowWidth - useUnitToPx(props.titleWidth)) / 2 + rightButtonWidth + "px"
+    // #endif
+    style.width = useUnitToPx(props.titleWidth) + "px"
+    style.position = "absolute"
+    style.justifyContent = "center"
+  }
+
+  style.color = props.titleColor
+  style.fontSize = props.titleSize
+  style.fontWeight = props.titleWeight
+  return useStyle(style)
+})
+const navbarHeight = computed(() => {
+  let height = systemInfo.osName == "ios" ? 44 : 48
+  // #ifdef MP
+  height = Math.min(menuButtonInfo.height + Math.max(menuButtonInfo.top - statusBarHeight, 0) * 2, 44)
+  // #endif
+  return props.height ? +useUnitToPx(props.height) : +height
+})
+const placeholderStyle = computed(() => {
+  const style: any = {}
+  style.height = 0
+  if (props.fixed && !props.immersive) style.height = navbarHeight.value + statusBarHeight + "px"
+  return useStyle(style)
+})
+
+watch(
+  () => navbarHeight.value,
+  () => {
+    emits("height", useUnitToPx(navbarHeight.value) + statusBarHeight)
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.background,
+  (val) => {
+    if (val && props.gradient) bRgb.value = useRgb(val)
+  },
+  { immediate: true },
+)
+
+async function resize() {
+  await nextTick()
+  routes.value = getCurrentPages()
+  route.value = routes.value[routes.value.length - 1]?.route
+  rect.value = await useElRect(".zm-navbar__inner", instance)
+}
+
+function event() {
+  view?.mitt.on("scroll", (options: Page.PageScrollOption) => {
+    // if (route.value === route) {
+    //   if (this.gradient) {
+    //     if (top <= this.gradientHeigt) {
+    //       this.scrollTop = top
+    //     } else if (top > this.gradientHeigt && this.scrollTop != this.gradientHeigt) {
+    //       this.scrollTop = top
+    //     }
+    //   }
+    // }
+  })
+}
+
+function handleBack() {
+  // 如果自定义了点击返回按钮的函数，则执行，否则执行返回逻辑
+  if (typeof this.customBack === "function") {
+    // 在微信，支付宝等环境(H5正常)，会导致父组件定义的customBack()函数体中的this变成子组件的this
+    // 通过bind()方法，绑定父组件的this，让this.customBack()的this为父组件的上下文
+    this.customBack.bind(this.$u.$parent.call(this))()
+  } else {
+    if (this.routes.length == 1) {
+      // #ifdef WEB
+      uni.reLaunch({ url: "/pages/tabbar/tabbar-1/tabbar-1" })
+      // #endif
+
+      // #ifndef WEB
+      uni.switchTab({ url: "/pages/tabbar/tabbar-1/tabbar-1" })
+      // #endif
+    } else {
+      uni.navigateBack()
+    }
+  }
+}
+event()
+onMounted(() => resize())
 defineExpose({ name: "zm-navbar" })
 </script>
 <script lang="ts">

@@ -51,7 +51,7 @@ function onClick() {
       }
       debounce(() => {
         uni[props.routeType]({
-          url: `/${props.route}${encodeParams(props.routeParams)}`,
+          url: `${props.route}${encodeParams(props.routeParams)}`,
           fail: (err: any) => {
             throw err
           },
