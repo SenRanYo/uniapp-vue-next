@@ -39,4 +39,9 @@ function handleGetData({ page, pageSize, type, success }) {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.zm-line {
+  display: flex;
+  flex-shrink: 0;
+}
+</style>
