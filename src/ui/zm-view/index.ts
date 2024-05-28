@@ -3,6 +3,10 @@ import { Mitt } from "../utils/mitt"
 
 export const viewProps = {
   /**
+   * @description 高度
+   */
+  height: { type: [String, Number], default: "" },
+  /**
    * @description 是否能够滚动
    */
   scroll: { type: Boolean, default: true },
@@ -35,6 +39,7 @@ export type ViewEmits = typeof viewEmits
 export type ViewExpose = {
   name: "zm-view"
   mitt: Mitt
+  id: string
   scroll: (options: { scrollTop: number }) => void
   reachTop: () => void
   reachBottom: () => void

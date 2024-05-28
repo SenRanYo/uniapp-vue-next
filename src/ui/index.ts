@@ -12,14 +12,20 @@ export function useView() {
   const onReachTop = (hook: Function = () => {}) => (onReachTopHook = hook)
 
   onPageScroll((options) => {
-    view.value.scroll(options)
-    if (options.scrollTop === 0) {
-      onReachTopHook()
-      view.value.reachTop()
+    if (view.value) {
+      view.value.scroll(options)
+      if (options.scrollTop === 0) {
+        onReachTopHook()
+        view.value.reachTop()
+      }
     }
   })
 
-  onReachBottom(() => view.value.reachBottom())
+  onReachBottom(() => {
+    if (view.value) {
+      view.value.reachBottom()
+    }
+  })
 
   nextTick(() => {
     Object.keys(instance.refs).forEach((key) => {

@@ -14,14 +14,16 @@
 </template>
 <script setup lang="ts">
 import { colorVars } from "../config"
+import { uuid } from "../utils/utils"
 import { viewEmits, viewProps } from "./index"
-import { useMitt, useStyle, useElRect } from "../hooks"
+import { useMitt, useUnit, useStyle, useElRect } from "../hooks"
 
 defineOptions({ name: "zm-view" })
 
 const emits = defineEmits(viewEmits)
 const props = defineProps(viewProps)
 
+const id = uuid()
 const mitt = useMitt()
 const rect = ref({})
 const scrollTop = ref(0)
@@ -29,6 +31,7 @@ const instance = getCurrentInstance()
 
 const style = computed(() => {
   const style: any = {}
+  style.height = useUnit(props.height)
   style.background = props.background
   style["--primary-color"] = colorVars.primary
   style["--success-color"] = colorVars.success
@@ -86,7 +89,7 @@ function onMouseup(e: any) {
 
 onBeforeMount(() => resize())
 provide("zm-view", { mitt, rect })
-defineExpose({ name: "zm-view", mitt, scroll, reachTop, reachBottom })
+defineExpose({ name: "zm-view", id, mitt, scroll, reachTop, reachBottom })
 </script>
 <script lang="ts">
 export default {

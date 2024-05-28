@@ -52,7 +52,7 @@ const innerStyle = computed(() => {
   const { r, g, b } = bRgb.value
   return useStyle({
     zIndex: props.zIndex,
-    background: props.gradient ? `rgba(${r},${g},${b},${scrollTop.value / useUnitToPx(props.gradientHeigt)})` : props.background,
+    background: props.gradient ? `rgba(${r},${g},${b},${scrollTop.value / useUnitToPx(props.gradientHeight)})` : props.background,
     ...useStyle(props.customStyle),
   })
 })
@@ -139,15 +139,11 @@ async function resize() {
 
 function event() {
   view?.mitt.on("scroll", (options: Page.PageScrollOption) => {
-    // if (route.value === route) {
-    //   if (this.gradient) {
-    //     if (top <= this.gradientHeigt) {
-    //       this.scrollTop = top
-    //     } else if (top > this.gradientHeigt && this.scrollTop != this.gradientHeigt) {
-    //       this.scrollTop = top
-    //     }
-    //   }
-    // }
+    if (props.gradient) {
+      scrollTop.value = options.scrollTop
+      emits("gradient", scrollTop.value)
+      console.log(scrollTop.value)
+    }
   })
 }
 

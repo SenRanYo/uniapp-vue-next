@@ -5,7 +5,7 @@
       <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
       <zm-tabbar-item name="3" icon="bag-o" route="/pages/tabbar/tabbar-3/index">Tabbar-3</zm-tabbar-item>
       <zm-tabbar-item name="4" icon="thumb-circle-o" route="/pages/tabbar/tabbar-4/index">Tabbar-4</zm-tabbar-item>
-      <zm-tabbar-item name="5" icon="user-circle-o" route="/pages/tabbar/tabbar-5/index">Tabbar-5</zm-tabbar-item>
+      <zm-tabbar-item name="5" icon="user-o" route="/pages/tabbar/tabbar-5/index">Tabbar-5</zm-tabbar-item>
     </zm-tabbar>
   </zm-view>
 </template>

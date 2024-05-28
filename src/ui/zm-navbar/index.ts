@@ -68,7 +68,7 @@ export const navbarProps = {
   /**
    * @description 渐变背景高度
    */
-  gradientHeigt: { type: [String, Number], default: 200 },
+  gradientHeight: { type: [String, Number], default: "200px" },
   /**
    * @description 背景颜色
    */
@@ -100,6 +100,7 @@ export const navbarProps = {
 }
 export const navbarEmits = {
   height: (height: number) => true,
+  gradient: (scrollTop: number) => true,
 }
 
 export type NavbarEmits = typeof navbarEmits
