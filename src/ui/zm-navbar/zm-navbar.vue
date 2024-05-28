@@ -5,7 +5,7 @@
         <view v-if="$slots.left" class="zm-navbar__left">
           <slot name="left"></slot>
         </view>
-        <view v-else-if="isBack" class="zm-navbar__back" @tap="handleBack">
+        <view v-else-if="isBack" class="zm-navbar__back" @tap="back">
           <zm-icon :name="backIcon" :color="backIconColor" :size="backIconSize"></zm-icon>
           <view v-if="backText" class="zm-navbar__back__text" :style="[backTextStyle]">{{ backText }}</view>
         </view>
@@ -48,6 +48,7 @@ const statusBarHeight = systemInfo.statusBarHeight
 const backIcon = computed(() => {
   return routes.value.length == 1 ? "wap-home-o" : props.backIconName
 })
+
 const innerStyle = computed(() => {
   const { r, g, b } = bRgb.value
   return useStyle({
@@ -56,6 +57,7 @@ const innerStyle = computed(() => {
     ...useStyle(props.customStyle),
   })
 })
+
 const contentStyle = computed(() => {
   const style: any = {}
   style.height = navbarHeight.value + "px"
@@ -76,6 +78,7 @@ const backTextStyle = computed(() => {
   style.fontSize = props.backTextSize
   return useStyle(style)
 })
+
 // 导航中间的标题的样式
 const titleStyle = computed(() => {
   let style: any = {}
@@ -100,6 +103,7 @@ const titleStyle = computed(() => {
   style.fontWeight = props.titleWeight
   return useStyle(style)
 })
+
 const navbarHeight = computed(() => {
   let height = systemInfo.osName == "ios" ? 44 : 48
   // #ifdef MP
@@ -107,6 +111,7 @@ const navbarHeight = computed(() => {
   // #endif
   return props.height ? +useUnitToPx(props.height) : +height
 })
+
 const placeholderStyle = computed(() => {
   const style: any = {}
   style.height = 0
@@ -135,6 +140,7 @@ async function resize() {
   routes.value = getCurrentPages()
   route.value = routes.value[routes.value.length - 1]?.route
   rect.value = await useElRect(".zm-navbar__inner", instance)
+  emits("height", rect.value.height)
 }
 
 function event() {
@@ -142,19 +148,15 @@ function event() {
     if (props.gradient) {
       scrollTop.value = options.scrollTop
       emits("gradient", scrollTop.value)
-      console.log(scrollTop.value)
     }
   })
 }
 
-function handleBack() {
-  // 如果自定义了点击返回按钮的函数，则执行，否则执行返回逻辑
-  if (typeof this.customBack === "function") {
-    // 在微信，支付宝等环境(H5正常)，会导致父组件定义的customBack()函数体中的this变成子组件的this
-    // 通过bind()方法，绑定父组件的this，让this.customBack()的this为父组件的上下文
-    this.customBack.bind(this.$u.$parent.call(this))()
+function back() {
+  if (typeof props.customBack === "function") {
+    props.customBack()
   } else {
-    if (this.routes.length == 1) {
+    if (routes.value.length == 1) {
       // #ifdef WEB
       uni.reLaunch({ url: "/pages/tabbar/tabbar-1/tabbar-1" })
       // #endif
@@ -167,6 +169,7 @@ function handleBack() {
     }
   }
 }
+
 event()
 onMounted(() => resize())
 defineExpose({ name: "zm-navbar" })

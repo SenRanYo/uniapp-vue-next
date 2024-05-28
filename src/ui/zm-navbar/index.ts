@@ -90,6 +90,10 @@ export const navbarProps = {
    */
   zIndex: { type: [String, Number], default: "" },
   /**
+   * @description 自定义返回
+   */
+  customBack: { type: Function, default: () => {} },
+  /**
    * @description 自定义类名
    */
   customClass: { type: String, default: "" },
