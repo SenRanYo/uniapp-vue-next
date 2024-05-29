@@ -1,7 +1,8 @@
 <template>
-  <view v-if="show" class="zm-empty" :class="[customClass]" :style="[style]">
+  <view v-if="show" class="zm-empty" :class="[props.customClass]" :style="[style]">
     <slot name="icon">
-      <image class="zm-empty__icon" :src="icon" mode="widthFix" :style="[iconStyle]"></image>
+      <image v-if="icon" class="zm-empty__icon" :src="icon" mode="widthFix" :style="[iconStyle]"></image>
+      <image v-else class="zm-empty__icon" src="./lib/empty.png" mode="widthFix" :style="[iconStyle]"></image>
     </slot>
     <slot name="text">
       <text class="zm-empty__text" :style="[textStyle]">{{ text }}</text>
@@ -12,107 +13,47 @@
   </view>
 </template>
 
-<script>
-import weixin from "@/mixins/weixin"
-import { useUnit, useColor, useStyle } from "@/utils/style"
+<script setup lang="ts">
+import { emptyEmits, emptyProps } from "./index"
+import { useUnit, useStyle, useColor } from "../hooks"
+
+defineOptions({ name: "zm-empty" })
+const emits = defineEmits(emptyEmits)
+const props = defineProps(emptyProps)
+
+const style = computed(() => {
+  return useStyle({
+    margin: useUnit(props.margin),
+    padding: useUnit(props.padding),
+    ...useStyle(props.customStyle),
+  })
+})
+
+const iconStyle = computed(() => {
+  const style: any = {}
+  style.color = useColor(props.iconColor)
+  style.width = useUnit(props.iconSize || props.iconWidth)
+  style.height = useUnit(props.iconSize || props.iconHeight)
+  style.fontWeight = props.iconWeight
+  return useStyle(style)
+})
+
+const textStyle = computed(() => {
+  const style: any = {}
+  style.color = useColor(props.iconColor)
+  style.width = useUnit(props.iconSize || props.iconWidth)
+  style.height = useUnit(props.iconSize || props.iconHeight)
+  style.fontWeight = props.iconWeight
+  return useStyle(style)
+})
+
+defineExpose({ name: "zm-empty" })
+</script>
+<script lang="ts">
 export default {
-  name: "zm-empty",
-  mixins: [weixin],
-  props: {
-    show: {
-      type: Boolean,
-      default: true
-    },
-    icon: {
-      type: String,
-      default: "/static/empty/zwsj-empty.png"
-    },
-    text: {
-      type: String,
-      default: "暂无数据~"
-    },
-    textSize: {
-      type: [String, Number],
-      default: ""
-    },
-    textColor: {
-      type: String,
-      default: ""
-    },
-    textWeight: {
-      type: [String, Number],
-      default: ""
-    },
-    iconSize: {
-      type: [String, Number],
-      default: ""
-    },
-    iconColor: {
-      type: String,
-      default: ""
-    },
-    iconWeight: {
-      type: [String, Number],
-      default: ""
-    },
-    iconWidth: {
-      type: [String, Number],
-      default: ""
-    },
-    iconHeight: {
-      type: [String, Number],
-      default: ""
-    },
-    margin: {
-      type: [String, Number],
-      default: ""
-    },
-    padding: {
-      type: [String, Number],
-      default: ""
-    },
-    // 自定义类名
-    customClass: {
-      type: [String, Array],
-      default: ""
-    },
-    // 自定义样式
-    customStyle: {
-      type: [Object, String],
-      default: ""
-    }
-  },
-  data() {
-    return {}
-  },
-  computed: {
-    style() {
-      return useStyle({
-        margin: useUnit(this.margin),
-        padding: useUnit(this.padding),
-        ...useStyle(this.customStyle)
-      })
-    },
-    iconStyle() {
-      const style = {}
-      style.color = useColor(this.iconColor)
-      style.width = useUnit(this.iconSize || this.iconWidth)
-      style.height = useUnit(this.iconSize || this.iconHeight)
-      style.fontWeight = this.iconWeight
-      return useStyle(style)
-    },
-    textStyle() {
-      const style = {}
-      style.color = useColor(this.textColor)
-      style.fontSize = useUnit(this.textSize)
-      style.fontWeight = this.textWeight
-      return useStyle(style)
-    }
-  },
-  methods: {}
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>
-
 <style lang="scss" scoped>
 .zm-empty {
   flex: 1;
@@ -129,10 +70,11 @@ export default {
   }
 
   &__text {
-    color: #999999;
+    color: #999;
     font-size: 26rpx;
     margin-top: 24rpx;
   }
+
   &__slot {
     margin-top: 24rpx;
   }

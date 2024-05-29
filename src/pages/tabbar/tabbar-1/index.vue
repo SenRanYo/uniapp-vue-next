@@ -1,6 +1,7 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
+    <zm-empty>123</zm-empty>
     <zm-footer>
       <view class="flex items-center p-24">底部内容</view>
     </zm-footer>

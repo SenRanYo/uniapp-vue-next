@@ -26,7 +26,7 @@ const style = computed(() => {
   style.zIndex = props.zIndex
   style.bottom = tabbarHeight.value + useUnitToPx(props.offsetBottom) + "px"
   style.background = useColor(props.background)
-  return useStyle(style)
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
 const placeholderStyle = computed(() => {
