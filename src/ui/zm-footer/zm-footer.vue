@@ -45,6 +45,7 @@ async function resize() {
   await nextTick()
   rect.value = await useElRect(".zm-footer__inner", instance)
   emits("rect", rect.value)
+  emits("height", rect.value.height)
   view?.mitt.emit("tabbar.rect.emit")
 }
 

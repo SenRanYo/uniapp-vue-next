@@ -103,6 +103,7 @@ export const navbarProps = {
   customStyle: { type: [String, Object], default: "" },
 }
 export const navbarEmits = {
+  rect: (rect: UniApp.NodeInfo) => true,
   height: (height: number) => true,
   gradient: (scrollTop: number) => true,
 }

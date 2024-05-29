@@ -55,6 +55,7 @@ export const tabbarEmits = {
   "update:modelValue": (value: string | number) => isString(value) || isNumber(value),
   change: (name: string | number) => isString(name) || isNumber(name),
   rect: (rect: UniApp.NodeInfo) => true,
+  height: (height: number) => true,
 }
 
 export type TabbarEmits = typeof tabbarEmits

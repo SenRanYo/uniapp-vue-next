@@ -28,6 +28,7 @@ export const footerProps = {
 }
 export const footerEmits = {
   rect: (rect: UniApp.NodeInfo) => true,
+  height: (height: number) => true,
 }
 
 export type FooterEmits = typeof footerEmits
