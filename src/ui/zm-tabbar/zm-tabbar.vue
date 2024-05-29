@@ -16,6 +16,7 @@ defineOptions({ name: "zm-tabbar" })
 const emits = defineEmits(tabbarEmits)
 const props = defineProps(tabbarProps)
 
+const view = inject<any>("zm-view", null)
 const rect = ref<UniApp.NodeInfo>({})
 const isExistFooter = ref(false)
 const safeAreaBottomHeight = ref(17)
@@ -48,9 +49,17 @@ const placeholderStyle = computed(() => {
   return useStyle({ height: rect.value?.height + "px" })
 })
 
+function event() {
+  view?.mitt.on("tabbar.rect.emit", async () => {
+    view.mitt.emit("tabbar.rect", await useElRect(".zm-tabbar__content", instance))
+  })
+}
+
 async function resize() {
   await nextTick()
   rect.value = await useElRect(".zm-tabbar__content", instance)
+  emits("rect", rect.value)
+  view?.mitt.emit("tabbar.rect", rect.value)
 }
 
 async function changeEvent(value: string | number) {
@@ -59,6 +68,7 @@ async function changeEvent(value: string | number) {
   emits("change", value)
 }
 
+event()
 onMounted(() => resize())
 provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, changeEvent })
 defineExpose({ name: "zm-tabbar", resize })

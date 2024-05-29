@@ -31,7 +31,7 @@ watch(
 )
 
 function event() {
-  view && view.mitt.on("scroll", () => updateSticky())
+  view?.mitt.on("scroll", () => updateSticky())
 }
 
 async function resize() {
