@@ -3,6 +3,8 @@ import { ViewExpose } from "./zm-view"
 import { getCurrentInstance } from "vue"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app"
 
+export * from "./zm-dialog"
+
 export function useView() {
   let mitt = ref<Mitt>()
   let view = ref<ViewExpose>()

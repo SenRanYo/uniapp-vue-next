@@ -22,8 +22,8 @@ import { useStyle, useUnit } from "../utils/style"
 import { toastProps, ToastOptions } from "./index"
 
 defineOptions({ name: "zm-toast" })
-
 const props = defineProps(toastProps)
+
 const timer = ref(null)
 const visible = ref(false)
 const icons = ref({ await: "clock", fail: "clear", success: "checked" })

@@ -1,7 +1,11 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-empty>123</zm-empty>
+    <zm-row>
+      <zm-col :span="24">
+        <button @click="handleClick">测试</button>
+      </zm-col>
+    </zm-row>
     <zm-footer>
       <view class="flex items-center p-24">底部内容</view>
     </zm-footer>
@@ -12,18 +16,21 @@
       <zm-tabbar-item name="4" icon="thumb-circle-o" route="/pages/tabbar/tabbar-4/index">Tabbar-4</zm-tabbar-item>
       <zm-tabbar-item name="5" icon="user-o" route="/pages/tabbar/tabbar-5/index">Tabbar-5</zm-tabbar-item>
     </zm-tabbar>
+    <zm-dialog ref="dialog"></zm-dialog>
   </zm-view>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { useView } from "@/ui"
+import { useView, DialogExpose } from "@/ui"
 
 const { view } = useView()
 
 const list = ref([])
 const tabbar = ref("1")
+const dialog = ref<DialogExpose>(null)
 const options = reactive({ size: 15 })
+const showDialog = ref(false)
 
 function handleGetData({ page, pageSize, type, success }) {
   if (type == "load") {
@@ -40,6 +47,22 @@ function handleGetData({ page, pageSize, type, success }) {
       success({ list: l, total: 80 })
     }, 1000)
   }
+}
+
+function handleClick() {
+  dialog.value?.open({
+    title: "温馨提示",
+    content: "一个组合商品至多支持添加5个商品,同一个商品可搭配多个数量,多规格商品只能选择其中一个规格参与搭建",
+    asyncClose: true,
+    showCancelButton: true,
+    showConfirmButton: true,
+    closeOnClickOverlay: false,
+    onConfirm: ({ close, done }) => {
+      setTimeout(() => {
+        done()
+      }, 2000)
+    },
+  })
 }
 </script>
 

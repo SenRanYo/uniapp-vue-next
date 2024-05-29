@@ -1,27 +1,27 @@
 <template>
-  <view class="zm-dialog" :style="dialogStyle" @touchmove.prevent.stop="noop">
-    <zm-overlay v-if="options.overlay" :show="visible" :duration="options.duration" :custom-style="options.overlayStyle" @click="onClickOverlay"></zm-overlay>
+  <view class="zm-dialog" :style="[style]" @touchmove.prevent.stop="noop">
+    <zm-overlay v-if="useOptions.overlay" :show="visible" :duration="useOptions.duration" :custom-style="useOptions.overlayStyle" @click="clickOverlay"></zm-overlay>
     <zm-transition
       mode="fade-zoom"
       :show="visible"
-      :duration="options.duration"
-      :timing-function="timingFunction"
-      :custom-style="dialogTransitionStyle"
+      :duration="useOptions.duration"
+      :custom-style="transitionStyle"
       @open="onOpen"
       @opened="onOpened"
       @close="onClose"
       @closed="onClosed"
+      @click="clickOverlay"
     >
       <view class="zm-dialog__fixed" :style="[fixedStyle]">
-        <view class="zm-dialog__body" :style="[bodyStyle]">
+        <view class="zm-dialog__body" :style="[bodyStyle]" @click.stop="noop">
           <slot name="title">
-            <view v-if="options.title" class="zm-dialog__title">{{ options.title }}</view>
+            <view v-if="useOptions.title" class="zm-dialog__title">{{ useOptions.title }}</view>
           </slot>
 
           <scroll-view class="zm-dialog__scroll" :style="[scrollStyle]" scroll-y enable-flex>
             <view class="zm-dialog__content" :style="[contentStyle]">
               <slot>
-                <view class="zm-dialog__content__text" :class="[textClass]">{{ options.content }}</view>
+                <view class="zm-dialog__content__text" :class="[textClass]">{{ useOptions.content }}</view>
               </slot>
             </view>
           </scroll-view>
@@ -30,7 +30,7 @@
             <slot name="footer">
               <slot name="cancel">
                 <zm-button
-                  v-if="options.showCancelButton"
+                  v-if="useOptions.showCancelButton"
                   block
                   :loading="cancelLoading"
                   loading-text=""
@@ -41,16 +41,16 @@
                   text-weight="500"
                   border-radius="0rpx"
                   border-width="0rpx"
-                  :text-color="options.cancelButtonColor"
+                  :text-color="useOptions.cancelButtonColor"
                   @click="cancel"
                 >
-                  {{ options.cancelButtonText }}
+                  {{ useOptions.cancelButtonText }}
                 </zm-button>
               </slot>
-              <view v-if="options.showCancelButton && options.showConfirmButton" class="zm-dialog__footer__line"></view>
+              <view v-if="useOptions.showCancelButton && useOptions.showConfirmButton" class="zm-dialog__footer__line"></view>
               <slot name="confirm">
                 <zm-button
-                  v-if="options.showConfirmButton"
+                  v-if="useOptions.showConfirmButton"
                   block
                   :loading="confirmLoading"
                   loading-text=""
@@ -61,10 +61,10 @@
                   text-weight="500"
                   border-radius="0rpx"
                   border-width="0rpx"
-                  :text-color="options.confirmButtonColor"
+                  :text-color="useOptions.confirmButtonColor"
                   @click="confirm"
                 >
-                  {{ options.confirmButtonText }}
+                  {{ useOptions.confirmButtonText }}
                 </zm-button>
               </slot>
             </slot>
@@ -76,296 +76,264 @@
   </view>
 </template>
 
-<script>
-import hook from "@/mixins/hook"
-import weixin from "@/mixins/weixin"
-import { merge } from "@/utils/utils"
-import { isFunction } from "@/utils/check"
-import { useStyle, useUnit, useColor } from "@/utils/style"
+<script setup lang="ts">
+import { merge } from "../utils/utils"
+import { isFunction } from "../utils/check"
+import { useStyle, useUnit, useColor, useUnitToPx, useElRect } from "../hooks"
+import { dialogEmits, dialogProps, DialogOptions, DoneAction, CloseAction, OpenAction } from "./index"
 
-/**
- * @name zm-dialog 弹出框组件
- * @prop {Boolean} show - 是否显示
- * @prop {String} title - 标题
- * @prop {Number|String} width - 整个dialog宽度
- * @prop {Number|String} height - 消息内容高度
- * @prop {String} content - 内容
- * @prop {String} contentAlign - 内容对齐方式
- * @prop {Boolean} showConfirmButton - 是否显示确认按钮
- * @prop {Boolean} showCancelButton - 是否显示取消按钮
- * @prop {String} confirmButtonText - 确认按钮文字
- * @prop {String} confirmButtonColor - 确认按钮文字颜色
- * @prop {String} cancelButtonText - 取消按钮文字
- * @prop {String} cancelButtonColor - 取消按钮文字颜色
- * @prop {Boolean} buttonReverse - 是否对调确认和取消按钮位置
- * @prop {Boolean} overlay - 是否显示遮罩层
- * @prop {Object|String} overlayStyle - 自定义遮罩层样式
- * @prop {Boolean} closeOnClickOverlay - 是否点击遮罩层后关闭
- * @prop {Number|String} offsetTop - 弹窗顶部偏移
- * @prop {Boolean} asyncClose - 是否异步关闭
- * @prop {Number|String} zIndex - 元素层级
- * @prop {Number|String} duration - 弹窗打开过渡时间,单位毫秒
- * @prop {Number|String} borderRadius - 弹窗圆角
- * @prop {Object|String} customStyle - 自定义样式
- */
-export default {
-  name: "zm-dialog",
-  mixins: [hook, weixin],
-  props: {
-    show: { type: Boolean, default: false },
-    title: { type: String, default: "" },
-    width: { type: [Number, String], default: "" },
-    height: { type: [Number, String], default: "" },
-    content: { type: String, default: "" },
-    contentAlign: { type: String, default: "center" },
-    showConfirmButton: { type: Boolean, default: true },
-    showCancelButton: { type: Boolean, default: false },
-    confirmButtonText: { type: String, default: "确认" },
-    confirmButtonColor: { type: String, default: "var(--theme-color)" },
-    cancelButtonText: { type: String, default: "取消" },
-    cancelButtonColor: { type: String, default: "" },
-    buttonReverse: { type: Boolean, default: false },
-    overlay: { type: Boolean, default: true },
-    overlayStyle: { type: [Object, String], default: () => ({}) },
-    closeOnClickOverlay: { type: Boolean, default: false },
-    padding: { type: [Number, String], default: "" },
-    offsetTop: { type: [Number, String], default: "" },
-    asyncClose: { type: Boolean, default: false },
-    zIndex: { type: [Number, String], default: "" },
-    duration: { type: [Number, String], default: 300 },
-    background: { type: String, default: "" },
-    borderRadius: { type: [Number, String], default: "16rpx" },
-    customStyle: { type: [Object, String], default: () => ({}) }
+defineOptions({ name: "zm-dialog" })
+const emits = defineEmits(dialogEmits)
+const props = defineProps(dialogProps)
+
+const visible = ref(false)
+const openAction = ref<OpenAction>("outside")
+const cancelLoading = ref(false)
+const confirmLoading = ref(false)
+const useOptions = ref<DialogOptions>({})
+const propOptions = ref<DialogOptions>({})
+const baseOptions = ref<DialogOptions>({
+  show: false,
+  title: "",
+  width: "",
+  height: "",
+  content: "",
+  contentAlign: "center",
+  showConfirmButton: true,
+  showCancelButton: false,
+  confirmButtonText: "确认",
+  confirmButtonColor: "var(--primary-color)",
+  cancelButtonText: "取消",
+  cancelButtonColor: "",
+  buttonReverse: false,
+  overlay: true,
+  overlayStyle: {},
+  closeOnClickOverlay: false,
+  padding: "",
+  offsetTop: "",
+  asyncClose: false,
+  zIndex: "",
+  duration: 300,
+  background: "",
+  borderRadius: "",
+  customStyle: {},
+  onConfirm: null,
+  onCancel: null,
+  onOverlay: null,
+})
+
+const style = computed(() => {
+  const style: any = {}
+  style.zIndex = useOptions.value.zIndex
+  return useStyle(style)
+})
+
+const transitionStyle = computed(() => {
+  const style: any = {}
+  style.top = 0
+  style.left = 0
+  style.right = 0
+  style.bottom = 0
+  style.position = "fixed"
+  return useStyle(style)
+})
+
+const fixedStyle = computed(() => {
+  const style: any = {}
+  style.width = useUnit(useOptions.value.width)
+  style.marginTop = useUnit(useOptions.value.offsetTop)
+  return useStyle({ ...style, ...useStyle(useOptions.value.customStyle) })
+})
+
+const bodyStyle = computed(() => {
+  const style: any = {}
+  style.background = useColor(useOptions.value.background)
+  style.borderRadius = useUnit(useOptions.value.borderRadius)
+  return useStyle({ ...style, ...useStyle(useOptions.value.customStyle) })
+})
+
+const scrollStyle = computed(() => {
+  const style: any = {}
+  style.height = useUnit(useOptions.value.height)
+  return useStyle(style)
+})
+
+const contentStyle = computed(() => {
+  const style: any = {}
+  style.padding = useUnit(useOptions.value.padding)
+  return useStyle(style)
+})
+
+const footerStyle = computed(() => {
+  const style: any = {}
+  style.borderBottomLeftRadius = useUnit(useOptions.value.borderRadius)
+  style.borderBottomRightRadius = useUnit(useOptions.value.borderRadius)
+  return useStyle(style)
+})
+
+const textClass = computed(() => {
+  const list = []
+  list.push(`zm-dialog__content__text--${useOptions.value.contentAlign}`)
+  return list
+})
+
+const footerClass = computed(() => {
+  const list = []
+  if (useOptions.value.buttonReverse) list.push("zm-dialog__footer--reverse")
+  return list
+})
+
+watch(
+  () => props,
+  (options) => {
+    propOptions.value = merge(baseOptions.value, options)
   },
-  data() {
-    return {
-      options: {
-        show: false,
-        title: "",
-        width: "",
-        height: "",
-        content: "",
-        contentAlign: "center",
-        showConfirmButton: true,
-        showCancelButton: false,
-        confirmButtonText: "确认",
-        confirmButtonColor: "var(--theme-color)",
-        cancelButtonText: "取消",
-        cancelButtonColor: "",
-        buttonReverse: false,
-        overlay: true,
-        overlayStyle: {},
-        closeOnClickOverlay: false,
-        padding: "",
-        offsetTop: "",
-        asyncClose: false,
-        zIndex: "",
-        duration: 300,
-        background: "",
-        borderRadius: "",
-        customStyle: {},
-        onConfirm: null,
-        onCancel: null,
-        onOverlay: null
-      },
-      openType: "outside",
-      visible: false,
-      cancelLoading: false,
-      confirmLoading: false,
-      timingFunction: "ease-out"
-    }
+  { deep: true, immediate: true },
+)
+
+watch(
+  () => props.show,
+  (val) => {
+    val ? open({}, "inner") : close("close")
   },
-  computed: {
-    dialogStyle() {
-      const style = {}
-      style.zIndex = this.options.zIndex
-      return useStyle(style)
-    },
-    dialogTransitionStyle() {
-      const style = {}
-      style.top = 0
-      style.left = 0
-      style.right = 0
-      style.bottom = 0
-      style.position = "fixed"
-      return useStyle(style)
-    },
-    fixedStyle() {
-      const style = {}
-      style.width = useUnit(this.options.width)
-      style.marginTop = useUnit(this.options.offsetTop)
-      return useStyle({ ...style, ...useStyle(this.options.customStyle) })
-    },
-    bodyStyle() {
-      const style = {}
-      style.background = useColor(this.options.background)
-      style.borderRadius = useUnit(this.options.borderRadius)
-      return useStyle({ ...style, ...useStyle(this.options.customStyle) })
-    },
-    scrollStyle() {
-      const style = {}
-      style.height = useUnit(this.options.height)
-      return useStyle(style)
-    },
-    contentStyle() {
-      const style = {}
-      style.padding = useUnit(this.options.padding)
-      return useStyle(style)
-    },
-    footerStyle() {
-      const style = {}
-      style.borderBottomLeftRadius = useUnit(this.options.borderRadius)
-      style.borderBottomRightRadius = useUnit(this.options.borderRadius)
-      return useStyle(style)
-    },
-    textClass() {
-      const list = []
-      list.push(`zm-dialog__content__text--${this.options.contentAlign}`)
-      return list
-    },
-    footerClass() {
-      const list = []
-      if (this.options.buttonReverse) list.push("zm-dialog__footer--reverse")
-      return list
-    }
-  },
-  watch: {
-    $props: {
-      handler(v) {
-        this.options = merge(this.options, v)
-      },
-      deep: true,
-      immediate: true
-    },
-    "options.show": {
-      handler(v) {
-        if (v) {
-          this.openType = "inner"
-          this.open()
-        } else {
-          this.openType = "outside"
-          this.close("prop")
-        }
-      },
-      immediate: true
-    }
-  },
-  methods: {
-    // 点击遮罩层
-    onClickOverlay() {
-      // 判断是否点击关闭按钮
-      if (this.options.closeOnClickOverlay) {
-        if (this.options.asyncClose) {
-          this.cancelLoading = true
-          if (this.openType === "inner") {
-            const close = () => this.close("overlay")
-            this.$emit("click-overlay", { close })
-          } else {
-            this.close("overlay")
-            this.$emit("click-overlay")
-          }
-        } else {
-          this.close("overlay")
-          this.$emit("click-overlay")
-        }
-      }
-    },
-    open(options = {}) {
-      if (this.visible) return
-      this.options = merge(this.options, options)
-      this.timingFunction = "ease-out"
-      this.visible = true
-      this.$emit("update:show", true)
-    },
-    close(action = "") {
-      if (this.visible) {
-        const _close = () => {
-          this.timingFunction = "ease-in"
-          this.visible = false
-          this.cancelLoading = false
-          this.confirmLoading = false
-          this.$emit("update:show", false)
-        }
-        if (action === "confirm" && isFunction(this.options.onConfirm)) {
-          if (this.options.asyncClose) this.options.onConfirm({ close: _close, done: this.done })
-          else {
-            _close()
-            this.options.onConfirm()
-          }
-        } else if (action === "cancel" && isFunction(this.options.onCancel)) {
-          if (this.options.asyncClose) this.options.onCancel({ close: _close, done: this.done })
-          else {
-            _close()
-            this.options.onCancel()
-          }
-        } else if (action === "overlay" && isFunction(this.options.onOverlay)) {
-          if (this.options.asyncClose) this.options.onOverlay({ close: _close, done: this.done })
-          else {
-            _close()
-            this.options.onOverlay()
-          }
-        } else {
-          _close()
-        }
-      }
-    },
-    done(action) {
-      if (action) {
-        const actions = { confirm: "confirmLoading", cancel: "cancelLoading" }
-        if (actions[action]) this[actions[action]] = false
-      }
-    },
-    cancel() {
-      if (this.options.asyncClose) {
-        this.cancelLoading = true
-        if (this.openType === "inner") {
-          const close = () => this.close("cancel")
-          const done = () => this.done("cancel")
-          this.$emit("cancel", { close, done })
-        } else {
-          this.close("cancel")
-          this.$emit("cancel")
-        }
+  { immediate: true },
+)
+
+function clickOverlay() {
+  if (useOptions.value.closeOnClickOverlay) {
+    if (useOptions.value.asyncClose) {
+      cancelLoading.value = true
+      if (openAction.value === "inner") {
+        const _close = () => close("overlay")
+        emits("click-overlay", { close: _close })
       } else {
-        this.close("cancel")
-        this.$emit("cancel")
+        close("overlay")
+        emits("click-overlay")
       }
-    },
-    confirm() {
-      if (this.options.asyncClose) {
-        this.confirmLoading = true
-        if (this.openType === "inner") {
-          const close = () => this.close("confirm")
-          const done = () => this.done("confirm")
-          this.$emit("confirm", { close, done })
-        } else {
-          this.close("confirm")
-          this.$emit("confirm")
-        }
-      } else {
-        this.close("confirm")
-        this.$emit("confirm")
-      }
-    },
-    onOpen() {
-      this.$emit("open")
-    },
-    onOpened() {
-      this.$emit("opened")
-    },
-    onClose() {
-      this.$emit("close")
-    },
-    onClosed() {
-      this.$emit("closed")
-    },
-    noop() {
-      return false
+    } else {
+      close("overlay")
+      emits("click-overlay")
     }
   }
 }
-</script>
 
+function open(options: DialogOptions = {}, action: OpenAction = "outside") {
+  if (visible.value) return
+  openAction.value = action
+  useOptions.value = merge(merge(baseOptions.value, propOptions.value), options)
+  visible.value = true
+  emits("update:show", true)
+}
+
+function close(action: CloseAction) {
+  if (visible.value) {
+    const _close = () => {
+      visible.value = false
+      openAction.value = "outside"
+      cancelLoading.value = false
+      confirmLoading.value = false
+      emits("update:show", false)
+    }
+    if (action === "confirm" && isFunction(useOptions.value.onConfirm)) {
+      if (useOptions.value.asyncClose) useOptions.value.onConfirm({ close: _close, done: () => done(action) })
+      else {
+        _close()
+        useOptions.value.onConfirm()
+      }
+    } else if (action === "cancel" && isFunction(useOptions.value.onCancel)) {
+      if (useOptions.value.asyncClose) useOptions.value.onCancel({ close: _close, done: () => done(action) })
+      else {
+        _close()
+        useOptions.value.onCancel()
+      }
+    } else if (action === "overlay" && isFunction(useOptions.value.onOverlay)) {
+      if (useOptions.value.asyncClose) useOptions.value.onOverlay({ close: _close, done: () => done(action) })
+      else {
+        _close()
+        useOptions.value.onOverlay()
+      }
+    } else {
+      _close()
+    }
+  }
+}
+
+function done(action: DoneAction) {
+  switch (action) {
+    case "confirm":
+      confirmLoading.value = false
+      break
+    case "cancel":
+      cancelLoading.value = false
+      break
+    default:
+      confirmLoading.value = false
+      cancelLoading.value = false
+      break
+  }
+}
+
+function cancel() {
+  if (useOptions.value.asyncClose) {
+    cancelLoading.value = true
+    if (openAction.value === "inner") {
+      const _done = () => done("cancel")
+      const _close = () => close("cancel")
+      emits("cancel", { close: _close, done: _done })
+    } else {
+      close("cancel")
+      emits("cancel")
+    }
+  } else {
+    close("cancel")
+    emits("cancel")
+  }
+}
+
+function confirm() {
+  if (useOptions.value.asyncClose) {
+    confirmLoading.value = true
+    if (openAction.value === "inner") {
+      const _done = () => done("confirm")
+      const _close = () => () => close("confirm")
+      emits("confirm", { close: _close, done: _done })
+    } else {
+      close("confirm")
+      emits("confirm")
+    }
+  } else {
+    close("confirm")
+    emits("confirm")
+  }
+}
+
+function onOpen() {
+  emits("open")
+}
+
+function onOpened() {
+  emits("opened")
+}
+
+function onClose() {
+  emits("close")
+}
+
+function onClosed() {
+  emits("closed")
+}
+
+function noop() {
+  return false
+}
+
+defineExpose({ name: "zm-dialog", open, close })
+</script>
+<script lang="ts">
+export default {
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss" scoped>
 .zm-dialog {
   z-index: 14500;
@@ -388,7 +356,7 @@ export default {
   &__body {
     overflow: hidden;
     border-radius: 16rpx;
-    background-color: #ffffff;
+    background-color: #fff;
   }
 
   &__title {
@@ -445,7 +413,7 @@ export default {
       height: 100%;
       display: flex;
       position: absolute;
-      background-color: #eeeeee;
+      background-color: #eee;
       transform: translateX(-50%);
     }
 
@@ -455,7 +423,7 @@ export default {
       width: 100%;
       content: "";
       position: absolute;
-      border-top: 2rpx solid #eeeeee;
+      border-top: 2rpx solid #eee;
     }
   }
 }
