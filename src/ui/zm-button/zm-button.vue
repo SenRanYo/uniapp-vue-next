@@ -134,6 +134,7 @@ defineExpose({ name: "zm-button" })
 </script>
 <script lang="ts">
 export default {
+  name: "zm-button",
   options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>
