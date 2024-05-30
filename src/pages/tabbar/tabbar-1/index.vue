@@ -6,6 +6,7 @@
         <zm-button @click="handleClick">测试</zm-button>
       </zm-col>
     </zm-row>
+    <zm-action-sheet title="选项" description="描述内容" :actions="actions" v-model:show="showaAtions"></zm-action-sheet>
     <zm-footer>
       <view class="flex items-center p-24">底部内容</view>
     </zm-footer>
@@ -28,9 +29,11 @@ const { view } = useView()
 
 const list = ref([])
 const tabbar = ref("1")
+const actions = ref([{ title: "选项一" }, { title: "选项二" }, { title: "选项三" }, { title: "选项四" }])
 const dialog = ref<DialogExpose>(null)
 const options = reactive({ size: 15 })
 const showDialog = ref(false)
+const showaAtions = ref(false)
 
 function handleGetData({ page, pageSize, type, success }) {
   if (type == "load") {
@@ -50,19 +53,20 @@ function handleGetData({ page, pageSize, type, success }) {
 }
 
 function handleClick() {
-  dialog.value?.open({
-    title: "温馨提示",
-    content: "一个组合商品至多支持添加5个商品,同一个商品可搭配多个数量,多规格商品只能选择其中一个规格参与搭建",
-    asyncClose: true,
-    showCancelButton: true,
-    showConfirmButton: true,
-    closeOnClickOverlay: false,
-    onConfirm: ({ close, done }) => {
-      setTimeout(() => {
-        done()
-      }, 2000)
-    },
-  })
+  showaAtions.value = true
+  // dialog.value?.open({
+  //   title: "温馨提示",
+  //   content: "一个组合商品至多支持添加5个商品,同一个商品可搭配多个数量,多规格商品只能选择其中一个规格参与搭建",
+  //   asyncClose: true,
+  //   showCancelButton: true,
+  //   showConfirmButton: true,
+  //   closeOnClickOverlay: false,
+  //   onConfirm: ({ close, done }) => {
+  //     setTimeout(() => {
+  //       done()
+  //     }, 2000)
+  //   },
+  // })
 }
 </script>
 
