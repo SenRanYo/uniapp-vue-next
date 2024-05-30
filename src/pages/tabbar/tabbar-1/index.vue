@@ -1,13 +1,12 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-arc height="300rpx" background="red" :percent="120"></zm-arc>
-    <!-- <zm-row>
+    <zm-row>
       <zm-col :span="24">
+        <zm-badge value="900"></zm-badge>
         <zm-button @click="handleClick">测试</zm-button>
       </zm-col>
-    </zm-row> -->
-    <zm-action-sheet title="选项" description="描述内容" :actions="actions" v-model:show="showaAtions"></zm-action-sheet>
+    </zm-row>
     <zm-footer>
       <view class="flex items-center p-24">底部内容</view>
     </zm-footer>
