@@ -22,7 +22,7 @@ export const buttonProps = {
   /**
    * @description 是否圆形的
    */
-  round: { type: Boolean, default: true },
+  round: { type: Boolean, default: false },
   /**
    * @description 是否文本按钮
    */

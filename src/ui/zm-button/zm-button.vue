@@ -160,6 +160,7 @@ $zm-button-medium-font-size: 28rpx;
 $zm-button-large-font-size: 32rpx;
 
 .zm-button {
+  margin: 0;
   display: flex;
   overflow: visible;
   position: relative;

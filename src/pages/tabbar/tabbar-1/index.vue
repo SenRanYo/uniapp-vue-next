@@ -3,7 +3,7 @@
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
     <zm-row>
       <zm-col :span="24">
-        <button @click="handleClick">测试</button>
+        <zm-button @click="handleClick">测试</zm-button>
       </zm-col>
     </zm-row>
     <zm-footer>
