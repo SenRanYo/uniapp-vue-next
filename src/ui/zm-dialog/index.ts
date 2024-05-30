@@ -41,7 +41,7 @@ export const dialogProps = {
   /**
    * @description 确认按钮文字颜色
    */
-  confirmButtonColor: { type: String, default: "var(--theme-color)" },
+  confirmButtonColor: { type: String, default: "var(--primary-color)" },
   /**
    * @description 取消按钮文字
    */
