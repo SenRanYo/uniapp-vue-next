@@ -7,6 +7,12 @@
         <zm-button @click="handleClick">测试</zm-button>
       </zm-col>
     </zm-row>
+    <zm-cell-group>
+      <zm-cell title="单元格1" desc="123" content="这是内容" value="内容" icon="wap-home-o"></zm-cell>
+      <zm-cell title="单元格2" value="内容" icon="wap-home-o"></zm-cell>
+      <zm-cell title="单元格3" value="内容" icon="wap-home-o"></zm-cell>
+      <zm-cell title="单元格4" value="内容" icon="wap-home-o"></zm-cell>
+    </zm-cell-group>
     <zm-footer>
       <view class="flex items-center p-24">底部内容</view>
     </zm-footer>
