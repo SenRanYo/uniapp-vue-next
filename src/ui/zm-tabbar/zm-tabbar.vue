@@ -27,7 +27,7 @@ const modelValue = computed({
     return props.modelValue
   },
   set(value) {
-    changeEvent(value)
+    updateValue(value)
   },
 })
 
@@ -63,7 +63,7 @@ async function resize() {
   view?.mitt.emit("tabbar.rect", rect.value)
 }
 
-async function changeEvent(value: string | number) {
+async function updateValue(value: string | number) {
   emits("update:modelValue", value)
   await nextTick()
   emits("change", value)
@@ -71,7 +71,7 @@ async function changeEvent(value: string | number) {
 
 event()
 onMounted(() => resize())
-provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, changeEvent })
+provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, updateValue })
 defineExpose({ name: "zm-tabbar", resize })
 </script>
 <script lang="ts">

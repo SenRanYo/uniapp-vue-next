@@ -58,7 +58,7 @@ function onClick() {
         })
       }, 100)
     } else {
-      tabbar.changeEvent(props.name)
+      tabbar.updateValue(props.name)
     }
   }
 }

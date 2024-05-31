@@ -1,5 +1,5 @@
 <template>
-  <view class="zm-checkbox" :class="[wrapClass, customClass]" :style="[wrapStyle]" @click="onClick">
+  <view class="zm-checkbox" :class="[classs, customClass]" :style="[style]" @click="onClick">
     <view class="zm-checkbox__icon" @click.stop="onClickIcon">
       <slot name="icon">
         <view class="zm-checkbox__icon__default" :class="{ 'is-round': round, 'is-checked': isChecked }" :style="[iconDefaultStyle]">
@@ -7,230 +7,179 @@
         </view>
       </slot>
     </view>
-    <view v-if="$slots.default" class="zm-checkbox__label" @click.stop="onClickLabel">
-      <slot></slot>
+    <view v-if="isShowLabel" class="zm-checkbox__label" :style="[labelStyle]" @click.stop="onClickLabel">
+      <slot>{{ label }}</slot>
     </view>
   </view>
 </template>
 
-<script>
-/**
- * @name zm-checkbox  复选框组件
- * @prop {Boolean} value - 是否选中，默认为 false
- * @prop {Number|String} name - 复选框的名称，默认为空字符串
- * @prop {Boolean} bindGroup - 是否绑定到组，默认为 true
- * @prop {Number|String} max - 最大可选数量，默认为无限大
- * @prop {Boolean} disabled - 是否禁用，默认为 false
- * @prop {String} icon - 图标名称，默认为 "success"
- * @prop {Number|String} size - 复选框尺寸，默认为空字符串
- * @prop {Boolean} round - 是否圆角，默认为 false
- * @prop {String} checkedColor - 选中状态的颜色，默认为空字符串
- * @prop {Number|String} iconSize - 图标尺寸，默认为空字符串
- * @prop {String} iconColor - 图标颜色，默认为空字符串
- * @prop {Number|String} iconWeight - 图标粗细，默认为空字符串
- * @prop {String} iconPrefix - 图标前缀，默认为 "zm-icon"
- * @prop {Number|String} labelSize - 标签尺寸，默认为空字符串
- * @prop {String} labelColor - 标签颜色，默认为空字符串
- * @prop {Number|String} labelWeight - 标签粗细，默认为空字符串
- * @prop {String|Number} labelGap - 标签与复选框之间的间距，默认为空字符串
- * @prop {Boolean} labelLeft - 是否将标签放在复选框左侧，默认为 false
- * @prop {Boolean} labelDisabled - 是否禁用标签
- * @prop {String} checkedLabelColor - 选中状态下的标签颜色，默认为空字符串
- * @prop {String} customClass - 自定义类名，默认为空字符串
- * @prop {Object|String} customStyle - 自定义样式，默认为一个空对象
- */
-import mixins from "../mixins"
+<script setup lang="ts">
 import { isBoolean } from "../utils/check"
-import { useStyle, useUnit, useColor } from "../utils/style"
-export default {
-  name: "zm-checkbox",
-  mixins: [mixins],
-  props: {
-    value: { type: Boolean, default: false },
-    name: { type: [Number, String], default: "" },
-    bindGroup: { type: Boolean, default: true },
-    max: { type: [Number, String], default: Infinity },
-    disabled: { type: Boolean, default: false },
-    icon: { type: String, default: "check" },
-    size: { type: [Number, String], default: "" },
-    round: { type: Boolean, default: false },
-    checkedColor: { type: String, default: "" },
-    iconSize: { type: [Number, String], default: "" },
-    iconColor: { type: String, default: "#c8c9cc" },
-    iconWeight: { type: [Number, String], default: "" },
-    iconPrefix: { type: String, default: "zm-icon" },
-    iconRadius: { type: [Number, String], default: "" },
-    labelSize: { type: [Number, String], default: "" },
-    labelColor: { type: String, default: "" },
-    labelWeight: { type: [Number, String], default: "" },
-    labelGap: { type: [String, Number], default: "" },
-    labelLeft: { type: Boolean, default: false },
-    labelDisabled: { type: Boolean },
-    checkedIconColor: { type: String, default: "" },
-    checkedLabelColor: { type: String, default: "" },
-    customClass: { type: String, default: "" },
-    customStyle: { type: [Object, String], default: () => ({}) }
+import { useStyle, useUnit, useColor } from "../hooks"
+import { checkboxEmits, checkboxProps, CheckboxValueType } from "./index"
+
+defineOptions({ name: "zm-checkbox" })
+const emits = defineEmits(checkboxEmits)
+const props = defineProps(checkboxProps)
+const checkboxGroup = inject("zm-checkbox-group", null)
+
+const slots = useSlots()
+const index = ref(null)
+
+const modelValue = computed({
+  get() {
+    return props.modelValue
   },
-  data() {
-    return {
-      index: -1,
-      checkboxGroup: null
+  set(value) {
+    updateValue(value)
+  },
+})
+
+const style = computed(() => {
+  const style: any = {}
+  style.fontSize = useUnit(checkboxGroup?.iconSize.value || props.iconSize)
+  if (checkboxGroup?.iconColor.value || props.iconColor) {
+    style["--zm-checkbox-icon-color"] = useColor(checkboxGroup?.iconColor.value || props.iconColor)
+  }
+  if (checkboxGroup?.checkedIconColor.value || props.checkedIconColor) {
+    style["--zm-checkbox-checked-icon-color"] = useColor(checkboxGroup?.checkedIconColor.value || props.checkedIconColor)
+  }
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
+})
+
+const classs = computed(() => {
+  const list = []
+  if (isChecked.value) list.push("zm-checkbox--checked")
+  if (checkboxGroup?.disabled.value || props.disabled) list.push("zm-checkbox--disabled")
+  if (checkboxGroup?.labelLeft.value || props.labelLeft) list.push("zm-checkbox--left")
+  return list
+})
+
+const iconStyle = computed(() => {
+  const style: any = {}
+  if (modelValue.value) {
+    style.background = useColor(checkboxGroup?.checkedColor.value || props.checkedColor)
+  }
+  return useStyle(style)
+})
+
+const iconClass = computed(() => {
+  const list = []
+  if (checkboxGroup?.round.value || props.round) list.push("zm-icon--round")
+  if (checkboxGroup?.icon.value || props.icon) list.push(`${checkboxGroup?.iconPrefix.value || props.iconPrefix}-${checkboxGroup?.icon.value || props.icon}`)
+  return list
+})
+
+const iconDefaultStyle = computed(() => {
+  const style: any = {}
+  style.color = useColor(checkboxGroup?.iconColor.value || props.iconColor)
+  style.fontSize = useUnit(checkboxGroup?.iconSize.value || props.iconSize)
+  style.fontWeight = checkboxGroup?.iconWeight.value || props.iconWeight
+  if (!checkboxGroup?.round.value || !props.round) {
+    style.borderRadius = checkboxGroup?.iconRadius.value || props.iconRadius
+  }
+  if (modelValue.value) {
+    style.borderColor = useColor(checkboxGroup?.checkedColor.value || props.checkedColor)
+  }
+  if (isChecked.value) {
+    style.borderColor = useColor(checkboxGroup?.checkedIconColor.value || props.checkedIconColor)
+    style.backgroundColor = useColor(checkboxGroup?.checkedIconColor.value || props.checkedIconColor)
+  }
+  return useStyle(style)
+})
+
+const isShowLabel = computed(() => {
+  return slots.default || props.label
+})
+
+const labelStyle = computed(() => {
+  const style: any = {}
+  style.color = useColor(checkboxGroup?.labelColor.value || props.labelColor)
+  style.fontSize = useUnit(checkboxGroup?.labelSize.value || props.labelSize)
+  style.fontWeight = checkboxGroup?.labelWeight.value || props.labelWeight
+  if (modelValue.value && (checkboxGroup?.checkedLabelColor.value || props.checkedLabelColor)) {
+    style.color = useColor(checkboxGroup?.checkedLabelColor.value || props.checkedLabelColor)
+  }
+  if (props.labelGap) {
+    props.labelLeft ? (style.marginRight = useUnit(checkboxGroup?.labelGap.value || props.labelGap)) : (style.marginLeft = useUnit(checkboxGroup?.labelGap.value || props.labelGap))
+  }
+  return useStyle(style)
+})
+
+const isChecked = computed(() => {
+  if (props.bindGroup && checkboxGroup) {
+    return checkboxGroup?.modelValue.value.includes(props.name || index.value)
+  } else {
+    return modelValue.value
+  }
+})
+
+function resize() {
+  checkboxGroup?.addChildren({ name: props.name })
+  index.value = checkboxGroup?.childrens.value.findIndex(({ name }) => name === props.name)
+}
+
+async function updateValue(value: CheckboxValueType) {
+  emits("update:modelValue", toRaw(value))
+  await nextTick()
+  emits("change", toRaw(value))
+}
+
+function toggle(check?: boolean) {
+  if (props.disabled || checkboxGroup?.disabled.value) return
+  if (checkboxGroup && props.bindGroup) {
+    const value = checkboxGroup.modelValue.value
+    const index = value.indexOf(props.name)
+    const add = () => {
+      const isMax = checkboxGroup.max.value && value.length >= checkboxGroup.max.value
+      if (!isMax && !value.includes(props.name)) {
+        value.push(props.name)
+        checkboxGroup.updateValue(value)
+      }
     }
-  },
-  computed: {
-    // 类名
-    wrapClass() {
-      const list = []
-      if (this.isChecked) list.push("zm-checkbox--checked")
-      if (this.checkboxGroup?.disabled || this.disabled) list.push("zm-checkbox--disabled")
-      if (this.checkboxGroup?.labelLeft || this.labelLeft) list.push("zm-checkbox--left")
-      return list
-    },
-    // 样式
-    wrapStyle() {
-      const style = {}
-      style.fontSize = useUnit(this.checkboxGroup?.size || this.size)
-      if (this.checkboxGroup?.iconColor || this.iconColor) {
-        style["--zm-checkbox-icon-color"] = useColor(this.checkboxGroup?.iconColor || this.iconColor)
-      }
-      if (this.checkboxGroup?.checkedIconColor || this.checkedIconColor) {
-        style["--zm-checkbox-checked-icon-color"] = useColor(this.checkboxGroup?.checkedIconColor || this.checkedIconColor)
-      }
-      return useStyle({ ...style, ...useStyle(this.customStyle) })
-    },
-    // icon类名
-    iconClass() {
-      const list = []
-      if (this.checkboxGroup?.round || this.round) list.push("zm-icon--round")
-      if (this.checkboxGroup?.icon || this.icon) list.push(`${this.iconPrefix}-${this.icon}`)
-      return list
-    },
-    iconDefaultStyle() {
-      const style = {}
-      style.color = useColor(this.checkboxGroup?.iconColor || this.iconColor)
-      style.fontSize = useUnit(this.checkboxGroup?.iconSize || this.iconSize)
-      style.fontWeight = this.checkboxGroup?.iconWeight || this.iconWeight
-      if (!this.checkboxGroup?.round || !this.round) {
-        style.borderRadius = this.checkboxGroup?.iconRadius || this.iconRadius
-      }
-      if (this.value) {
-        style.borderColor = useColor(this.checkboxGroup?.checkedColor || this.checkedColor)
-      }
-      if (this.isChecked) {
-        style.borderColor = useColor(this.checkboxGroup?.checkedIconColor || this.checkedIconColor)
-        style.backgroundColor = useColor(this.checkboxGroup?.checkedIconColor || this.checkedIconColor)
-      }
-      return useStyle(style)
-    },
-    // icon样式
-    iconStyle() {
-      const style = {}
-      if (this.value) {
-        style.background = useColor(this.checkboxGroup?.checkedColor || this.checkedColor)
-      }
-      return useStyle(style)
-    },
-    // label样式
-    labelStyle() {
-      const style = {}
-      style.color = useColor(this.checkboxGroup?.labelColor || this.labelColor)
-      style.fontSize = useUnit(this.checkboxGroup?.labelSize || this.labelSize)
-      style.fontWeight = this.checkboxGroup?.labelWeight || this.labelWeight
-      if (this.value && (this.checkboxGroup?.checkedLabelColor || this.checkedLabelColor)) {
-        style.color = useColor(this.checkboxGroup?.checkedLabelColor || this.checkedLabelColor)
-      }
-      if (this.labelGap) {
-        this.labelLeft ? (style.marginRight = useUnit(this.checkboxGroup?.labelGap || this.labelGap)) : (style.marginLeft = useUnit(this.checkboxGroup?.labelGap || this.labelGap))
-      }
-      return useStyle(style)
-    },
-    iconInnerStyle() {
-      const style = {}
-      return useStyle(style)
-    },
-    isChecked() {
-      if (this.bindGroup && this.checkboxGroup) {
-        return this.checkboxGroup?.value?.includes(this.name || this.index)
-      } else {
-        return this.value
+    const remove = () => {
+      if (index !== -1) {
+        value.splice(index, 1)
+        checkboxGroup.updateValue(value)
       }
     }
-  },
-  watch: {
-    value: {
-      handler(val) {
-        this.$emit("change", val)
-      }
+    if (isBoolean(check)) {
+      if (check) add()
+      else remove()
+    } else if (index >= 0) {
+      remove()
+    } else {
+      add()
     }
-  },
-  mounted() {
-    this.init()
-  },
-  methods: {
-    init() {
-      this.checkboxGroup = this.useParent("zm-checkbox-group")
-      if (this.checkboxGroup) {
-        this.checkboxGroup.updateChildren(this)
-        this.checkboxGroup = this.useParent("zm-checkbox-group")
-        this.index = this.checkboxGroup.childrens.indexOf(this)
-      }
-    },
-    update() {
-      this.checkboxGroup = this.useParent("zm-checkbox-group")
-    },
-    // 切换状态
-    toggle(check) {
-      // 如果当前组件或者父组件禁用，则直接返回
-      if (this.disabled || this.checkboxGroup?.disabled) return
-      // 如果当前组件和父组件绑定，则根据当前组件的value属性，更新父组件的value
-      if (this.checkboxGroup && this.bindGroup) {
-        const value = [...this.checkboxGroup.value]
-        const index = value.indexOf(this.name || this.index)
-        const add = () => {
-          // 如果当前组件的value属性为false，则将当前组件的name添加到value中
-          const isMax = this.checkboxGroup.max && value.length >= this.checkboxGroup.max
-          if (!isMax && !value.includes(this.name || this.index)) {
-            value.push(this.name || this.index)
-            this.checkboxGroup.updateValue(value)
-          }
-        }
-        const remove = () => {
-          if (index !== -1) {
-            value.splice(index, 1)
-            this.checkboxGroup.updateValue(value)
-          }
-        }
-        if (isBoolean(check)) {
-          if (check) add()
-          else remove()
-        } else if (index >= 0) {
-          remove()
-        } else {
-          add()
-        }
-      } else {
-        // 如果当前组件和父组件没有绑定，则触发input事件
-        this.$emit("input", !this.value)
-      }
-    },
-    onClick() {
-      if (this.checkboxGroup?.labelDisabled || this.labelDisabled) return
-      this.toggle()
-      this.$emit("click")
-    },
-    onClickIcon() {
-      this.toggle()
-      this.$emit("click")
-    },
-    onClickLabel() {
-      if (this.checkboxGroup?.labelDisabled || this.labelDisabled) return
-      this.toggle()
-      this.$emit("click")
-    }
+  } else {
+    updateValue(!modelValue.value)
   }
 }
-</script>
 
+function onClick(event: TouchEvent) {
+  if (this.checkboxGroup?.labelDisabled || this.labelDisabled) return
+  toggle()
+  emits("click", event)
+}
+function onClickIcon(event: TouchEvent) {
+  toggle()
+  emits("click", event)
+}
+function onClickLabel(event: TouchEvent) {
+  if (checkboxGroup?.labelDisabled.value || props.labelDisabled) return
+  toggle()
+  emits("click", event)
+}
+
+onMounted(() => resize())
+defineExpose({ name: "zm-checkbox", toggle })
+</script>
+<script lang="ts">
+export default {
+  name: "zm-checkbox",
+  options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
+}
+</script>
 <style lang="scss" scoped>
 .zm-checkbox {
   display: flex;
@@ -239,6 +188,7 @@ export default {
   &--disabled {
     .zm-checkbox__icon {
       background-color: #ebedf0;
+
       .zm-icon {
         color: #c8c9cc;
         border-color: #c8c9cc;
@@ -251,16 +201,20 @@ export default {
     position: relative;
     transition: all 0.3s;
     flex: 0;
+
     &__default {
       display: flex;
       transition: all 0.3s;
       border: 2rpx solid var(--zm-checkbox-icon-color);
+
       &.is-round {
         border-radius: 999px;
       }
+
       &.is-checked {
-        border-color: var(--theme-color);
-        background-color: var(--theme-color);
+        border-color: var(--primary-color);
+        background-color: var(--primary-color);
+
         .zm-icon {
           opacity: 1;
           transform: scale(1);
@@ -268,13 +222,14 @@ export default {
         }
       }
     }
+
     .zm-icon {
       width: 1em;
       height: 1em;
       opacity: 0;
       padding: 2rpx;
       line-height: 1;
-      color: #ffffff;
+      color: #fff;
       transform: scale(0);
       border-radius: inherit;
       box-sizing: content-box;

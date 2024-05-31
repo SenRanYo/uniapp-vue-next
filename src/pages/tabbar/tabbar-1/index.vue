@@ -7,6 +7,11 @@
         <zm-button @click="handleClick">测试</zm-button>
       </zm-col>
     </zm-row>
+    <zm-checkbox-group v-model="checkboxs" @change="onCheckboxChange">
+      <zm-checkbox label="选项1" name="1" :bind-group="false" v-model="checkbox" @change="onCheckboxChange"></zm-checkbox>
+      <zm-checkbox label="选项1" name="2"></zm-checkbox>
+      <zm-checkbox label="选项1" name="3"></zm-checkbox>
+    </zm-checkbox-group>
     <zm-cell-group>
       <zm-cell title="单元格1" desc="123" content="这是内容" value="内容" icon="wap-home-o"></zm-cell>
       <zm-cell title="单元格2" value="内容" icon="wap-home-o"></zm-cell>
@@ -41,6 +46,9 @@ const options = reactive({ size: 15 })
 const showDialog = ref(false)
 const showaAtions = ref(false)
 
+const checkbox = ref(false)
+const checkboxs = ref([])
+
 function handleGetData({ page, pageSize, type, success }) {
   if (type == "load") {
     setTimeout(() => {
@@ -56,6 +64,10 @@ function handleGetData({ page, pageSize, type, success }) {
       success({ list: l, total: 80 })
     }, 1000)
   }
+}
+
+function onCheckboxChange(v) {
+  console.log(v)
 }
 
 function handleClick() {

@@ -11,7 +11,7 @@ import { useStyle, useUnit, useColor } from "../hooks"
 defineOptions({ name: "zm-cell-group" })
 const emits = defineEmits(cellGroupEmits)
 const props = defineProps(cellGroupProps)
-const cells = ref([])
+const childrens = ref([])
 
 const style = computed(() => {
   const style: any = {}
@@ -20,12 +20,12 @@ const style = computed(() => {
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-function addCell(id: string) {
-  const index = cells.value.findIndex((cellId) => cellId === id)
-  if (index === -1) cells.value.push(id)
+function addChildren(id: string) {
+  const index = childrens.value.findIndex((cellId) => cellId === id)
+  if (index === -1) childrens.value.push(id)
 }
 
-provide("zm-cell-group", { ...toRefs(props), cells, addCell })
+provide("zm-cell-group", { ...toRefs(props), childrens, addChildren })
 defineExpose({ name: "zm-cell-group" })
 </script>
 <script lang="ts">

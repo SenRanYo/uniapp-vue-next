@@ -56,7 +56,7 @@ const classs = computed(() => {
   const state = ["center", "clickable"]
   state.forEach((state) => props[state] && list.push(`zm-cell--${state}`))
   if (cellGroup?.border || props.border) {
-    if (!props.border && index.value === cellGroup?.cells.value.length - 1) return
+    if (!props.border && index.value === cellGroup?.childrens.value.length - 1) return
     list.push("zm-cell--border")
   }
   return list
@@ -107,8 +107,8 @@ const contentStyle = computed(() => {
 })
 
 function resize() {
-  cellGroup?.addCell(id)
-  index.value = cellGroup?.cells.value.findIndex((cellId: string) => cellId === id)
+  cellGroup?.addChildren(id)
+  index.value = cellGroup?.childrens.value.findIndex((cellId: string) => cellId === id)
 }
 
 function onClick(event: TouchEvent) {
@@ -121,9 +121,8 @@ function onClick(event: TouchEvent) {
   }
 }
 
-onMounted(() => {
-  resize()
-})
+onMounted(() => resize())
+defineExpose({ name: "zm-cell" })
 </script>
 <script lang="ts">
 export default {
