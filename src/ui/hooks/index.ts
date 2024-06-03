@@ -146,35 +146,6 @@ export function useCurrentRouter() {
 }
 
 /**
- * 获取父组件
- * @param name 父组件的名称
- * @param vm 调用组件实例
- */
-export async function useParent(name: string, vm: ComponentInternalInstance) {
-  if (vm) {
-    let parent = vm.proxy?.$.parent
-    if (parent) {
-      // parent = parent.proxy?.$
-      // console.log(vm.parent)
-      console.log(parent.proxy?.$)
-      // while (parent.type.name !== name) {
-      //   console.log(parent)
-      //   parent = parent.proxy?.$
-      //   if (!parent) return
-      // }
-    }
-
-    // if (parent) {
-    //   console.log(parent.type)
-    //   // 判断父组件的名称是否与指定名称相同
-    //   if (parent.type.name === name) {
-    //     return parent.exposed
-    //   }
-    // }
-  }
-}
-
-/**
  * 获取元素位置信息
  * @param selector 元素的选择器
  * @param instance 调用组件实例
@@ -212,3 +183,6 @@ export function useElRects(selector: string, instance: ComponentInternalInstance
 export function useMitt() {
   return new Mitt()
 }
+
+export * from "./useParent"
+export * from "./useChildren"

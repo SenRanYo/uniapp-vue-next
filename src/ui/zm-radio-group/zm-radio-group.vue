@@ -5,13 +5,16 @@
 </template>
 
 <script setup lang="ts">
-import { useStyle } from "../hooks"
-import { radioGroupEmits, radioGroupProps, RadioGroupValueType, RadioGroupChildrenType } from "./index"
+import { useStyle, useChildren } from "../hooks"
+import { radioGroupEmits, radioGroupProps, RadioGroupValueType, radioGroupKey } from "./index"
 
-defineOptions({ name: "zm-cell-group" })
+defineOptions({ name: "zm-radio-group" })
+
 const emits = defineEmits(radioGroupEmits)
 const props = defineProps(radioGroupProps)
-const childrens = ref([])
+const { linkChildren } = useChildren(radioGroupKey)
+
+linkChildren({ props, updateValue })
 
 const style = computed(() => {
   const style = {}
@@ -24,28 +27,17 @@ const classs = computed(() => {
   return list
 })
 
-const modelValue = computed({
-  get: () => props.modelValue,
-  set: (value) => updateValue(value),
-})
-
 async function updateValue(value: RadioGroupValueType) {
   emits("update:modelValue", toRaw(value))
   await nextTick()
   emits("change", toRaw(value))
 }
 
-function addChildren(children: RadioGroupChildrenType) {
-  const index = childrens.value.findIndex(({ name }) => name === children.name)
-  if (index === -1) childrens.value.push(children)
-}
-
-provide("zm-radio-group", { ...toRefs(props), modelValue, childrens, addChildren, updateValue })
 defineExpose({ name: "zm-radio-group" })
 </script>
 <script lang="ts">
 export default {
-  name: "zm-cell-group",
+  name: "zm-radio-group",
   options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>

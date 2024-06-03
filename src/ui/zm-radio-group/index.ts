@@ -1,7 +1,8 @@
-import { isBoolean, isString } from "../utils/check"
 import RadioGroup from "./zm-radio-group.vue"
-import type { ExtractPropTypes } from "vue"
+import { isBoolean, isString } from "../utils/check"
+import type { InjectionKey, ExtractPropTypes } from "vue"
 
+export const radioGroupKey: InjectionKey<RadioGroupProvide> = Symbol("zm-radio-group")
 export const radioGroupProps = {
   /**
    * @description 绑定值
@@ -106,5 +107,5 @@ export type RadioGroupValueType = string | number
 export type RadioGroupChildrenType = { id: string; name: number | string; index: number }
 export type RadioGroupEmits = typeof radioGroupEmits
 export type RadioGroupProps = ExtractPropTypes<typeof radioGroupProps>
-export type RadioGroupExpose = { name: "zm-radio-group" }
+export type RadioGroupProvide = { props: RadioGroupProps; updateValue: (value: unknown) => void }
 export type RadioGroupInstance = InstanceType<typeof RadioGroup>
