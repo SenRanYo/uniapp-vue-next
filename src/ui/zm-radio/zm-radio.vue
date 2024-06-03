@@ -101,10 +101,6 @@ const isChecked = computed(() => {
   return parentProp("modelValue") == props.name
 })
 
-function resize() {
-  console.log(index.value)
-}
-
 function toggle() {
   parent.updateValue(props.name)
 }
@@ -127,7 +123,6 @@ function onClickLabel(event: TouchEvent) {
   emits("click", event)
 }
 
-onMounted(() => resize())
 defineExpose({ name: "zm-radio", toggle })
 </script>
 <script lang="ts">

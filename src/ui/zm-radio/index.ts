@@ -1,5 +1,4 @@
 import Radio from "./zm-radio.vue"
-import { isBoolean } from "../utils/check"
 import type { ExtractPropTypes } from "vue"
 
 export const radioProps = {
@@ -95,5 +94,4 @@ export const radioEmits = {
 export type RadioNameType = string | number
 export type RadioEmits = typeof radioEmits
 export type RadioProps = ExtractPropTypes<typeof radioProps>
-export type RadioExpose = { name: "zm-radio" }
 export type RadioInstance = InstanceType<typeof Radio>
