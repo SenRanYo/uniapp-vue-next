@@ -84,7 +84,7 @@ export const navbarProps = {
   /**
    * @description 是否显示底部边框
    */
-  borderBottom: { type: Boolean, default: true },
+  borderBottom: { type: Boolean, default: false },
   /**
    * @description 元素层级
    */

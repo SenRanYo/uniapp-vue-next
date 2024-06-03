@@ -1,26 +1,11 @@
 <template>
-  <zm-view ref="view" height="300vh">
+  <zm-view ref="view" height="300vh" custom-style="padding: 24rpx; font-size: 28rpx;">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-row>
-      <zm-col :span="24">
-        <zm-badge value="900"></zm-badge>
-        <zm-button @click="handleClick">测试</zm-button>
-      </zm-col>
-    </zm-row>
-    <zm-checkbox-group v-model="checkboxs" @change="onCheckboxChange">
-      <zm-checkbox label="选项1" name="1" :bind-group="false" v-model="checkbox" @change="onCheckboxChange"></zm-checkbox>
-      <zm-checkbox label="选项1" name="2"></zm-checkbox>
-      <zm-checkbox label="选项1" name="3"></zm-checkbox>
-    </zm-checkbox-group>
-    <zm-cell-group>
-      <zm-cell title="单元格1" desc="123" content="这是内容" value="内容" icon="wap-home-o"></zm-cell>
-      <zm-cell title="单元格2" value="内容" icon="wap-home-o"></zm-cell>
-      <zm-cell title="单元格3" value="内容" icon="wap-home-o"></zm-cell>
-      <zm-cell title="单元格4" value="内容" icon="wap-home-o"></zm-cell>
-    </zm-cell-group>
-    <zm-footer>
-      <view class="flex items-center p-24">底部内容</view>
-    </zm-footer>
+    <zm-radio-group v-model="radio" vertical @change="onCheckboxChange">
+      <zm-radio label="选项一" name="1" disabled></zm-radio>
+      <zm-radio label="选项二" name="2"></zm-radio>
+      <zm-radio label="选项三" name="3"></zm-radio>
+    </zm-radio-group>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -46,8 +31,7 @@ const options = reactive({ size: 15 })
 const showDialog = ref(false)
 const showaAtions = ref(false)
 
-const checkbox = ref(false)
-const checkboxs = ref([])
+const radio = ref("1")
 
 function handleGetData({ page, pageSize, type, success }) {
   if (type == "load") {
@@ -89,6 +73,10 @@ function handleClick() {
 </script>
 
 <style lang="scss" scoped>
+.p-24 {
+  padding: 24rpx;
+}
+
 .zm-line {
   display: flex;
   flex-shrink: 0;
