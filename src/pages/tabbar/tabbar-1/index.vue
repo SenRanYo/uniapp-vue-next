@@ -1,6 +1,7 @@
 <template>
-  <zm-view ref="view" height="300vh" custom-style="padding: 24rpx; font-size: 28rpx;">
+  <zm-view ref="view" height="300vh" background="#fff" custom-style="padding: 24rpx; font-size: 28rpx;">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
+    <zm-image width="200" height="200" src="https://th.wallhaven.cc/lg/2y/2yx5og.jpg"></zm-image>
     <zm-radio-group v-model="radio" vertical @change="onCheckboxChange">
       <zm-radio label="选项一" name="1" disabled></zm-radio>
       <zm-radio label="选项二" name="2"></zm-radio>

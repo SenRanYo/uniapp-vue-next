@@ -8,7 +8,7 @@ import {
   ButtonOnLaunchappEvent,
   ButtonOnOpensettingEvent,
   ButtonOnGetphonenumberEvent,
-} from "@uni-helper/uni-app-types/index"
+} from "@uni-helper/uni-app-types"
 
 export const buttonProps = {
   /**
