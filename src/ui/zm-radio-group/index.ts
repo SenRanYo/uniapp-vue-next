@@ -31,7 +31,7 @@ export const radioGroupProps = {
   /**
    * @description 形状
    */
-  shape: { type: String, default: "round", validator: (val: string) => ["round", "square", "dot"].includes(val) },
+  shape: { type: String, default: "round", validator: (val: string) => ["round", "square"].includes(val) },
   /**
    * @description 选中的颜色
    */
@@ -83,7 +83,7 @@ export const radioGroupProps = {
   /**
    * @description 选中的图标颜色
    */
-  checkedIconColor: { type: String, default: "" },
+  checkedIconColor: { type: String, default: "primary" },
   /**
    * @description 选中的标签颜色
    */

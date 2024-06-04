@@ -73,7 +73,7 @@ export const radioProps = {
   /**
    * @description 选中时的图标颜色
    */
-  checkedIconColor: { type: String, default: "" },
+  checkedIconColor: { type: String, default: "primary" },
   /**
    * @description 选中时的标签文本颜色
    */

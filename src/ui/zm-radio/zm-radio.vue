@@ -1,10 +1,8 @@
 <template>
   <view class="zm-radio" :class="[classs, customClass]" :style="[style]" @click="onClick">
-    <view class="zm-radio__icon" :class="[iconClass]" @click.stop="onClickIcon">
+    <view class="zm-radio__icon" @click.stop="onClickIcon">
       <slot name="icon">
-        <view class="zm-radio__icon__default" :class="{ 'is-checked': isChecked }" :style="[iconDefaultStyle]">
-          <text class="zm-icon" :class="[iconClass]" :style="[iconStyle]"></text>
-        </view>
+        <zm-icon :name="prop('icon')" :custom-style="iconStyle"></zm-icon>
       </slot>
     </view>
     <view v-if="isShowLabel" class="zm-radio__label" :style="[labelStyle]" @click.stop="onClickLabel">
@@ -20,61 +18,32 @@ import { useStyle, useUnit, useColor, useParent } from "../hooks"
 
 defineOptions({ name: "zm-radio" })
 
+const slots = useSlots()
 const emits = defineEmits(radioEmits)
 const props = defineProps(radioProps)
-const slots = useSlots()
-const { parent, index } = useParent(radioGroupKey)
-const parentProp = (name: string) => parent && parent.props[name]
+const { parent } = useParent(radioGroupKey)
 
-const style = computed(() => {
-  const style: any = {}
-  style.fontSize = useUnit(parentProp("iconSize") || props.iconSize)
-  if (parentProp("iconColor") || props.iconColor) {
-    style["--zm-radio-icon-color"] = useColor(parentProp("iconColor") || props.iconColor)
-  }
-  if (parentProp("checkedIconColor") || props.checkedIconColor) {
-    style["--zm-radio-checked-icon-color"] = useColor(parentProp("checkedIconColor") || props.checkedIconColor)
-  }
-  return useStyle({ ...style, ...useStyle(props.customStyle) })
-})
+const style = computed(() => useStyle(props.customStyle))
 
 const classs = computed(() => {
   const list = []
+  list.push(`zm-radio--${prop("shape")}`)
+  if (prop("labelLeft")) list.push("zm-radio--left")
+  if (prop("disabled")) list.push("zm-radio--disabled")
   if (isChecked.value) list.push("zm-radio--checked")
-  if (parentProp("disabled") || props.disabled) list.push("zm-radio--disabled")
-  if (parentProp("labelLeft") || props.labelLeft) list.push("zm-radio--left")
   return list
 })
 
 const iconStyle = computed(() => {
   const style: any = {}
+  style.fontSize = useUnit(prop("iconSize"))
+  style.fontWeight = useUnit(prop("iconWeight"))
+  style.borderColor = useUnit(prop("iconColor"))
+  style.borderRadius = useUnit(prop("iconRadius"))
   if (isChecked.value) {
-    style.background = useColor(parentProp("checkedColor") || props.checkedColor)
-  }
-  return useStyle(style)
-})
-
-const iconClass = computed(() => {
-  const list = []
-  if (parentProp("shape") || props.shape) list.push(`zm-icon--${parentProp("shape") || props.shape}`)
-  if (parentProp("icon") || props.icon) list.push(`${parentProp("iconPrefix") || props.iconPrefix}-${parentProp("icon") || props.icon}`)
-  return list
-})
-
-const iconDefaultStyle = computed(() => {
-  const style: any = {}
-  style.color = useColor(parentProp("iconColor") || props.iconColor)
-  style.fontSize = useUnit(parentProp("iconSize") || props.iconSize)
-  style.fontWeight = parentProp("iconWeight") || props.iconWeight
-  // if (!radioGroup?.round.value || !props.round) {
-  //   style.borderRadius = radioGroup?.iconRadius.value || props.iconRadius
-  // }
-  if (parentProp("modelValue")) {
-    style.borderColor = useColor(parentProp("checkedColor") || props.checkedColor)
-  }
-  if (isChecked.value) {
-    style.borderColor = useColor(parentProp("checkedIconColor") || props.checkedIconColor)
-    style.backgroundColor = useColor(parentProp("checkedIconColor") || props.checkedIconColor)
+    style.color = "#ffffff"
+    style.background = useColor(prop("checkedIconColor"))
+    style.borderColor = useColor(prop("checkedIconColor"))
   }
   return useStyle(style)
 })
@@ -85,40 +54,43 @@ const isShowLabel = computed(() => {
 
 const labelStyle = computed(() => {
   const style: any = {}
-  style.color = useColor(parentProp("labelColor") || props.labelColor)
-  style.fontSize = useUnit(parentProp("labelSize") || props.labelSize)
-  style.fontWeight = parentProp("labelWeight") || props.labelWeight
-  if (parentProp("modelValue") && (parentProp("checkedIconColor") || props.checkedLabelColor)) {
-    style.color = useColor(parentProp("checkedLabelColor") || props.checkedLabelColor)
-  }
+  style.color = useColor(prop("labelColor"))
+  style.fontSize = useUnit(prop("labelSize"))
+  style.fontWeight = prop("labelWeight")
+  if (isChecked.value && prop("checkedLabelColor")) style.color = useColor(prop("checkedLabelColor"))
   if (props.labelGap) {
-    props.labelLeft ? (style.marginRight = useUnit(parentProp("labelGap") || props.labelGap)) : (style.marginLeft = useUnit(parentProp("labelGap") || props.labelGap))
+    props.labelLeft ? (style.marginRight = useUnit(prop("labelGap"))) : (style.marginLeft = useUnit(prop("labelGap")))
   }
   return useStyle(style)
 })
 
 const isChecked = computed(() => {
-  return parentProp("modelValue") == props.name
+  return prop("modelValue") == props.name
 })
+
+function prop(name: string) {
+  if (parent) return parent.props[name] || props[name]
+  return props[name]
+}
 
 function toggle() {
   parent.updateValue(props.name)
 }
 
 function onClick(event: TouchEvent) {
-  if (props.disabled || parentProp("disabled") || isChecked.value) return
+  if (prop("disabled") || isChecked.value) return
   toggle()
   emits("click", event)
 }
 
 function onClickIcon(event: TouchEvent) {
-  if (props.disabled || parentProp("disabled") || isChecked.value) return
+  if (prop("disabled") || isChecked.value) return
   toggle()
   emits("click", event)
 }
 
 function onClickLabel(event: TouchEvent) {
-  if (props.disabled || parentProp("disabled") || props.labelDisabled || parentProp("labelDisabled") || isChecked.value) return
+  if (prop("disabled") || prop("labelDisabled") || isChecked.value) return
   toggle()
   emits("click", event)
 }
@@ -134,60 +106,26 @@ export default {
 <style lang="scss" scoped>
 .zm-radio {
   display: flex;
+  cursor: pointer;
   user-select: none;
   align-items: center;
 
-  &--disabled {
-    .zm-checkbox__icon {
-      background-color: #ebedf0;
-
-      .zm-icon {
-        color: #c8c9cc;
-        border-color: #c8c9cc;
-        background-color: #ebedf0;
-      }
-    }
-  }
-
   &__icon {
     display: flex;
-    cursor: pointer;
     position: relative;
 
-    &__default {
-      display: flex;
-      transition: all 0.3s;
-      border: 2rpx solid var(--zm-checkbox-icon-color);
-
-      &.is-round {
-        border-radius: 999px;
-      }
-
-      &.is-checked {
-        border-color: var(--primary-color);
-        background-color: var(--primary-color);
-
-        .zm-icon {
-          opacity: 1;
-          transform: scale(1);
-          transition: all 0.2s cubic-bezier(0.12, 0.4, 0.29, 1.46) 0.1s;
-        }
-      }
-    }
-
     .zm-icon {
-      width: 1em;
-      height: 1em;
-      opacity: 0;
-      padding: 2rpx;
-      line-height: 1;
-      color: #fff;
-      transform: scale(0);
-      border-radius: inherit;
-      box-sizing: content-box;
-      transition:
-        all 0.1s cubic-bezier(0.71, -0.46, 0.88, 0.6),
-        opacity 0.1s;
+      width: 1.25em;
+      height: 1.25em;
+      display: flex;
+      font-size: 0.8em;
+      color: transparent;
+      text-align: center;
+      border-width: 2rpx;
+      border-radius: 4rpx;
+      border-style: solid;
+      transition-duration: 300ms;
+      transition-property: color, border-color, background-color;
     }
   }
 
@@ -202,6 +140,29 @@ export default {
     .zm-checkbox__label {
       margin-left: 0;
       margin-right: 8rpx;
+    }
+  }
+
+  &--round {
+    .zm-icon {
+      border-radius: 50%;
+    }
+  }
+
+  &--checked {
+    .zm-icon {
+      color: #fff;
+      border-color: var(--zm-radio-checked-icon-color);
+      background-color: var(--zm-radio-checked-icon-color);
+    }
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+
+    .zm-icon {
+      border-color: #c8c9cc;
+      background-color: #ebedf0;
     }
   }
 }
