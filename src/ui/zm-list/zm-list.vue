@@ -449,11 +449,11 @@ export default defineComponent({
   height: 100%;
 
   &__inner {
-    position: relative;
-    display: flex;
     flex: 1;
-    flex-direction: row;
+    display: flex;
     overflow: hidden;
+    position: relative;
+    flex-direction: row;
   }
 
   &__view {

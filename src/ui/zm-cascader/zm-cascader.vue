@@ -32,18 +32,20 @@
     </scroll-view>
     <swiper class="zm-cascader__swiper" :current="activeTab" @change="onSwiperChange">
       <swiper-item class="zm-cascader__swiper__item" v-for="(item, index) in tabs" :key="index">
-        <view class="zm-cascader__options">
-          <view
-            class="zm-cascader__options__option"
-            :class="{ 'zm-cascader__options__option--selected': item.selected && option[valueKey] === item.selected[valueKey] }"
-            v-for="(option, optionIndex) in item.options"
-            :key="optionIndex"
-            @click="onClickOption(option, index)"
-          >
-            <view class="option-text">{{ option[textKey] }}</view>
-            <zm-icon name="check" v-if="item.selected && option[valueKey] === item.selected[valueKey]"></zm-icon>
+        <scroll-view scroll-y>
+          <view class="zm-cascader__options">
+            <view
+              class="zm-cascader__options__option"
+              :class="{ 'zm-cascader__options__option--selected': item.selected && option[valueKey] === item.selected[valueKey] }"
+              v-for="(option, optionIndex) in item.options"
+              :key="optionIndex"
+              @click="onClickOption(option, index)"
+            >
+              <view class="option-text">{{ option[textKey] }}</view>
+              <zm-icon name="check" v-if="item.selected && option[valueKey] === item.selected[valueKey]"></zm-icon>
+            </view>
           </view>
-        </view>
+        </scroll-view>
       </swiper-item>
     </swiper>
   </view>
@@ -168,6 +170,10 @@ function onClickOption(option: CascaderOption, index: number) {
   if (!option[childrenKey]) {
     emits("finish", params)
   }
+
+  nextTick(() => {
+    updateRect()
+  })
 }
 
 function onSwiperChange(event: any) {
@@ -189,6 +195,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .zm-cascader {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
   &__header {
     display: flex;
     padding: 24rpx;
@@ -240,9 +250,20 @@ export default {
     }
   }
 
-  &__options {
+  &__swiper {
+    height: 100%;
     padding-top: 24rpx;
 
+    &__item {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+      flex-direction: row;
+    }
+  }
+
+  &__options {
     &__option {
       display: flex;
       font-size: 28rpx;

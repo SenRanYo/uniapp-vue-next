@@ -53,6 +53,9 @@ importers:
       '@dcloudio/uni-ui':
         specifier: ^1.5.5
         version: 1.5.5
+      '@vant/area-data':
+        specifier: ^1.5.1
+        version: 1.5.1
       dayjs:
         specifier: ^1.11.11
         version: 1.11.11
@@ -1990,6 +1993,9 @@ packages:
     resolution: {integrity: sha512-mmppBuulAHCal+sC0Qz36Y99t0HicAmznpj70Kzwl7g/yvXwm58/DW2OnpCWw+uA8/JBft/+z3zE+XvrI+T1HA==}
     peerDependencies:
       vite: ^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0
+
+  '@vant/area-data@1.5.1':
+    resolution: {integrity: sha512-gR5TPEzTbxN1cTK1aDhCoyikSCLX7DAacxyXoKyI4SAsYYTZrDl/nLgQFIm9vLsvWzlPIda8xV8/U3x7M9k6ww==}
 
   '@vitejs/plugin-legacy@5.4.0':
     resolution: {integrity: sha512-Z7o44IbOIir/appjqtVzxnmLeGD8DjWGNm48lfPWZn4hxjzUjTkMX7BDwncpauWAQ/0VIz6uPeMHl3Za0Rw7wA==}
@@ -8945,6 +8951,8 @@ snapshots:
       vite: 5.2.8(@types/node@20.12.11)(sass@1.77.1)(terser@5.31.0)
     transitivePeerDependencies:
       - rollup
+
+  '@vant/area-data@1.5.1': {}
 
   '@vitejs/plugin-legacy@5.4.0(terser@5.31.0)(vite@5.2.8(@types/node@20.12.11)(sass@1.77.1)(terser@5.31.0))':
     dependencies:
