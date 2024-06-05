@@ -166,13 +166,13 @@ export function useElRect(selector: string, instance: ComponentInternalInstance)
  * @param selector 元素的选择器
  * @param instance 调用组件实例
  */
-export function useElRects(selector: string, instance: ComponentInternalInstance) {
+export function useElRects(selector: string, instance: ComponentInternalInstance): Promise<UniApp.NodeInfo[]> {
   return new Promise((resolve) => {
     uni
       .createSelectorQuery()
       .in(instance)
       .selectAll(selector)
-      .boundingClientRect((rect) => resolve(rect))
+      .boundingClientRect((rect) => resolve(rect as UniApp.NodeInfo[]))
       .exec()
   })
 }
