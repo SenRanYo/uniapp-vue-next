@@ -1,5 +1,5 @@
 <template>
-  <view class="zm-cascader" :class="[customClass]" :style="[style]" @click="onClick">
+  <view class="zm-cascader" :class="[customClass]" :style="[style]">
     <view class="zm-cascader__header" v-if="showHeader">
       <slot name="title">
         <text class="zm-cascader__header__title">{{ title }}</text>
@@ -35,13 +35,13 @@
         <view class="zm-cascader__options">
           <view
             class="zm-cascader__options__option"
-            :class="{ 'zm-cascader__options__option--selected': option[valueKey] === item.selected[valueKey] }"
+            :class="{ 'zm-cascader__options__option--selected': item.selected && option[valueKey] === item.selected[valueKey] }"
             v-for="(option, optionIndex) in item.options"
             :key="optionIndex"
             @click="onClickOption(option, index)"
           >
             <view class="option-text">{{ option[textKey] }}</view>
-            <zm-icon name="check" v-if="option[valueKey] === item.selected[valueKey]"></zm-icon>
+            <zm-icon name="check" v-if="item.selected && option[valueKey] === item.selected[valueKey]"></zm-icon>
           </view>
         </view>
       </swiper-item>
@@ -50,9 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import { useStyle, useColor, useUnit, useUnitToPx, useElRects } from "../hooks"
+import { useStyle, useElRects } from "../hooks"
 import { cascaderEmits, cascaderProps, CascaderOption, CascaderTab } from "./index"
-import { ImageOnErrorEvent, ImageOnLoadEvent, SwiperOnChange } from "@uni-helper/uni-app-types"
 
 defineOptions({ name: "zm-cascader" })
 
@@ -68,7 +67,6 @@ const { text: textKey, value: valueKey, children: childrenKey, disabled: disable
 
 const style = computed(() => {
   const style: any = {}
-
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
@@ -81,40 +79,9 @@ const tabsLineStyle = computed(() => {
   return style
 })
 
-watch(
-  () => tabs.value,
-  (val) => {
-    console.log(val, "tabs")
-  },
-  { immediate: true },
-)
-
-watch(
-  () => activeTab.value,
-  (val) => {
-    console.log(val, "activeTab")
-  },
-  { immediate: true },
-)
-
+watch(() => props.modelValue, updateTabs)
 watch(() => props.options, updateTabs, { deep: true })
-watch(
-  () => activeTab.value,
-  () => {
-    updateRect()
-  },
-  { immediate: true },
-)
-watch(
-  () => props.modelValue,
-  (value) => {
-    if (value) {
-      const values = tabs.value.map((tab) => tab.selected?.[valueKey])
-      if (values.includes(value)) return
-    }
-    updateTabs()
-  },
-)
+watch(() => activeTab.value, updateRect, { immediate: true })
 
 function updateTabs() {
   const { options, modelValue } = props
@@ -128,9 +95,7 @@ function updateTabs() {
         const tab = { options: optionsCursor, selected: option }
 
         const next = optionsCursor.find((item) => item[valueKey] === option[valueKey])
-        if (next) {
-          optionsCursor = next[childrenKey]
-        }
+        if (next) optionsCursor = next[childrenKey]
 
         return tab
       })
@@ -167,6 +132,7 @@ async function updateRect() {
 
 function onClickTab(item: CascaderTab, index: number) {
   activeTab.value = index
+  emits("click-tab", { index })
 }
 
 function onClickOption(option: CascaderOption, index: number) {
@@ -204,15 +170,13 @@ function onClickOption(option: CascaderOption, index: number) {
   }
 }
 
-function onClick(event: TouchEvent) {
-  emits("click", event)
-}
-
 function onSwiperChange(event: any) {
   activeTab.value = event.detail.current
 }
 
-function onClickClose() {}
+function onClickClose(event: TouchEvent) {
+  emits("close", event)
+}
 
 updateTabs()
 defineExpose({ name: "zm-cascader" })

@@ -81,10 +81,9 @@ export const cascaderProps = {
 }
 export const cascaderEmits = {
   close: (evnet: TouchEvent) => true,
-  click: (evnet: TouchEvent) => true,
   change: (data: { value: string | number; selectedOptions: CascaderOption[]; index: number }) => true,
   finish: (data: { value: string | number; selectedOptions: CascaderOption[]; index: number }) => true,
-  "click-tab": (data: { tabIndex: number }) => true,
+  "click-tab": (data: { index: number }) => true,
   "update:modelValue": (value: string | number) => true,
 }
 
