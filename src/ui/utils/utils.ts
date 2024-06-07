@@ -205,3 +205,17 @@ export function pick(obj: any, keys: string[]): any {
     return acc
   }, {})
 }
+
+/**
+ * 在数字或字符串前面补零，使其达到指定的长度
+ * @param num 要补零的数字或字符串
+ * @param size 最终要达到的长度，默认为2
+ * @returns 补零后的字符串
+ */
+export function padZero(num: string | number, size = 2): string {
+  let str = num + ""
+  while (str.length < size) {
+    str = "0" + str
+  }
+  return str
+}

@@ -1,9 +1,16 @@
 <template>
   <zm-view ref="view" height="300vh" background="#fff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-popup :show="visible" height="60vh">
-      <zm-cascader v-model="cascaderValue" :options="options" title="请选择地区" @close="visible = false" @finish="onCascaderChange"></zm-cascader>
-    </zm-popup>
+
+    <zm-date-time-picker
+      v-model="date"
+      title="选择日期"
+      :min-date="minDate"
+      :max-date="maxDate"
+      :columns="['year', 'month', 'day', 'hour', 'minute', 'second']"
+    ></zm-date-time-picker>
+    <!-- <zm-cascader v-model="cascaderValue" :options="options" title="请选择地区"></zm-cascader> -->
+
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -17,73 +24,25 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { useView, DialogExpose } from "@/ui"
+import { useView } from "@/ui"
 import { useCascaderAreaData } from "@vant/area-data"
 
 const { view } = useView()
-
-const list = ref([])
 const tabbar = ref("1")
-const actions = ref([{ title: "选项一" }, { title: "选项二" }, { title: "选项三" }, { title: "选项四" }])
-const dialog = ref<DialogExpose>(null)
-const showDialog = ref(false)
-const showaAtions = ref(false)
-const radio = ref("1")
-const visible = ref(true)
-
 const options = useCascaderAreaData()
-const cascaderValue = ref("20")
+const cascaderValue = ref("")
 
-function handleGetData({ page, pageSize, type, success }) {
-  if (type == "load") {
-    setTimeout(() => {
-      const l = Array.from({ length: pageSize }, (_, i) => i)
-      list.value = list.value.concat(l)
-      success({ list: l, total: 80 })
-    }, 100)
-  }
-  if (type == "refresh") {
-    setTimeout(() => {
-      const l = Array.from({ length: pageSize }, (_, i) => i)
-      list.value = l
-      success({ list: l, total: 80 })
-    }, 1000)
-  }
-}
+const date = ref<any>(new Date())
+const minDate = ref("2024-06-01 08:30:30")
+const maxDate = ref("2024-06-09 20:30:30")
 
-function onCascaderChange(val) {
+watch(date, (val) => {
   console.log(val)
-}
+})
 
-function onCheckboxChange(v) {
-  console.log(v)
-}
-
-function handleClick() {
-  showaAtions.value = true
-  // dialog.value?.open({
-  //   title: "温馨提示",
-  //   content: "一个组合商品至多支持添加5个商品,同一个商品可搭配多个数量,多规格商品只能选择其中一个规格参与搭建",
-  //   asyncClose: true,
-  //   showCancelButton: true,
-  //   showConfirmButton: true,
-  //   closeOnClickOverlay: false,
-  //   onConfirm: ({ close, done }) => {
-  //     setTimeout(() => {
-  //       done()
-  //     }, 2000)
-  //   },
-  // })
-}
+setTimeout(() => {
+  date.value = "2024-06-07 08:30:30"
+}, 3000)
 </script>
 
-<style lang="scss" scoped>
-.p-24 {
-  padding: 24rpx;
-}
-
-.zm-line {
-  display: flex;
-  flex-shrink: 0;
-}
-</style>
+<style lang="scss" scoped></style>
