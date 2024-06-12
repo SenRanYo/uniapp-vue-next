@@ -192,6 +192,17 @@ export function throttling(func: Function, wait: number = 500, immediate: boolea
 }
 
 /**
+ * 将一个数字限制在指定的范围内
+ * @param {number} num - 要限制的数字
+ * @param {number} min - 最小值
+ * @param {number} max - 最大值
+ * @returns {number} - 限制后的数字
+ */
+export function clamp(num: number, min: number, max: number): number {
+  return Math.min(Math.max(num, min), max)
+}
+
+/**
  * 从对象中选择指定的键，返回一个新对象
  * @param {Object} obj - 要选择键的对象
  * @param {Array} keys - 要选择的键的数组
