@@ -1,17 +1,36 @@
 <template>
   <view class="zm-picker" :class="[customClass]" :style="[style]">
-    <view class="zm-picker__header"></view>
+    <slot name="header">
+      <view class="zm-picker__header" v-if="showHeader">
+        <view class="zm-picker__header__cancel" @click="onCancel">
+          <slot name="cancel">
+            <zm-button text text-color="#969799">{{ cancelText }}</zm-button>
+          </slot>
+        </view>
+        <view class="zm-picker__header__title">
+          <slot name="title">
+            {{ title }}
+          </slot>
+        </view>
+        <view class="zm-picker__header__confirm" @click="onConfirm">
+          <slot name="confirm">
+            <zm-button text>{{ confirmText }}</zm-button>
+          </slot>
+        </view>
+      </view>
+    </slot>
     <picker-view class="zm-picker__view" :style="[viewStyle]" :indicator-style="indicatorStyle" :value="selectedIndexs"
       @change="onChange">
       <picker-view-column class="zm-picker__columns" v-for="(column, columnIndex) in columns" :key="columnIndex">
-        <view class="zm-picker__columns__column" v-for="(item, index) in column" :key="index">{{ item[textKey] }}</view>
+        <view class="zm-picker__columns__column" v-for="(item, index) in column" :key="index">{{ item[fields.text] }}
+        </view>
       </picker-view-column>
     </picker-view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { clamp, merge } from "../utils/utils"
+import { merge } from "../utils/utils"
 import { isNoEmpty } from "../utils/check"
 import { useStyle, useUnit, useUnitToPx } from "../hooks"
 import { PickerViewOnChangeEvent } from "@uni-helper/uni-app-types/index"
@@ -25,17 +44,15 @@ const props = defineProps(pickerProps)
 const selectedValues = ref([])
 const selectedIndexs = ref<any>([])
 const oldSelectedIndexs = ref<any>([])
-const { text: textKey, value: valueKey, children: childrenKey } = props.columnsFields
 
 const type = computed(() => getColumnsType(props.columns, fields.value))
-const fields = computed(() => merge({ text: "text", value: "value", children: "children" }, props.columnsFields))
+const fields = computed(() => mergeFields(props.columnsFields))
 const columns = computed<PickerColumn[]>(() => {
   const { columns } = props
   switch (type.value) {
     case "multiple":
       return columns
     case "cascade":
-      console.log(formatCascadeColumns(columns, fields.value, selectedValues.value));
       return formatCascadeColumns(columns, fields.value, selectedValues.value)
     default:
       return [columns]
@@ -67,6 +84,50 @@ watch(
   { immediate: true },
 )
 
+
+function onChange(data: PickerViewOnChangeEvent) {
+  const value = data.detail.value
+  const index = Math.max(value.findIndex((value, index) => value !== oldSelectedIndexs.value[index]), 0)
+  setValue(index, columns.value[index][value[index]][fields.value])
+
+  if (type.value === "cascade") {
+    selectedValues.value.forEach((value, index) => {
+      const column = columns.value[index]
+      if (!findColumnByValue(column, value, fields.value)) {
+        setValue(index, columns.value.length ? column[0][fields.value] : "")
+      }
+    })
+  }
+
+  updateSelectedIndexs()
+
+  emits("change",
+    {
+      values: toRaw(selectedValues.value),
+      value: columns.value[index][value[index]][fields.value],
+      indexs: toRaw(selectedIndexs.value),
+      index,
+      columns: selectedIndexs.value.map((_: any, index: number) => columns.value[index][selectedIndexs.value[index]]),
+    })
+  nextTick(() => emits("update:modelValue", selectedValues.value))
+}
+
+function onCancel() {
+  emits("cancel", {
+    values: toRaw(selectedValues.value),
+    indexs: toRaw(selectedIndexs.value),
+    columns: selectedIndexs.value.map((_: any, index: number) => columns.value[index][selectedIndexs.value[index]]),
+  })
+}
+
+function onConfirm() {
+  emits("confirm", {
+    values: toRaw(selectedValues.value),
+    indexs: toRaw(selectedIndexs.value),
+    columns: selectedIndexs.value.map((_: any, index: number) => columns.value[index][selectedIndexs.value[index]]),
+  })
+}
+
 function setValue(index: number, value: string | number) {
   if (selectedValues.value[index] !== value) {
     const newValues = selectedValues.value.slice(0)
@@ -75,28 +136,17 @@ function setValue(index: number, value: string | number) {
   }
 }
 
-function onChange(data: PickerViewOnChangeEvent) {
-  const value = data.detail.value
-  const index = Math.max(value.findIndex((value, index) => value !== oldSelectedIndexs.value[index]), 0)
-  setValue(index, columns.value[index][value[index]][valueKey])
-
-  if (type.value === "cascade") {
-    selectedValues.value.forEach((value, index) => {
-      const column = columns.value[index]
-      if (!findColumnByValue(column, value)) {
-        setValue(index, columns.value.length ? column[0][valueKey] : "")
-      }
-    })
-  }
-  updateSelectedIndexs()
-}
 
 function updateSelectedIndexs() {
   selectedIndexs.value = columns.value.map((column, index) => {
-    const findIndex = column.findIndex((item: PickerColumn) => item[valueKey] === selectedValues.value[index])
+    const findIndex = column.findIndex((item: PickerColumn) => item[fields.value] === selectedValues.value[index])
     return Math.max(findIndex, 0)
   })
   oldSelectedIndexs.value = selectedIndexs.value
+}
+
+function mergeFields(fields: PickerColumnFields) {
+  return merge({ text: "text", value: "value", children: "children" }, fields)
 }
 
 function getColumnsType(columns: PickerColumn[], fields: PickerColumnFields) {
@@ -108,7 +158,7 @@ function getColumnsType(columns: PickerColumn[], fields: PickerColumnFields) {
   return "default"
 }
 
-function findColumnByValue(columns: any, value: string | number): PickerColumn | undefined {
+function findColumnByValue(columns: any, value: string | number, fields: Required<PickerColumnFields>): PickerColumn | undefined {
   return columns?.find((column: PickerColumn) => column[fields.value] === value)
 }
 
@@ -120,10 +170,10 @@ function formatCascadeColumns(columns: PickerColumn[], fields: PickerColumnField
   while (column && column[fields.children]) {
     const value = selectedValues[index]
     const children = column[fields.children]
-    column = isNoEmpty(value) ? findColumnByValue(children, value) : undefined
+    column = isNoEmpty(value) ? findColumnByValue(children, value, fields) : undefined
 
     if (!column && children.length) {
-      column = findColumnByValue(children, columns[0]?.[fields.value])
+      column = findColumnByValue(children, columns[0]?.[fields.value], fields)
     }
 
     index++
@@ -145,12 +195,19 @@ export default {
 <style lang="scss">
 .zm-picker {
   display: flex;
+  position: relative;
   flex-direction: column;
 
-  .zm-picker__header {
+  &__header {
     display: flex;
+    padding: 24rpx;
     align-items: center;
     justify-content: space-between;
+
+    &__title {
+      font-size: 28rpx;
+      font-weight: bold;
+    }
   }
 
   &__columns {

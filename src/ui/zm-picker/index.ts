@@ -15,10 +15,6 @@ export const pickerProps = {
    */
   columns: { type: Array as PropType<PickerColumn[]>, default: () => [] },
   /**
-   * @description 是否加载中
-   */
-  loading: { type: Boolean, default: false },
-  /**
    * @description 是否显示顶部栏
    */
   showHeader: { type: Boolean, default: true },
@@ -43,10 +39,6 @@ export const pickerProps = {
    */
   visibleColumnNum: { type: [String, Number], default: 5 },
   /**
-   * @description 是否允许点击遮罩关闭选择器
-   */
-  closeOnClickOverlay: { type: Boolean, default: true },
-  /**
    * @description 自定义类名
    */
   customClass: { type: String, default: "" },
@@ -57,12 +49,14 @@ export const pickerProps = {
 }
 
 export const pickerEmits = {
-  cancel: (data: { value: string; selectedValues: string[]; selectedIndexes: number[] }) => true,
-  change: (data: { value: string; selectedValues: string[]; selectedIndexes: number[] }) => true,
-  confirm: (data: { value: string; selectedValues: string[]; selectedIndexes: number[] }) => true,
+  change: (data: { values: PickerValue[]; value: PickerValue; indexs: number[]; index: number; columns: PickerColumn[] }) => true,
+  cancel: (data: { values: PickerValue[]; indexs: number[]; columns: PickerColumn[] }) => true,
+  confirm: (data: { values: PickerValue[]; indexs: number[]; columns: PickerColumn[] }) => true,
   "update:show": (value: boolean) => true,
+  "update:modelValue": (value: PickerValue[]) => true,
 }
 
+export type PickerValue = string | number
 export type PickerColumn = { text?: string | number; value?: string | number; children?: PickerColumn[]; [key: PropertyKey]: any }
 export type PickerColumnFields = { text: string; value: string; children: string }
 export type PickerEmits = typeof pickerEmits

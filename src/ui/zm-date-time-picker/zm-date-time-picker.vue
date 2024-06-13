@@ -1,7 +1,7 @@
 <template>
   <view class="zm-date-picker" :class="[customClass]" :style="[style]">
     <slot name="header">
-      <view class="zm-date-picker__header">
+      <view class="zm-date-picker__header" v-if="showHeader">
         <view class="zm-date-picker__header__cancel" @click="onCancel">
           <slot name="cancel">
             <zm-button text text-color="#969799">{{ cancelText }}</zm-button>
@@ -22,7 +22,8 @@
     <view class="zm-date-picker__options">
       <picker-view :style="[viewStyle]" :value="selectedIndexes" :indicator-style="optionStyle" @change="onChange">
         <picker-view-column v-for="(column, columnIndex) in columns" :key="columnIndex">
-          <view class="zm-date-picker__options__option" v-for="(item, itemIndex) in column" :key="itemIndex">{{ item.text }}</view>
+          <view class="zm-date-picker__options__option" v-for="(item, itemIndex) in column" :key="itemIndex">{{
+            item.text }}</view>
         </picker-view-column>
       </picker-view>
     </view>
