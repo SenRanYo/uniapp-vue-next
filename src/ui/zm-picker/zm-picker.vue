@@ -19,11 +19,12 @@
         </view>
       </view>
     </slot>
-    <picker-view class="zm-picker__view" :style="[viewStyle]" :indicator-style="indicatorStyle" :value="selectedIndexs"
-      @change="onChange">
+    <view class="zm-picker__loading" v-if="loading">
+      <zm-loading size="40rpx"></zm-loading>
+    </view>
+    <picker-view class="zm-picker__view" :style="[viewStyle]" :indicator-style="indicatorStyle" :value="selectedIndexs" @change="onChange">
       <picker-view-column class="zm-picker__columns" v-for="(column, columnIndex) in columns" :key="columnIndex">
-        <view class="zm-picker__columns__column" v-for="(item, index) in column" :key="index">{{ item[fields.text] }}
-        </view>
+        <view class="zm-picker__columns__column" v-for="(item, index) in column" :key="index">{{ item[fields.text] }}</view>
       </picker-view-column>
     </picker-view>
   </view>
@@ -84,10 +85,12 @@ watch(
   { immediate: true },
 )
 
-
 function onChange(data: PickerViewOnChangeEvent) {
   const value = data.detail.value
-  const index = Math.max(value.findIndex((value, index) => value !== oldSelectedIndexs.value[index]), 0)
+  const index = Math.max(
+    value.findIndex((value, index) => value !== oldSelectedIndexs.value[index]),
+    0,
+  )
   setValue(index, columns.value[index][value[index]][fields.value])
 
   if (type.value === "cascade") {
@@ -101,14 +104,13 @@ function onChange(data: PickerViewOnChangeEvent) {
 
   updateSelectedIndexs()
 
-  emits("change",
-    {
-      values: toRaw(selectedValues.value),
-      value: columns.value[index][value[index]][fields.value],
-      indexs: toRaw(selectedIndexs.value),
-      index,
-      columns: selectedIndexs.value.map((_: any, index: number) => columns.value[index][selectedIndexs.value[index]]),
-    })
+  emits("change", {
+    values: toRaw(selectedValues.value),
+    value: columns.value[index][value[index]][fields.value],
+    indexs: toRaw(selectedIndexs.value),
+    index,
+    columns: selectedIndexs.value.map((_: any, index: number) => columns.value[index][selectedIndexs.value[index]]),
+  })
   nextTick(() => emits("update:modelValue", selectedValues.value))
 }
 
@@ -135,7 +137,6 @@ function setValue(index: number, value: string | number) {
     selectedValues.value = newValues
   }
 }
-
 
 function updateSelectedIndexs() {
   selectedIndexs.value = columns.value.map((column, index) => {
@@ -208,6 +209,19 @@ export default {
       font-size: 28rpx;
       font-weight: bold;
     }
+  }
+
+  &__loading {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(255 255 255 / 60%);
   }
 
   &__columns {

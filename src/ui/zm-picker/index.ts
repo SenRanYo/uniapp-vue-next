@@ -15,6 +15,10 @@ export const pickerProps = {
    */
   columns: { type: Array as PropType<PickerColumn[]>, default: () => [] },
   /**
+   * @description 是否显示加载中
+   */
+  loading: { type: Boolean, default: false },
+  /**
    * @description 是否显示顶部栏
    */
   showHeader: { type: Boolean, default: true },

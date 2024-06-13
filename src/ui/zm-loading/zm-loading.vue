@@ -1,5 +1,5 @@
 <template>
-  <view v-if="show" class="zm-loading" :class="[classs, props.customClass]" :style="[style]">
+  <view v-if="show" class="zm-loading" :class="[classs, customClass]" :style="[style]">
     <view class="zm-loading__icon" :style="[iconStyle]">
       <slot name="icon">
         <view class="icon-spinner" :style="[iconStyle]">

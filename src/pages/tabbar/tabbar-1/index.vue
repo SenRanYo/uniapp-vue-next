@@ -80,12 +80,15 @@ const columns = ref([
   },
 ])
 
-watch(() => picker.value, (val) => {
-  console.log(val);
-})
+watch(
+  () => picker.value,
+  (val) => {
+    console.log(val)
+  },
+)
 
 function onChange(val) {
-  console.log(val);
+  console.log(val)
 }
 </script>
 
