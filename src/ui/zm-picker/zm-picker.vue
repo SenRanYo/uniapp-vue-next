@@ -22,9 +22,11 @@
     <view class="zm-picker__loading" v-if="loading">
       <zm-loading size="40rpx"></zm-loading>
     </view>
-    <picker-view class="zm-picker__view" :style="[viewStyle]" :indicator-style="indicatorStyle" :value="selectedIndexs" @change="onChange">
+    <picker-view class="zm-picker__view" :style="[viewStyle]" :indicator-style="indicatorStyle" :value="selectedIndexs"
+      @change="onChange">
       <picker-view-column class="zm-picker__columns" v-for="(column, columnIndex) in columns" :key="columnIndex">
-        <view class="zm-picker__columns__column" v-for="(item, index) in column" :key="index">{{ item[fields.text] }}</view>
+        <view class="zm-picker__columns__column" v-for="(item, index) in column" :key="index">{{ item[fields.text] }}
+        </view>
       </picker-view-column>
     </picker-view>
   </view>
@@ -87,26 +89,24 @@ watch(
 
 function onChange(data: PickerViewOnChangeEvent) {
   const value = data.detail.value
-  const index = Math.max(
-    value.findIndex((value, index) => value !== oldSelectedIndexs.value[index]),
-    0,
-  )
-  setValue(index, columns.value[index][value[index]][fields.value])
+  const index = Math.max(value.findIndex((value, index) => value !== oldSelectedIndexs.value[index]), 0,)
+  setValue(index, columns.value[index][value[index]][fields.value.value])
 
   if (type.value === "cascade") {
-    selectedValues.value.forEach((value, index) => {
-      const column = columns.value[index]
-      if (!findColumnByValue(column, value, fields.value)) {
-        setValue(index, columns.value.length ? column[0][fields.value] : "")
+    const len = selectedValues.value.length
+    for (let i = 0; i < len; i++) {
+      const column = columns.value[i]
+      if (!findColumnByValue(column, selectedValues.value[i], fields.value)) {
+        setValue(i, columns.value.length ? column[0][fields.value.value] : "")
       }
-    })
+    }
   }
 
   updateSelectedIndexs()
 
   emits("change", {
     values: toRaw(selectedValues.value),
-    value: columns.value[index][value[index]][fields.value],
+    value: columns.value[index][value[index]][fields.value.value],
     indexs: toRaw(selectedIndexs.value),
     index,
     columns: selectedIndexs.value.map((_: any, index: number) => columns.value[index][selectedIndexs.value[index]]),
@@ -140,7 +140,7 @@ function setValue(index: number, value: string | number) {
 
 function updateSelectedIndexs() {
   selectedIndexs.value = columns.value.map((column, index) => {
-    const findIndex = column.findIndex((item: PickerColumn) => item[fields.value] === selectedValues.value[index])
+    const findIndex = column.findIndex((item: PickerColumn) => item[fields.value.value] === selectedValues.value[index])
     return Math.max(findIndex, 0)
   })
   oldSelectedIndexs.value = selectedIndexs.value
@@ -172,9 +172,8 @@ function formatCascadeColumns(columns: PickerColumn[], fields: PickerColumnField
     const value = selectedValues[index]
     const children = column[fields.children]
     column = isNoEmpty(value) ? findColumnByValue(children, value, fields) : undefined
-
     if (!column && children.length) {
-      column = findColumnByValue(children, columns[0]?.[fields.value], fields)
+      column = findColumnByValue(children, children[0]?.[fields.value], fields)
     }
 
     index++
