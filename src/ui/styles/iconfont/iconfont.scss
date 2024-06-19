@@ -1,10 +1,10 @@
 @font-face {
   font-family: zm-icon;
   /* #ifndef MP-WEIXIN */
-  src: url("https://public-oss-file.zmaxfilm.com/zuimei-film-oss/iconfont/zuimei-icon/iconfont.ttf?t=1712545822561") format("truetype");
+  src: url("//at.alicdn.com/t/c/font_4304440_96itxcl7ayq.ttf?t=1718784075292") format("truetype");
   /* #endif */
   /* #ifdef MP-WEIXIN */
-  src: url("https://public-oss-file.zmaxfilm.com/zuimei-film-oss/iconfont/zuimei-icon/iconfont.ttf?t=1712545822561") format("truetype");
+  src: url("//at.alicdn.com/t/c/font_4304440_96itxcl7ayq.ttf?t=1718784075292") format("truetype");
   /* #endif */
 }
 
@@ -26,6 +26,18 @@
     align-items: center;
     justify-content: center;
   }
+}
+
+.zm-icon-document::before {
+  content: "\e740";
+}
+
+.zm-icon-file::before {
+  content: "\e672";
+}
+
+.zm-icon-time::before {
+  content: "\e62d";
 }
 
 .zm-icon-check::before {

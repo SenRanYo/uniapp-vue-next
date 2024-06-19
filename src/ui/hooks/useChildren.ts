@@ -5,19 +5,19 @@ export function flattenVNodes(children: VNodeNormalizedChildren) {
 
   const traverse = (children: VNodeNormalizedChildren) => {
     if (Array.isArray(children)) {
-      children.forEach((child) => {
-        if (isVNode(child)) {
-          result.push(child)
+      children.forEach((child: any) => {
+        // if (isVNode(child)) {
+        result.push(child)
 
-          if (child.component?.subTree) {
-            result.push(child.component.subTree)
-            traverse(child.component.subTree.children)
-          }
-
-          if (child.children) {
-            traverse(child.children)
-          }
+        if (child.component?.subTree) {
+          result.push(child.component.subTree)
+          traverse(child.component.subTree.children)
         }
+
+        if (child.children) {
+          traverse(child.children)
+        }
+        // }
       })
     }
   }

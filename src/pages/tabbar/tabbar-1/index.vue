@@ -2,7 +2,7 @@
   <zm-view ref="view" height="300vh" background="#fff" custom-style="padding: 0 24rpx">
     <view class="border">
       <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-      <zm-search v-model="search" :action="true"></zm-search>
+      <zm-upload v-model="urls" accept="file" multiple :before-read="onBeforeRead"></zm-upload>
       <zm-tabbar v-model="tabbar" route>
         <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
         <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -31,6 +31,7 @@ const date = ref<any>(new Date())
 const minDate = ref("2024-06-01 08:30:30")
 const maxDate = ref("2024-06-09 20:30:30")
 
+const urls = ref("https://fastly.jsdelivr.net/npm/@vant/assets/leaf.jpeg,https://fastly.jsdelivr.net/npm/@vant/assets/tree.jpeg")
 const search = ref("")
 const popup = ref(true)
 const picker = ref(["130000", "130300", "130303"])
@@ -45,6 +46,10 @@ watch(
 
 function onChange(val) {
   console.log(val)
+}
+
+function onBeforeRead(files, next) {
+  console.log(files)
 }
 </script>
 

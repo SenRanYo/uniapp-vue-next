@@ -105,6 +105,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .zm-image {
+  width: 100%;
+  height: 100%;
   display: flex;
   overflow: hidden;
   position: relative;

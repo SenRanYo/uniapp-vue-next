@@ -50,6 +50,16 @@ export function isImage(link: any): boolean {
 }
 
 /**
+ * 校验链接是否为文档
+ * @param {string} link - 要校验的链接
+ * @return {boolean} - 如果链接是文档链接，则返回 true；否则返回 false
+ */
+export function isDocument(link: any): boolean {
+  const reg = /\.(docx|xlsx|pptx|pdf|txt|html|csv|json|xml)$/i
+  return reg.test(link)
+}
+
+/**
  * @description 校验是否是日期格式
  * @param {String|Date} value 校验内容
  * @return {Boolean}
@@ -84,7 +94,7 @@ export function isNumber(value: any): boolean {
  * @param {*} value - 要检查的值
  * @returns {boolean} - 如果值是字符串类型，则返回true；否则返回false
  */
-export function isString(value: any): boolean {
+export function isString(value: any): value is string {
   return typeof value === "string"
 }
 
