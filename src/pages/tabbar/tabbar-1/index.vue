@@ -2,7 +2,7 @@
   <zm-view ref="view" height="300vh" background="#fff" custom-style="padding: 0 24rpx">
     <view class="border">
       <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-      <zm-upload v-model="urls" accept="file" multiple :before-read="onBeforeRead"></zm-upload>
+      <zm-upload v-model="urls" accept="file" :before-read="onBeforeRead" :max-size="onOversize"></zm-upload>
       <zm-tabbar v-model="tabbar" route>
         <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
         <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -48,39 +48,20 @@ function onChange(val) {
   console.log(val)
 }
 
-function onBeforeRead(files: any, next: Function) {
-  console.log(files)
-  let max = 100
-  let count = 0
-  // let timer = setInterval(() => {
-  let data = files.map((file) => {
-    file.status = "uploading"
-    file.message = `进度${count}%`
-
-    if (count >= 100) {
-      file.status = "success"
-    }
-    return file
-  })
-  next(data)
+function onBeforeRead(file: any, next: Function) {
+  console.log(file)
+  file.status = "uploading"
+  file.message = `上传中...`
+  next(file)
   setTimeout(() => {
-    count = 100
-    let data = files.map((file) => {
-      console.log(file)
-      file.status = "success"
-      file.message = `进度${count}%`
-
-      if (count >= 100) {
-        file.status = "success"
-      }
-      return file
-    })
-    next(data)
+    file.status = "fail"
+    file.message = `上传失败`
+    next(file)
   }, 2000)
-  // next(data)
-  //   count++
-  //   if (count >= max) clearInterval(timer)
-  // }, 200)
+}
+
+function onOversize(file) {
+  console.log(file)
 }
 </script>
 

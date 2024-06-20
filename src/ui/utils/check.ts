@@ -103,7 +103,7 @@ export function isString(value: any): value is string {
  * @param {*} fn - 需要检查的参数
  * @returns {boolean} 如果给定的参数是函数则返回true，否则返回false
  */
-export function isFunction(fn: any): boolean {
+export function isFunction(fn: any): fn is Function {
   return typeof fn === "function"
 }
 

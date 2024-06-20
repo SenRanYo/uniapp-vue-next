@@ -1,34 +1,32 @@
 <template>
-  <view class="zm-upload" :class="[customClass]" :style="[style]">
-    <view class="zm-upload__previews">
-      <view class="zm-upload__preview" :style="[previewStyle]" v-for="(item, index) in list" :key="index">
-        <view class="zm-upload__status" v-if="isShowStatus(item)">
-          <zm-icon v-if="item.status === 'fail'" name="close" color="#fff"></zm-icon>
-          <zm-loading v-if="item.status === 'uploading'" color="#fff"></zm-loading>
-          <text class="zm-upload__status__message">{{ item.message }}</text>
-        </view>
-        <view class="zm-upload__delete" v-if="isShowDelete(item)" @click="onClickDelete(index)">
-          <slot name="delete">
-            <zm-icon custom-class="zm-upload__delete__icon" name="cross" color="#fff" size="20rpx"></zm-icon>
-          </slot>
-        </view>
-        <zm-image v-if="isImage(item.name || item.url)" :src="item.url"></zm-image>
-        <zm-icon v-else-if="isDocument(item.name || item.url)" name="document" :size="previewIconSize" :color="previewIconColor" :weight="previewIconWeight"></zm-icon>
-        <zm-icon v-else name="file" :size="previewIconSize" :color="previewIconColor" :weight="previewIconWeight"></zm-icon>
+  <view class="zm-upload" :class="[classs, customClass]" :style="[style]">
+    <view class="zm-upload__preview" :style="[previewStyle(index)]" v-for="(item, index) in list" :key="index" @click="previewImage(item)">
+      <view class="zm-upload__status" v-if="isShowStatus(item)">
+        <zm-icon v-if="item.status === 'fail'" name="close" color="#fff"></zm-icon>
+        <zm-loading v-if="item.status === 'uploading'" color="#fff"></zm-loading>
+        <text class="zm-upload__status__message">{{ item.message }}</text>
       </view>
-      <view class="zm-upload__trigger" :style="[uploadStyle]" @click="upload">
-        <slot name="icon">
-          <zm-icon :name="icon" :size="iconSize" :color="iconColor" :weight="iconWeight"></zm-icon>
+      <view class="zm-upload__delete" v-if="isShowDelete(item)" @click.stop="deleteFile(index)">
+        <slot name="delete">
+          <zm-icon custom-class="zm-upload__delete__icon" name="cross" color="#fff" size="20rpx"></zm-icon>
         </slot>
       </view>
+      <zm-image v-if="isImage(item.name || item.url)" :src="item.url" :mode="imageMode"></zm-image>
+      <zm-icon v-else-if="isDocument(item.name || item.url)" name="document" :size="previewIconSize" :color="previewIconColor" :weight="previewIconWeight"></zm-icon>
+      <zm-icon v-else name="file" :size="previewIconSize" :color="previewIconColor" :weight="previewIconWeight"></zm-icon>
+    </view>
+    <view class="zm-upload__trigger" :hover-class="triggerHoverClass" :hover-stay-time="100" :style="[triggerStyle]" @click="triggerUpload">
+      <slot name="icon">
+        <zm-icon :name="icon" :size="iconSize" :color="iconColor" :weight="iconWeight"></zm-icon>
+      </slot>
     </view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { uuid, clone } from "../utils/utils"
-import { useStyle, useUnit } from "../hooks"
 import { uploadEmits, uploadProps, UploadFile } from "./index"
+import { useStyle, useUnit, useElRect, useElRects, useColor } from "../hooks"
 import { isFunction, isArray, isString, isImage as isImageLink, isDocument as isDocumentLink } from "../utils/check"
 
 defineOptions({ name: "zm-upload" })
@@ -37,6 +35,15 @@ const emits = defineEmits(uploadEmits)
 const props = defineProps(uploadProps)
 
 const list = ref([])
+const triggerRect = ref<UniApp.NodeInfo>({})
+const previewRects = ref<UniApp.NodeInfo[]>([])
+const instance = getCurrentInstance()
+
+const classs = computed(() => {
+  const list = []
+  if (props.disabled) list.push("zm-upload--disabled")
+  return list
+})
 
 const style = computed(() => {
   const style: any = {}
@@ -44,18 +51,39 @@ const style = computed(() => {
 })
 
 const previewStyle = computed(() => {
+  return (index: number) => {
+    const style: any = {}
+    const firstRect = previewRects.value[0]
+    const currentRect = previewRects.value[index]
+    style.width = useUnit(props.width)
+    style.height = useUnit(props.width)
+    style.background = useColor(props.background)
+    style.marginRight = useUnit(props.previewGap)
+    if (firstRect && currentRect && firstRect.top !== currentRect.top) {
+      style.marginTop = useUnit(props.previewGap)
+    }
+    return useStyle(style)
+  }
+})
+
+const triggerStyle = computed(() => {
   const style: any = {}
+  const firstRect = previewRects.value[0]
   style.width = useUnit(props.width)
   style.height = useUnit(props.width)
-  style.marginRight = useUnit(props.previewGap)
+  style.background = useColor(props.background)
+  if (props.disabled) {
+    style.opacity = 0.6
+    style.cursor = "not-allowed"
+  }
+  if (firstRect && triggerRect && firstRect.top !== triggerRect.value.top) {
+    style.marginTop = useUnit(props.previewGap)
+  }
   return useStyle(style)
 })
 
-const uploadStyle = computed(() => {
-  const style: any = {}
-  style.width = useUnit(props.width)
-  style.height = useUnit(props.width)
-  return useStyle(style)
+const triggerHoverClass = computed(() => {
+  return props.disabled ? "" : "zm-upload__trigger--active"
 })
 
 const isShowStatus = computed(() => {
@@ -66,64 +94,69 @@ const isShowStatus = computed(() => {
 
 const isShowDelete = computed(() => {
   return (item: UploadFile) => {
-    return item.status !== "uploading"
+    return item.status !== "uploading" && props.deletable && !props.disabled
   }
 })
 
 const isImage = computed(() => {
-  return (url: string) => {
-    return isImageLink(url)
-  }
+  return (url: string) => isImageLink(url)
 })
 
 const isDocument = computed(() => {
-  return (url: string) => {
-    return isDocumentLink(url)
-  }
+  return (url: string) => isDocumentLink(url)
 })
 
 watch(() => props.modelValue, formatModelValue, { deep: true, immediate: true })
 
-async function upload() {
+// 触发上传
+async function triggerUpload() {
   try {
     if (props.disabled) return
-    const files = await handleChooseFile()
-    list.value = [...list.value, ...files]
-    beforeRead(files)
+    const files = await handleChoose()
+    files.forEach((file) => {
+      const index = list.value.findIndex((item) => item.uuid === file.uuid)
+      if (isFunction(props.maxSize)) {
+        if (props.maxSize(file)) {
+          emits("oversize", file)
+        } else return
+      } else if (file.size > +props.maxSize) {
+        emits("oversize", file)
+        return
+      } else {
+        list.value.push(file)
+        beforeRead({ ...file, index })
+      }
+    })
+    await nextTick()
+    triggerRect.value = await useElRect(".zm-upload__trigger", instance)
+    previewRects.value = await useElRects(".zm-upload__preview", instance)
   } catch (error) {}
 }
 
 // 读取之前
-async function beforeRead(files: UploadFile[]) {
-  const next = (files: UploadFile | UploadFile[]) => {
-    if (isArray(files)) {
-      files.forEach((file) => {
-        list.value.forEach((item, index) => {
-          if (item.uuid === file.uuid) {
-            list.value.splice(index, 1, clone(file))
-          }
-        })
-      })
-    } else {
-      list.value.forEach((item, index) => {
-        if (files.uuid === item.uuid) {
-          list.value.splice(index, 1, clone(files))
-        }
-      })
-    }
+async function beforeRead(file: UploadFile) {
+  const next = (file: UploadFile) => {
+    list.value.forEach((item, index) => {
+      if (file.uuid === item.uuid) {
+        list.value.splice(index, 1, clone(file))
+        afterRead(file)
+      }
+    })
   }
   if (isFunction(props.beforeRead)) {
-    props.beforeRead(props.multiple ? toRaw(files) : toRaw(files[0]), next)
+    props.beforeRead(toRaw(file), next)
   } else {
-    next(files)
+    next(file)
   }
 }
 
 // 读取之后
-async function afterRead() {}
+async function afterRead(file: UploadFile) {
+  if (isFunction(props.afterRead)) props.afterRead(file)
+}
 
 // 格式化绑定值列表
-function formatModelValue(value: string | string[]) {
+function formatModelValue() {
   if (isArray(props.modelValue)) {
     list.value = props.modelValue.map((url: string) => {
       return { url, status: "success", message: "" }
@@ -137,7 +170,7 @@ function formatModelValue(value: string | string[]) {
 }
 
 // 处理选择文件
-function handleChooseFile(): Promise<UploadFile[]> {
+function handleChoose(): Promise<UploadFile[]> {
   return new Promise(async (resolve, reject) => {
     try {
       let result: UploadFile[] = []
@@ -190,6 +223,13 @@ function handleChooseFile(): Promise<UploadFile[]> {
       reject(error)
     }
   })
+}
+
+// 预览图片
+function previewImage(item: UploadFile) {
+  if (isImageLink(item.name)) {
+    uni.previewImage({ urls: [item.url] })
+  }
 }
 
 // 选择文件
@@ -252,16 +292,16 @@ function chooseMediaFile(params?: any): Promise<UploadFile[]> {
 }
 
 // 选择微信聊天文件(微信小程序)
-function chooseMessageFile(params?: any): Promise<UploadFile[]> {
+function chooseMessageFile(): Promise<UploadFile[]> {
   return new Promise((resolve, reject) => {
     // @ts-ignore
     wx.chooseMessageFile({
-      count: props.multiple ? props.maxCount : 1,
+      count: props.multiple ? Math.min(props.maxCount, 100) : 1,
       type: props.accept,
       success: (res: any) => {
         resolve(
           res.tempFiles.map((item: any) => {
-            return { ...item, uuid: uuid(), status: "", message: "" }
+            return { ...item, url: item.path, uuid: uuid(), status: "", message: "" }
           }),
         )
       },
@@ -301,7 +341,7 @@ function chooseVideoFile(): Promise<UploadFile[]> {
 }
 
 // 删除文件
-function onClickDelete(index: number) {
+function deleteFile(index: number) {
   list.value.splice(index, 1)
 }
 
@@ -317,11 +357,6 @@ export default {
 .zm-upload {
   display: flex;
   flex-wrap: wrap;
-
-  &__previews {
-    display: flex;
-    flex-wrap: wrap;
-  }
 
   &__preview {
     /* #ifdef WEB */
@@ -377,9 +412,29 @@ export default {
     cursor: pointer;
     /* #endif */
     display: flex;
+    position: relative;
     align-items: center;
     justify-content: center;
     background-color: #f7f8fa;
+
+    &::before {
+      top: 50%;
+      left: 50%;
+      opacity: 0;
+      width: 100%;
+      z-index: 3;
+      height: 100%;
+      content: "";
+      border: inherit;
+      position: absolute;
+      background: #000;
+      border-radius: inherit;
+      transform: translate(-50%, -50%);
+    }
+
+    &--active::before {
+      opacity: 0.1;
+    }
   }
 }
 </style>

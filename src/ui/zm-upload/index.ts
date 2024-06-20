@@ -31,7 +31,7 @@ export const uploadProps = {
    */
   camera: { type: String as PropType<"back" | "front">, default: "" },
   /**
-   * @description 是否点击预览
+   * @description 是否点击预览，仅支持图片格式
    */
   preview: { type: Boolean, default: false },
   /**
@@ -57,7 +57,7 @@ export const uploadProps = {
   /**
    * @description 选择单个文件的最大大小
    */
-  maxSize: { type: Number, default: Infinity },
+  maxSize: { type: [Number, String, Function], default: Infinity },
   /**
    * @description 文件上传数量限制
    */
@@ -75,9 +75,9 @@ export const uploadProps = {
    */
   previewGap: { type: [String, Number], default: "20rpx" },
   /**
-   * @description 预览上传的图片时的裁剪模式，和image组件mode属性一致
+   * @description 图片显示模式，和image组件mode属性一致
    */
-  previewMode: { type: String, default: "aspectFill" },
+  imageMode: { type: String, default: "aspectFill" },
   /**
    * @description 预览区图标大小
    */
@@ -131,6 +131,7 @@ export const uploadProps = {
 export const uploadEmits = {
   upload: (event: { files: any }) => true,
   delete: (event: { inex: number; file: any }) => true,
+  oversize: (file: UploadFile) => true,
   "update:modelValue": (value: string) => true,
 }
 
@@ -140,6 +141,7 @@ export type UploadFile = {
   name: string
   size: number
   type: string
+  index?: number
   message?: string
   status?: "success" | "fail" | "uploading"
   [key: string]: any
