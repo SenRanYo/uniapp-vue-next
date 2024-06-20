@@ -48,8 +48,39 @@ function onChange(val) {
   console.log(val)
 }
 
-function onBeforeRead(files, next) {
+function onBeforeRead(files: any, next: Function) {
   console.log(files)
+  let max = 100
+  let count = 0
+  // let timer = setInterval(() => {
+  let data = files.map((file) => {
+    file.status = "uploading"
+    file.message = `进度${count}%`
+
+    if (count >= 100) {
+      file.status = "success"
+    }
+    return file
+  })
+  next(data)
+  setTimeout(() => {
+    count = 100
+    let data = files.map((file) => {
+      console.log(file)
+      file.status = "success"
+      file.message = `进度${count}%`
+
+      if (count >= 100) {
+        file.status = "success"
+      }
+      return file
+    })
+    next(data)
+  }, 2000)
+  // next(data)
+  //   count++
+  //   if (count >= max) clearInterval(timer)
+  // }, 200)
 }
 </script>
 

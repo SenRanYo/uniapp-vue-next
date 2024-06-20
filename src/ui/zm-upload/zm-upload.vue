@@ -2,7 +2,12 @@
   <view class="zm-upload" :class="[customClass]" :style="[style]">
     <view class="zm-upload__previews">
       <view class="zm-upload__preview" :style="[previewStyle]" v-for="(item, index) in list" :key="index">
-        <view class="zm-upload__delete" @click="onClickDelete(index)">
+        <view class="zm-upload__status" v-if="isShowStatus(item)">
+          <zm-icon v-if="item.status === 'fail'" name="close" color="#fff"></zm-icon>
+          <zm-loading v-if="item.status === 'uploading'" color="#fff"></zm-loading>
+          <text class="zm-upload__status__message">{{ item.message }}</text>
+        </view>
+        <view class="zm-upload__delete" v-if="isShowDelete(item)" @click="onClickDelete(index)">
           <slot name="delete">
             <zm-icon custom-class="zm-upload__delete__icon" name="cross" color="#fff" size="20rpx"></zm-icon>
           </slot>
@@ -21,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { uuid } from "../utils/utils"
+import { uuid, clone } from "../utils/utils"
 import { useStyle, useUnit } from "../hooks"
 import { uploadEmits, uploadProps, UploadFile } from "./index"
 import { isFunction, isArray, isString, isImage as isImageLink, isDocument as isDocumentLink } from "../utils/check"
@@ -53,6 +58,18 @@ const uploadStyle = computed(() => {
   return useStyle(style)
 })
 
+const isShowStatus = computed(() => {
+  return (item: UploadFile) => {
+    return ["fail", "uploading"].includes(item.status)
+  }
+})
+
+const isShowDelete = computed(() => {
+  return (item: UploadFile) => {
+    return item.status !== "uploading"
+  }
+})
+
 const isImage = computed(() => {
   return (url: string) => {
     return isImageLink(url)
@@ -70,7 +87,6 @@ watch(() => props.modelValue, formatModelValue, { deep: true, immediate: true })
 async function upload() {
   try {
     if (props.disabled) return
-    // if (props.maxCount >= list.value.length) return
     const files = await handleChooseFile()
     list.value = [...list.value, ...files]
     beforeRead(files)
@@ -84,27 +100,24 @@ async function beforeRead(files: UploadFile[]) {
       files.forEach((file) => {
         list.value.forEach((item, index) => {
           if (item.uuid === file.uuid) {
-            list.value.splice(index, 1, file)
+            list.value.splice(index, 1, clone(file))
           }
         })
       })
     } else {
       list.value.forEach((item, index) => {
         if (files.uuid === item.uuid) {
-          list.value.splice(index, 1, files)
+          list.value.splice(index, 1, clone(files))
         }
       })
     }
   }
   if (isFunction(props.beforeRead)) {
-    props.beforeRead(props.multiple ? files : files[0], next)
+    props.beforeRead(props.multiple ? toRaw(files) : toRaw(files[0]), next)
   } else {
     next(files)
   }
 }
-
-// 删除文件
-async function deleteFile(index: number) {}
 
 // 读取之后
 async function afterRead() {}
@@ -113,32 +126,14 @@ async function afterRead() {}
 function formatModelValue(value: string | string[]) {
   if (isArray(props.modelValue)) {
     list.value = props.modelValue.map((url: string) => {
-      return { url, status: "", message: "" }
+      return { url, status: "success", message: "" }
     })
   }
   if (isString(props.modelValue)) {
     list.value = props.modelValue.split(",").map((url: string) => {
-      return { url, status: "", message: "" }
+      return { url, status: "success", message: "" }
     })
   }
-}
-
-// 选择文件
-function chooseFile(): Promise<UploadFile[]> {
-  return new Promise((resolve, reject) => {
-    uni.chooseFile({
-      count: props.multiple ? props.maxCount : 1,
-      type: props.accept as any,
-      success: (res: any) => {
-        resolve(
-          res.tempFiles.map((file: any) => {
-            return { file: file, url: file.path, name: file.name, size: file.size, type: file.type, uuid: uuid() }
-          }),
-        )
-      },
-      fail: reject,
-    })
-  })
 }
 
 // 处理选择文件
@@ -197,6 +192,24 @@ function handleChooseFile(): Promise<UploadFile[]> {
   })
 }
 
+// 选择文件
+function chooseFile(): Promise<UploadFile[]> {
+  return new Promise((resolve, reject) => {
+    uni.chooseFile({
+      count: props.multiple ? props.maxCount : 1,
+      type: props.accept as any,
+      success: (res: any) => {
+        resolve(
+          res.tempFiles.map((file: any) => {
+            return { file: file, url: file.path, name: file.name, size: file.size, type: file.type, uuid: uuid(), status: "", message: "" }
+          }),
+        )
+      },
+      fail: reject,
+    })
+  })
+}
+
 // 选择图片文件
 function chooseImageFile(): Promise<UploadFile[]> {
   return new Promise((resolve, reject) => {
@@ -207,7 +220,7 @@ function chooseImageFile(): Promise<UploadFile[]> {
       success: (res: any) => {
         resolve(
           res.tempFiles.map((file: any) => {
-            return { file: file, url: file.path, name: file.name, size: file.size, type: file.type, fileType: "image", thumb: file.path, uuid: uuid() }
+            return { file: file, url: file.path, name: file.name, size: file.size, type: file.type, fileType: "image", thumb: file.path, uuid: uuid(), status: "", message: "" }
           }),
         )
       },
@@ -229,7 +242,7 @@ function chooseMediaFile(params?: any): Promise<UploadFile[]> {
       success: (res) => {
         resolve(
           res.tempFiles.map((item: any) => {
-            return { ...item, url: item.tempFilePath, thumb: res.type === "video" ? item.thumbTempFilePath : item.tempFilePath, uuid: uuid() }
+            return { ...item, url: item.tempFilePath, thumb: res.type === "video" ? item.thumbTempFilePath : item.tempFilePath, uuid: uuid(), status: "", message: "" }
           }),
         )
       },
@@ -246,7 +259,11 @@ function chooseMessageFile(params?: any): Promise<UploadFile[]> {
       count: props.multiple ? props.maxCount : 1,
       type: props.accept,
       success: (res: any) => {
-        resolve(res.tempFiles)
+        resolve(
+          res.tempFiles.map((item: any) => {
+            return { ...item, uuid: uuid(), status: "", message: "" }
+          }),
+        )
       },
       fail: reject,
     })
@@ -270,6 +287,8 @@ function chooseVideoFile(): Promise<UploadFile[]> {
             path: res.tempFilePath,
             thumb: res.thumbTempFilePath,
             uuid: uuid(),
+            status: "",
+            message: "",
             // #ifdef WEB
             file: res.tempFile,
             // #endif
@@ -281,6 +300,7 @@ function chooseVideoFile(): Promise<UploadFile[]> {
   })
 }
 
+// 删除文件
 function onClickDelete(index: number) {
   list.value.splice(index, 1)
 }
@@ -314,14 +334,32 @@ export default {
     background-color: #f7f8fa;
   }
 
+  &__status {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: absolute;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    background-color: rgb(50 50 51 / 88%);
+
+    &__message {
+      color: #fff;
+      margin-top: 12rpx;
+    }
+  }
+
   &__delete {
     top: 0;
     right: 0;
-    z-index: 1;
+    z-index: 2;
     position: absolute;
 
     &__icon {
-      z-index: 1;
       width: 28rpx;
       height: 28rpx;
       display: flex;
