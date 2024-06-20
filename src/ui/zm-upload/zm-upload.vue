@@ -227,7 +227,7 @@ function handleChoose(): Promise<UploadFile[]> {
 
 // 预览图片
 function previewImage(item: UploadFile) {
-  if (isImageLink(item.name)) {
+  if (isImageLink(item.name || item.url)) {
     uni.previewImage({ urls: [item.url] })
   }
 }
