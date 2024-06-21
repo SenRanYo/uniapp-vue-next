@@ -155,8 +155,8 @@ function initTransition(type: string) {
   return animation.value
 }
 
-function onClick() {
-  emits("click")
+function onClick(event: TouchEvent) {
+  emits("click", event)
 }
 
 defineExpose({ name: "zm-transition", open, close, step })

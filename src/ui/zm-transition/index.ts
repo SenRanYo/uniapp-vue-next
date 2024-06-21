@@ -54,7 +54,7 @@ export const transitionEmits = {
   opened: () => true,
   close: () => true,
   closed: () => true,
-  click: () => true,
+  click: (event: TouchEvent) => true,
 }
 
 export type TransitionEmits = typeof transitionEmits

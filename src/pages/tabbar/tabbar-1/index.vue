@@ -2,7 +2,6 @@
   <zm-view ref="view" height="300vh" background="#fff" custom-style="padding: 0 24rpx">
     <view class="border">
       <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-      <zm-upload v-model="urls" accept="file" :before-read="onBeforeRead"></zm-upload>
       <zm-tabbar v-model="tabbar" route>
         <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
         <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -36,6 +35,7 @@ const search = ref("")
 const popup = ref(true)
 const picker = ref(["130000", "130300", "130303"])
 const columns = useCascaderAreaData()
+const notify = ref(null)
 
 watch(
   () => search.value,
