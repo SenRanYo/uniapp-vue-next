@@ -76,6 +76,5 @@ export type NotifyOptions = {
   customStyle?: string | Record<string, any>
 }
 export type NotifyType = "primary" | "success" | "warning" | "error"
-export type UploadEmits = typeof notifyEmits
 export type NotifyProps = ExtractPropTypes<typeof notifyProps>
 export type NotifyInstance = InstanceType<typeof Notify>
