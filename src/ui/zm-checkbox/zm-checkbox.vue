@@ -15,30 +15,27 @@
 
 <script setup lang="ts">
 import { isBoolean } from "../utils/check"
-import { useStyle, useUnit, useColor } from "../hooks"
+import { checkboxGroupKey } from "../zm-checkbox-group"
+import { useStyle, useUnit, useColor, useParent } from "../hooks"
 import { checkboxEmits, checkboxProps, CheckboxValueType } from "./index"
 
 defineOptions({ name: "zm-checkbox" })
+
+const slots = useSlots()
 const emits = defineEmits(checkboxEmits)
 const props = defineProps(checkboxProps)
 const checkboxGroup = inject("zm-checkbox-group", null)
-
-const slots = useSlots()
-const index = ref(null)
+const { index, parent } = useParent(checkboxGroupKey)
 
 const modelValue = computed({
-  get() {
-    return props.modelValue
-  },
-  set(value) {
-    updateValue(value)
-  },
+  get: () => props.modelValue,
+  set: (value) => updateValue(value),
 })
 
 const style = computed(() => {
   const style: any = {}
-  style.fontSize = useUnit(checkboxGroup?.iconSize.value || props.iconSize)
-  if (checkboxGroup?.iconColor.value || props.iconColor) {
+  style.fontSize = useUnit(prop("iconSize"))
+  if (prop("iconColor")) {
     style["--zm-checkbox-icon-color"] = useColor(checkboxGroup?.iconColor.value || props.iconColor)
   }
   if (checkboxGroup?.checkedIconColor.value || props.checkedIconColor) {
@@ -114,9 +111,9 @@ const isChecked = computed(() => {
   }
 })
 
-function resize() {
-  checkboxGroup?.addChildren({ name: props.name })
-  index.value = checkboxGroup?.childrens.value.findIndex(({ name }) => name === props.name)
+function prop(name: string) {
+  if (parent) return parent.props[name] || props[name]
+  return props[name]
 }
 
 async function updateValue(value: CheckboxValueType) {
@@ -171,8 +168,7 @@ function onClickLabel(event: TouchEvent) {
   emits("click", event)
 }
 
-onMounted(() => resize())
-defineExpose({ name: "zm-checkbox", toggle })
+defineExpose({ name: "zm-checkbox", toggle, index })
 </script>
 <script lang="ts">
 export default {

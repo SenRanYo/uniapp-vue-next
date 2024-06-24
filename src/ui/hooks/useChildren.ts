@@ -1,4 +1,4 @@
-import { VNode, isVNode, provide, reactive, InjectionKey, getCurrentInstance, VNodeNormalizedChildren, ComponentPublicInstance, ComponentInternalInstance } from "vue"
+import { VNode, provide, reactive, InjectionKey, getCurrentInstance, VNodeNormalizedChildren, ComponentPublicInstance, ComponentInternalInstance } from "vue"
 
 export function flattenVNodes(children: VNodeNormalizedChildren) {
   const result: VNode[] = []
@@ -6,7 +6,6 @@ export function flattenVNodes(children: VNodeNormalizedChildren) {
   const traverse = (children: VNodeNormalizedChildren) => {
     if (Array.isArray(children)) {
       children.forEach((child: any) => {
-        // if (isVNode(child)) {
         result.push(child)
 
         if (child.component?.subTree) {
@@ -17,7 +16,6 @@ export function flattenVNodes(children: VNodeNormalizedChildren) {
         if (child.children) {
           traverse(child.children)
         }
-        // }
       })
     }
   }
@@ -28,49 +26,45 @@ export function flattenVNodes(children: VNodeNormalizedChildren) {
 }
 
 const findVNodeIndex = (vnodes: VNode[], vnode: VNode) => {
-  const index = vnodes.indexOf(vnode)
-  if (index === -1) {
-    return vnodes.findIndex((item) => vnode.key !== undefined && vnode.key !== null && item.type === vnode.type && item.key === vnode.key)
-  }
-  return index
+  return vnodes.indexOf(vnode)
 }
 
-export function sortChildren(parent: ComponentInternalInstance, publicChildren: ComponentPublicInstance[], internalChildren: ComponentInternalInstance[]) {
+export function sortChildren(parent: ComponentInternalInstance, publicChildrens: ComponentPublicInstance[], childrens: ComponentInternalInstance[]) {
   const vnodes = flattenVNodes(parent.subTree.children)
 
-  internalChildren.sort((a, b) => findVNodeIndex(vnodes, a.vnode) - findVNodeIndex(vnodes, b.vnode))
+  childrens.sort((a, b) => findVNodeIndex(vnodes, a.vnode) - findVNodeIndex(vnodes, b.vnode))
 
-  const orderedPublicChildren = internalChildren.map((item) => item.proxy!)
+  const orderedPublicChildren = childrens.map((item) => item.proxy!)
 
-  publicChildren.sort((a, b) => {
+  publicChildrens.sort((a, b) => {
     const indexA = orderedPublicChildren.indexOf(a)
     const indexB = orderedPublicChildren.indexOf(b)
     return indexA - indexB
   })
 }
 
-export function useChildren<Child extends ComponentPublicInstance = ComponentPublicInstance<{}, any>, ProvideValue = never>(key: InjectionKey<ProvideValue>) {
-  const publicChildren: Child[] = reactive([])
-  const internalChildren: ComponentInternalInstance[] = reactive([])
+export function useChildren<Child extends ComponentInternalInstance, ProvideValue = never>(key: InjectionKey<ProvideValue>) {
   const parent = getCurrentInstance()!
+  const childrens: ComponentInternalInstance[] = reactive([])
+  const publicChildrens: ComponentPublicInstance[] = reactive([])
 
-  const linkChildren = (value?: ProvideValue) => {
+  const linkChildren = (value?: any) => {
     const link = (child: ComponentInternalInstance) => {
       if (child.proxy) {
-        internalChildren.push(child)
-        publicChildren.push(child.proxy as Child)
-        sortChildren(parent, publicChildren, internalChildren)
+        childrens.push(child as Child)
+        publicChildrens.push(child.proxy)
+        sortChildren(parent, publicChildrens, childrens)
       }
     }
 
     const unlink = (child: ComponentInternalInstance) => {
-      const index = internalChildren.indexOf(child)
-      publicChildren.splice(index, 1)
-      internalChildren.splice(index, 1)
+      const index = childrens.indexOf(child)
+      publicChildrens.splice(index, 1)
+      childrens.splice(index, 1)
     }
 
-    provide(key, Object.assign({ link, unlink, children: publicChildren, internalChildren }, value))
+    provide(key, Object.assign({ link, unlink, children: childrens, publicChildrens }, value))
   }
 
-  return { children: publicChildren, linkChildren }
+  return { childrens, linkChildren }
 }

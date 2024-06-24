@@ -2,6 +2,8 @@ import { Mitt } from "../utils/mitt"
 import { cssVars } from "../config"
 import { isNumber, isObject, isString, isEmpty } from "../utils/check"
 import { Ref, ComponentInternalInstance, nextTick, getCurrentInstance } from "vue"
+export * from "./useParent"
+export * from "./useChildren"
 
 // 使用css变量
 export function useVar(name: string): string {
@@ -183,6 +185,3 @@ export function useElRects(selector: string, instance: ComponentInternalInstance
 export function useMitt() {
   return new Mitt()
 }
-
-export * from "./useParent"
-export * from "./useChildren"

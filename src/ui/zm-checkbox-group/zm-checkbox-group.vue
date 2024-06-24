@@ -5,14 +5,20 @@
 </template>
 
 <script setup lang="ts">
-import { useStyle } from "../hooks"
 import { isBoolean } from "../utils/check"
-import { checkboxGroupEmits, checkboxGroupProps, CheckboxGroupValueType, CheckboxGroupChildrenType } from "./index"
+import { useStyle, useChildren } from "../hooks"
+import { checkboxGroupEmits, checkboxGroupProps, CheckboxGroupValueType, checkboxGroupKey } from "./index"
 
-defineOptions({ name: "zm-cell-group" })
+defineOptions({ name: "zm-checkbox-group" })
 const emits = defineEmits(checkboxGroupEmits)
 const props = defineProps(checkboxGroupProps)
-const childrens = ref([])
+
+const { childrens, linkChildren } = useChildren(checkboxGroupKey)
+linkChildren({ props, updateValue })
+
+setTimeout(() => {
+  console.log(childrens)
+}, 3000)
 
 const style = computed(() => {
   const style = {}
@@ -25,27 +31,18 @@ const classs = computed(() => {
   return list
 })
 
-const modelValue = computed({
-  get() {
-    return props.modelValue
-  },
-  set(value) {
-    updateValue(value)
-  },
-})
-
 function toggleAll(checked: boolean) {
   if (isBoolean(checked)) {
     if (checked) {
-      const value = childrens.value.map((item) => item.name)
+      const value: any[] = childrens.map((item) => item.props.name)
       updateValue(value)
     } else {
       updateValue([])
     }
   } else {
     const value = []
-    childrens.value.forEach((children) => {
-      if (props.modelValue.includes(children.name || children.index)) value.push(children.name)
+    childrens.forEach((children) => {
+      if (props.modelValue.includes(children.props.name as any)) value.push(children.props.name)
     })
     updateValue(value)
   }
@@ -57,17 +54,11 @@ async function updateValue(value: CheckboxGroupValueType) {
   emits("change", toRaw(value))
 }
 
-function addChildren(children: CheckboxGroupChildrenType) {
-  const index = childrens.value.findIndex(({ name }) => name === children.name)
-  if (index === -1) childrens.value.push(children)
-}
-
-provide("zm-checkbox-group", { ...toRefs(props), modelValue, childrens, addChildren, toggleAll, updateValue })
 defineExpose({ name: "zm-checkbox-group", toggleAll })
 </script>
 <script lang="ts">
 export default {
-  name: "zm-cell-group",
+  name: "zm-checkbox-group",
   options: { virtualHost: true, multipleSlots: true, styleIsolation: "shared" },
 }
 </script>

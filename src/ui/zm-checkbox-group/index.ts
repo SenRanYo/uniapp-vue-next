@@ -2,6 +2,7 @@ import { isArray } from "../utils/check"
 import CheckboxGroup from "./zm-checkbox-group.vue"
 import type { ExtractPropTypes } from "vue"
 
+export const checkboxGroupKey = Symbol("zm-checkbox-group")
 export const checkboxGroupProps = {
   /**
    * @description 绑定值

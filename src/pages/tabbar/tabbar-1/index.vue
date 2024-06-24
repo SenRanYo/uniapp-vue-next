@@ -2,17 +2,12 @@
   <zm-view ref="view" height="300vh" background="#fff" custom-style="padding: 0 24rpx">
     <view class="border">
       <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-      <zm-swiper>
-        <zm-swiper-item>
-          <zm-image src="https://ilike-images.oss-cn-hangzhou.aliyuncs.com/cloud/logo/2024-05-31/1717118225-79030.png"></zm-image>
-        </zm-swiper-item>
-        <zm-swiper-item>
-          <zm-image src="https://ilike-images.oss-cn-hangzhou.aliyuncs.com/cloud/logo/2024-05-29/1716977543-91643.jpg"></zm-image>
-        </zm-swiper-item>
-        <zm-swiper-item>
-          <zm-image src="https://ilike-images.oss-cn-hangzhou.aliyuncs.com/cloud/logo/2024-05-23/1716427518-66488.jpg"></zm-image>
-        </zm-swiper-item>
-      </zm-swiper>
+      <zm-checkbox-group v-model="check">
+        <zm-checkbox name="1">1</zm-checkbox>
+        <zm-checkbox name="2">2</zm-checkbox>
+        <zm-checkbox name="3">3</zm-checkbox>
+        <zm-checkbox name="4">4</zm-checkbox>
+      </zm-checkbox-group>
       <zm-tabbar v-model="tabbar" route>
         <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
         <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -38,6 +33,7 @@ const cascaderValue = ref("")
 const visible = ref(true)
 
 const date = ref<any>(new Date())
+const check = ref(["1"])
 const minDate = ref("2024-06-01 08:30:30")
 const maxDate = ref("2024-06-09 20:30:30")
 

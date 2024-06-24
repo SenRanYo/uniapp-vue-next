@@ -14,7 +14,7 @@ export function useCurrentRouter() {
  * @param name 父组件的名称
  * @param r 可选的 Ref 对象
  */
-export function useParent(name: string, r?: Ref) {
+export function useParent(name: string | symbol, r?: Ref) {
   // 获取当前组件实例
   const instance = getCurrentInstance()
 

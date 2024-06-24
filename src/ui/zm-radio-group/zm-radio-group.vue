@@ -12,8 +12,8 @@ defineOptions({ name: "zm-radio-group" })
 
 const emits = defineEmits(radioGroupEmits)
 const props = defineProps(radioGroupProps)
-const { linkChildren } = useChildren(radioGroupKey)
 
+const { linkChildren } = useChildren(radioGroupKey)
 linkChildren({ props, updateValue })
 
 const style = computed(() => {
