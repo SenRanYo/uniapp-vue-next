@@ -26,6 +26,7 @@ linkChildren({ props, scrollTo, updateValue })
 
 const style = computed(() => {
   const style: any = {}
+  style.background = useColor(props.background)
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
@@ -34,7 +35,7 @@ const lineStyle = computed(() => {
   const childrenRect = getActiveChildrenRect()
   style.width = useUnit(props.lineWidth)
   style.height = useUnit(props.lineHeight)
-  style.backgroundColor = useColor(props.lineColor)
+  style.background = useColor(props.lineColor)
 
   if (childrenRect && lineRect.value?.height && rect.value?.top) {
     const lineY = childrenRect.top - rect.value.top + childrenRect.height / 2
@@ -46,11 +47,13 @@ const lineStyle = computed(() => {
 watch(() => props.modelValue, scrollTo, { immediate: true })
 
 function scrollTo(value: SidebarValue) {
-  const current = childrens.find((item) => item.props.name === value)
-  if (current) {
-    const height = rect.value.height / 2
-    const scrollY = current.exposed.rect.bottom
-    scrollTop.value = scrollY > height ? scrollY - height : 0
+  if (props.autoScroll) {
+    const current = childrens.find((item) => item.props.name === value)
+    if (current) {
+      const height = rect.value.height / 2
+      const scrollY = current.exposed.rect.bottom
+      scrollTop.value = scrollY > height ? scrollY - height : 0
+    }
   }
 }
 

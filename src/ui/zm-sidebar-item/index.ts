@@ -11,9 +11,9 @@ export const sidebarItemProps = {
    */
   title: { type: [String, Number], default: () => "" },
   /**
-   * @description 宽度
+   * @description 高度
    */
-  width: { type: [String, Number], default: "" },
+  height: { type: [String, Number], default: "" },
   /**
    * @description 标题颜色
    */
@@ -38,18 +38,6 @@ export const sidebarItemProps = {
    * @description 激活项文字粗细
    */
   activeFontWeight: { type: [String, Number], default: "" },
-  /**
-   * @description 激活线条颜色
-   */
-  lineColor: { type: String, default: "" },
-  /**
-   * @description 激活线条宽度
-   */
-  lineWidth: { type: [String, Number], default: "" },
-  /**
-   * @description 激活线条高度
-   */
-  lineHeight: { type: [String, Number], default: "" },
   /**
    * @description 背景颜色
    */

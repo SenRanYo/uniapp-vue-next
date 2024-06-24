@@ -99,8 +99,7 @@ const isChecked = computed(() => {
 })
 
 function prop(name: string) {
-  if (parent) return parent.props[name] || props[name]
-  return props[name]
+  return props[name] || parent?.props[name] || ""
 }
 
 async function updateValue(value: CheckboxValueType) {

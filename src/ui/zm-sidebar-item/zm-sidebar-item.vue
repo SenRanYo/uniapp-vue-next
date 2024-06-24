@@ -1,6 +1,8 @@
 <template>
   <view class="zm-sidebar-item" :class="[classs, customClass]" :style="[style]" @click="onClick">
-    <view class="zm-sidebar-item__text">{{ title }}</view>
+    <slot>
+      <view class="zm-sidebar-item__title" :style="[titleStyle]">{{ title }}</view>
+    </slot>
   </view>
 </template>
 
@@ -18,22 +20,45 @@ const { index, parent } = useParent(sidebarKey)
 
 const rect = ref<UniApp.NodeInfo>({})
 
-const style = computed(() => {
-  const style: any = {}
-  return useStyle({ ...style, ...useStyle(props.customStyle) })
-})
-
 const classs = computed(() => {
   const list: any = []
   if (parent.props.modelValue === props.name) list.push("zm-sidebar-item--active")
   return list
 })
 
+const style = computed(() => {
+  const style: any = {}
+  style.height = useUnit(props.height)
+  style.background = useColor(props.background)
+  if (props.name === parent.props.modelValue) {
+    style.background = useColor(prop("activeBackground"))
+  }
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
+})
+
+const titleStyle = computed(() => {
+  const style: any = {}
+  style.color = useColor(prop("color"))
+  style.fontSize = useUnit(prop("fontSize"))
+  style.fontWeight = prop("fontWeight")
+  if (props.name === parent.props.modelValue) {
+    style.color = useColor(prop("activeColor") || prop("color"))
+    style.fontSize = useColor(prop("activeFontSize") || prop("fontSize"))
+    style.fontWeight = useColor(prop("activeFontWeight") || prop("fontWeight"))
+  }
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
+})
+
+function prop(name: string) {
+  return props[name] || parent?.props[name] || ""
+}
+
 async function resize() {
   rect.value = await useElRect(".zm-sidebar-item", instance)
 }
 
 function onClick() {
+  if (props.name === parent.props.modelValue) return
   parent.scrollTo(props.name)
   parent.updateValue(props.name)
 }
@@ -58,7 +83,7 @@ export default {
     background-color: #fff;
   }
 
-  &__text {
+  &__title {
     flex: 1;
     padding: 0 24rpx;
     overflow: hidden;

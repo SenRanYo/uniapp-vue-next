@@ -1,8 +1,8 @@
 <template>
   <zm-view ref="view" background="#fff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-sidebar v-model="sidebar" width="300rpx" @change="onSidebarChange">
-      <zm-sidebar-item :name="index" v-for="(item, index) in 30" :key="index" :title="`标签${index}标签${index}标签${index}标签${index}标签${index}`"></zm-sidebar-item>
+    <zm-sidebar v-model="sidebar" width="300rpx" font-size="28rpx" @change="onSidebarChange">
+      <zm-sidebar-item :name="index" v-for="(item, index) in 30" :key="index" :title="`标签${index}`"></zm-sidebar-item>
     </zm-sidebar>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -24,12 +24,8 @@ const tabbar = ref("1")
 const sidebar = ref(0)
 
 function onSidebarChange(val: any) {
-  // console.log(val)
+  console.log(val)
 }
-
-setTimeout(() => {
-  sidebar.value = 15
-}, 3000)
 </script>
 
 <style lang="scss" scoped></style>

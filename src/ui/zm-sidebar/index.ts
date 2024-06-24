@@ -12,13 +12,9 @@ export const sidebarProps = {
    */
   width: { type: [String, Number], default: "" },
   /**
-   * @description 高度
+   * @description 高度，默认自动
    */
   height: { type: [String, Number], default: "" },
-  /**
-   * @description 列表项高度
-   */
-  itemHeight: { type: [String, Number], default: "" },
   /**
    * @description 标题颜色
    */
@@ -60,6 +56,10 @@ export const sidebarProps = {
    */
   background: { type: String, default: "" },
   /**
+   * @description 是否自动滚动
+   */
+  autoScroll: { type: Boolean, default: true },
+  /**
    * @description 激活项背景颜色
    */
   activeBackground: { type: String, default: "" },
@@ -74,7 +74,6 @@ export const sidebarProps = {
 }
 
 export const sidebarEmits = {
-  blur: () => true,
   change: (value: SidebarValue) => true,
   "update:modelValue": (value: SidebarValue) => true,
 }
