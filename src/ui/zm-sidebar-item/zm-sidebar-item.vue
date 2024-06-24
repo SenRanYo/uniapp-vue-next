@@ -34,6 +34,7 @@ async function resize() {
 }
 
 function onClick() {
+  parent.scrollTo(props.name)
   parent.updateValue(props.name)
 }
 
