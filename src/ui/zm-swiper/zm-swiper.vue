@@ -28,8 +28,6 @@ const emits = defineEmits(swiperEmits)
 const props = defineProps(swiperProps)
 const current = ref(0)
 
-const ins = getCurrentInstance()
-console.log(ins)
 const style = computed(() => {
   const style: any = {}
   return useStyle({ ...style, ...useStyle(props.customStyle) })

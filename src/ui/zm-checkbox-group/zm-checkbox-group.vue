@@ -12,7 +12,6 @@ import { checkboxGroupEmits, checkboxGroupProps, CheckboxGroupValueType, checkbo
 defineOptions({ name: "zm-checkbox-group" })
 const emits = defineEmits(checkboxGroupEmits)
 const props = defineProps(checkboxGroupProps)
-
 const { childrens, linkChildren } = useChildren(checkboxGroupKey)
 linkChildren({ props, updateValue })
 
