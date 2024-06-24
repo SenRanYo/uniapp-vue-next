@@ -63,7 +63,7 @@ export function useChildren<Child extends ComponentInternalInstance, ProvideValu
       childrens.splice(index, 1)
     }
 
-    provide(key, Object.assign({ link, unlink, children: childrens, publicChildrens }, value))
+    provide(key, Object.assign({ link, unlink, childrens }, value))
   }
 
   return { childrens, linkChildren }

@@ -3,20 +3,19 @@ import { ref, inject, computed, onUnmounted, InjectionKey, getCurrentInstance, C
 type ParentProvide<T> = T & {
   link(child: ComponentInternalInstance): void
   unlink(child: ComponentInternalInstance): void
-  children: ComponentPublicInstance[]
-  internalChildren: ComponentInternalInstance[]
+  childrens: ComponentInternalInstance[]
 }
 
 export function useParent<T>(key: InjectionKey<ParentProvide<T>>) {
   const parent = inject(key, null)
   if (parent) {
     const instance = getCurrentInstance()!
-    const { link, unlink, internalChildren } = parent
+    const { link, unlink, childrens } = parent
 
     link(instance)
     onUnmounted(() => unlink(instance))
 
-    const index = computed(() => internalChildren.indexOf(instance))
+    const index = computed(() => childrens.indexOf(instance))
 
     return { index, parent }
   }

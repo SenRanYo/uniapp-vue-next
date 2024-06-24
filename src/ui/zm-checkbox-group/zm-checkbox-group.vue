@@ -16,10 +16,6 @@ const props = defineProps(checkboxGroupProps)
 const { childrens, linkChildren } = useChildren(checkboxGroupKey)
 linkChildren({ props, updateValue })
 
-setTimeout(() => {
-  console.log(childrens)
-}, 3000)
-
 const style = computed(() => {
   const style = {}
   return useStyle({ ...style, ...useStyle(props.customStyle) })

@@ -32,55 +32,45 @@ const modelValue = computed({
   set: (value) => updateValue(value),
 })
 
-const style = computed(() => {
-  const style: any = {}
-  style.fontSize = useUnit(prop("iconSize"))
-  if (prop("iconColor")) {
-    style["--zm-checkbox-icon-color"] = useColor(checkboxGroup?.iconColor.value || props.iconColor)
-  }
-  if (checkboxGroup?.checkedIconColor.value || props.checkedIconColor) {
-    style["--zm-checkbox-checked-icon-color"] = useColor(checkboxGroup?.checkedIconColor.value || props.checkedIconColor)
-  }
-  return useStyle({ ...style, ...useStyle(props.customStyle) })
-})
-
 const classs = computed(() => {
   const list = []
   if (isChecked.value) list.push("zm-checkbox--checked")
-  if (checkboxGroup?.disabled.value || props.disabled) list.push("zm-checkbox--disabled")
-  if (checkboxGroup?.labelLeft.value || props.labelLeft) list.push("zm-checkbox--left")
+  if (prop("disabled")) list.push("zm-checkbox--disabled")
+  if (prop("labelLeft")) list.push("zm-checkbox--left")
   return list
+})
+
+const style = computed(() => {
+  const style: any = {}
+  style.fontSize = useUnit(prop("iconSize"))
+  if (prop("iconColor")) style["--zm-checkbox-icon-color"] = useColor(prop("iconColor"))
+  if (prop("checkedIconColor")) style["--zm-checkbox-checked-icon-color"] = prop("checkedIconColor")
+  return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
 const iconStyle = computed(() => {
   const style: any = {}
-  if (modelValue.value) {
-    style.background = useColor(checkboxGroup?.checkedColor.value || props.checkedColor)
-  }
+  if (modelValue.value) style.background = useColor(prop("checkedColor"))
   return useStyle(style)
 })
 
 const iconClass = computed(() => {
   const list = []
-  if (checkboxGroup?.round.value || props.round) list.push("zm-icon--round")
-  if (checkboxGroup?.icon.value || props.icon) list.push(`${checkboxGroup?.iconPrefix.value || props.iconPrefix}-${checkboxGroup?.icon.value || props.icon}`)
+  if (prop("round")) list.push("zm-icon--round")
+  if (prop("icon")) list.push(`${prop("iconPrefix")}-${prop("icon")}`)
   return list
 })
 
 const iconDefaultStyle = computed(() => {
   const style: any = {}
-  style.color = useColor(checkboxGroup?.iconColor.value || props.iconColor)
-  style.fontSize = useUnit(checkboxGroup?.iconSize.value || props.iconSize)
-  style.fontWeight = checkboxGroup?.iconWeight.value || props.iconWeight
-  if (!checkboxGroup?.round.value || !props.round) {
-    style.borderRadius = checkboxGroup?.iconRadius.value || props.iconRadius
-  }
-  if (modelValue.value) {
-    style.borderColor = useColor(checkboxGroup?.checkedColor.value || props.checkedColor)
-  }
+  style.color = useColor(prop("iconColor"))
+  style.fontSize = useUnit(prop("iconSize"))
+  style.fontWeight = prop("iconWeight")
+  if (!prop("round")) style.borderRadius = prop("iconRadius")
+  if (modelValue.value) style.borderColor = useColor(prop("checkedColor"))
   if (isChecked.value) {
-    style.borderColor = useColor(checkboxGroup?.checkedIconColor.value || props.checkedIconColor)
-    style.backgroundColor = useColor(checkboxGroup?.checkedIconColor.value || props.checkedIconColor)
+    style.borderColor = useColor(prop("checkedIconColor"))
+    style.backgroundColor = useColor(prop("checkedIconColor"))
   }
   return useStyle(style)
 })
@@ -91,21 +81,19 @@ const isShowLabel = computed(() => {
 
 const labelStyle = computed(() => {
   const style: any = {}
-  style.color = useColor(checkboxGroup?.labelColor.value || props.labelColor)
-  style.fontSize = useUnit(checkboxGroup?.labelSize.value || props.labelSize)
-  style.fontWeight = checkboxGroup?.labelWeight.value || props.labelWeight
-  if (modelValue.value && (checkboxGroup?.checkedLabelColor.value || props.checkedLabelColor)) {
-    style.color = useColor(checkboxGroup?.checkedLabelColor.value || props.checkedLabelColor)
-  }
+  style.color = useColor(prop("labelColor"))
+  style.fontSize = useUnit(prop("labelSize"))
+  style.fontWeight = prop("labelWeight")
+  if (modelValue.value && prop("checkedLabelColor")) style.color = useColor(prop("checkedLabelColor"))
   if (props.labelGap) {
-    props.labelLeft ? (style.marginRight = useUnit(checkboxGroup?.labelGap.value || props.labelGap)) : (style.marginLeft = useUnit(checkboxGroup?.labelGap.value || props.labelGap))
+    props.labelLeft ? (style.marginRight = useUnit(prop("labelGap"))) : (style.marginLeft = useUnit(prop("labelGap")))
   }
   return useStyle(style)
 })
 
 const isChecked = computed(() => {
-  if (props.bindGroup && checkboxGroup) {
-    return checkboxGroup?.modelValue.value.includes(props.name || index.value)
+  if (props.bindGroup && parent) {
+    return parent.props.modelValue.includes(props.name || index.value)
   } else {
     return modelValue.value
   }
@@ -123,27 +111,26 @@ async function updateValue(value: CheckboxValueType) {
 }
 
 function toggle(check?: boolean) {
-  if (props.disabled || checkboxGroup?.disabled.value) return
-  if (checkboxGroup && props.bindGroup) {
-    const value = checkboxGroup.modelValue.value
-    const index = value.indexOf(props.name)
+  if (prop("disabled")) return
+  if (parent && props.bindGroup) {
+    const value = parent.props.modelValue
     const add = () => {
-      const isMax = checkboxGroup.max.value && value.length >= checkboxGroup.max.value
+      const isMax = parent.props.max && value.length >= parent.props.max
       if (!isMax && !value.includes(props.name)) {
         value.push(props.name)
-        checkboxGroup.updateValue(value)
+        parent.updateValue(value)
       }
     }
     const remove = () => {
-      if (index !== -1) {
-        value.splice(index, 1)
-        checkboxGroup.updateValue(value)
+      if (index.value !== -1) {
+        value.splice(index.value, 1)
+        parent.updateValue(value)
       }
     }
     if (isBoolean(check)) {
       if (check) add()
       else remove()
-    } else if (index >= 0) {
+    } else if (index.value >= 0) {
       remove()
     } else {
       add()
@@ -154,21 +141,23 @@ function toggle(check?: boolean) {
 }
 
 function onClick(event: TouchEvent) {
-  if (this.checkboxGroup?.labelDisabled || this.labelDisabled) return
-  toggle()
-  emits("click", event)
-}
-function onClickIcon(event: TouchEvent) {
-  toggle()
-  emits("click", event)
-}
-function onClickLabel(event: TouchEvent) {
-  if (checkboxGroup?.labelDisabled.value || props.labelDisabled) return
+  if (prop("labelDisabled")) return
   toggle()
   emits("click", event)
 }
 
-defineExpose({ name: "zm-checkbox", toggle, index })
+function onClickIcon(event: TouchEvent) {
+  toggle()
+  emits("click", event)
+}
+
+function onClickLabel(event: TouchEvent) {
+  if (prop("labelDisabled")) return
+  toggle()
+  emits("click", event)
+}
+
+defineExpose({ name: "zm-checkbox", toggle, index: index.value })
 </script>
 <script lang="ts">
 export default {
