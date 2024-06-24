@@ -24,7 +24,6 @@ defineOptions({ name: "zm-checkbox" })
 const slots = useSlots()
 const emits = defineEmits(checkboxEmits)
 const props = defineProps(checkboxProps)
-const checkboxGroup = inject("zm-checkbox-group", null)
 const { index, parent } = useParent(checkboxGroupKey)
 
 const modelValue = computed({
