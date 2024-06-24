@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStyle, useColor, useUnit, useChildren, useElRect, useUnitToPx } from "../hooks"
+import { useStyle, useColor, useUnit, useChildren, useElRect } from "../hooks"
 import { sidebarEmits, sidebarProps, sidebarKey, SidebarValue } from "./index"
 
 defineOptions({ name: "zm-sidebar" })
