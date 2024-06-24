@@ -12,6 +12,14 @@ export const sidebarProps = {
    */
   width: { type: [String, Number], default: "" },
   /**
+   * @description 高度
+   */
+  height: { type: [String, Number], default: "" },
+  /**
+   * @description 列表项高度
+   */
+  itemHeight: { type: [String, Number], default: "" },
+  /**
    * @description 标题颜色
    */
   color: { type: String, default: "" },

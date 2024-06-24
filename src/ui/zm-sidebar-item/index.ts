@@ -3,9 +3,13 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const sidebarItemProps = {
   /**
-   * @description 绑定值
+   * @description 标识符，通常为一个唯一的字符串或数字
    */
-  modelValue: { type: [String, Number], default: () => "" },
+  name: { type: [String, Number], default: () => "", required: true },
+  /**
+   * @description 标题
+   */
+  title: { type: [String, Number], default: () => "" },
   /**
    * @description 宽度
    */

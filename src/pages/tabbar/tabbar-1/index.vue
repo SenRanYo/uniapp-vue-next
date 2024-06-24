@@ -1,8 +1,8 @@
 <template>
-  <zm-view ref="view" height="300vh" background="#fff" custom-style="padding: 0 24rpx">
+  <zm-view ref="view" height="300vh" background="#fff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
     <zm-sidebar v-model="sidebar" width="300rpx" @change="onSidebarChange">
-      <zm-sidebar-item :name="index" v-for="(item, index) in 10" :key="index" :title="`标签${index}`"></zm-sidebar-item>
+      <zm-sidebar-item :name="index" v-for="(item, index) in 10" :key="index" :title="`标签${index}标签${index}标签${index}标签${index}标签${index}`"></zm-sidebar-item>
     </zm-sidebar>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -21,7 +21,7 @@ import { useView } from "@/ui"
 
 const { view } = useView()
 const tabbar = ref("1")
-const sidebar = ref("0")
+const sidebar = ref(2)
 
 function onSidebarChange(val: any) {
   console.log(val)
