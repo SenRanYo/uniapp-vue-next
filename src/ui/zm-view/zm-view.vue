@@ -15,19 +15,22 @@
 <script setup lang="ts">
 import { colorVars } from "../config"
 import { uuid } from "../utils/utils"
-import { viewEmits, viewProps } from "./index"
-import { useMitt, useUnit, useStyle, useElRect } from "../hooks"
+import { viewEmits, viewProps, viewKey } from "./index"
+import { useMitt, useUnit, useStyle, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-view" })
 
 const emits = defineEmits(viewEmits)
 const props = defineProps(viewProps)
+const { linkChildren } = useChildren(viewKey)
 
 const id = uuid()
 const mitt = useMitt()
 const rect = ref({})
 const scrollTop = ref(0)
 const instance = getCurrentInstance()
+
+linkChildren({ props, mitt, scrollTop })
 
 const style = computed(() => {
   const style: any = {}

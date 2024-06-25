@@ -30,6 +30,7 @@ const findVNodeIndex = (vnodes: VNode[], vnode: VNode) => {
 }
 
 export function sortChildren(parent: ComponentInternalInstance, publicChildrens: ComponentPublicInstance[], childrens: ComponentInternalInstance[]) {
+  console.log(parent)
   const vnodes = flattenVNodes(parent.subTree.children)
 
   childrens.sort((a, b) => findVNodeIndex(vnodes, a.vnode) - findVNodeIndex(vnodes, b.vnode))

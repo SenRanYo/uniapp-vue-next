@@ -1,6 +1,7 @@
 import View from "./zm-view.vue"
 import { Mitt } from "../utils/mitt"
 
+export const viewKey = Symbol("zm-view")
 export const viewProps = {
   /**
    * @description 高度

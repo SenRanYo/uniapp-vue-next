@@ -29,7 +29,6 @@ const itemRects = ref<UniApp.NodeInfo[]>([])
 const isClick = ref(false)
 const scrollTop = ref(-1)
 const stickyIndexValue = ref(null)
-const touching = ref(false)
 
 const style = computed(() => {
   const style: any = {}
@@ -56,6 +55,7 @@ async function resize() {
 }
 
 function onClick(index: number | string) {
+  if (stickyIndexValue.value === index) return
   const children = childrens.find((children) => children.props.index === index)
   if (children) {
     isClick.value = true
