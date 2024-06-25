@@ -1,9 +1,14 @@
 <template>
-  <zm-view ref="view" background="#fff">
+  <zm-view ref="view">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-sidebar v-model="sidebar" width="300rpx" font-size="28rpx" @change="onSidebarChange">
-      <zm-sidebar-item :name="index" v-for="(item, index) in 30" :key="index" :title="`标签${index}`"></zm-sidebar-item>
-    </zm-sidebar>
+    <zm-index-bar :index-list="indexs">
+      <view v-for="(item, index) in indexs" :key="index">
+        <zm-index-anchor :index="item"></zm-index-anchor>
+        <view class="cell">文本</view>
+        <view class="cell">文本</view>
+        <view class="cell">文本</view>
+      </view>
+    </zm-index-bar>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -21,11 +26,22 @@ import { useView } from "@/ui"
 
 const { view } = useView()
 const tabbar = ref("1")
+const indexs = ref([])
 const sidebar = ref(0)
+
+for (let i = 65; i <= 90; i++) {
+  indexs.value.push(String.fromCharCode(i))
+}
 
 function onSidebarChange(val: any) {
   console.log(val)
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.cell {
+  padding: 24rpx;
+  background-color: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+</style>
