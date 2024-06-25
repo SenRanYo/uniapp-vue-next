@@ -27,6 +27,10 @@ export const backTopProps = {
    */
   background: { type: String, default: "" },
   /**
+   * @description 圆角值
+   */
+  borderRadius: { type: [String, Number], default: "" },
+  /**
    * @description 自定义类名
    */
   customClass: { type: String, default: "" },

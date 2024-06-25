@@ -1,13 +1,11 @@
 import { Mitt } from "./utils/mitt"
-import { ViewExpose } from "./zm-view"
 import { getCurrentInstance } from "vue"
 import { onPageScroll, onReachBottom } from "@dcloudio/uni-app"
-
 export * from "./zm-dialog"
 
 export function useView() {
   let mitt = ref<Mitt>()
-  let view = ref<ViewExpose>()
+  let view = ref<any>()
   const instance: any = getCurrentInstance()
 
   let onReachTopHook: Function = () => {}

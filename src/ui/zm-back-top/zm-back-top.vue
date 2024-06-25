@@ -32,12 +32,14 @@ const style = computed(() => {
   style.right = useUnit(props.right)
   style.bottom = useUnit(props.bottom)
   style.background = useColor(props.background)
+  style.borderRadius = useUnit(props.borderRadius)
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
 watch(
   () => parent.scrollTop.value,
   (top) => {
+    console.log(top)
     visible.value = top >= useUnitToPx(props.offset)
   },
 )
@@ -62,6 +64,7 @@ export default {
   display: flex;
   position: fixed;
   transform: scale(0);
+  background-color: var(--primary-color);
   transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
 
   &--hover {
@@ -82,7 +85,6 @@ export default {
     align-items: center;
     border-radius: 999px;
     justify-content: center;
-    background-color: var(--primary-color);
     box-shadow: 0 2px 8px 0 rgb(0 0 0 / 12%);
   }
 }
