@@ -1,7 +1,12 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-back-top></zm-back-top>
+    <zm-checkbox-group v-model="checkbox">
+      <zm-checkbox name="1">复选框1</zm-checkbox>
+      <zm-checkbox name="2">复选框2</zm-checkbox>
+      <zm-checkbox name="3">复选框3</zm-checkbox>
+    </zm-checkbox-group>
+    <zm-footer></zm-footer>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>
@@ -19,20 +24,8 @@ import { useView } from "@/ui"
 
 const { view } = useView()
 const tabbar = ref("1")
-const indexs = ref([])
+const checkbox = ref([])
 const sidebar = ref(0)
-
-for (let i = 65; i <= 90; i++) {
-  indexs.value.push(String.fromCharCode(i))
-}
-
-function onSidebarChange(val: any) {
-  console.log(val)
-}
-
-function onSelect(v) {
-  console.log(v)
-}
 </script>
 
 <style lang="scss" scoped>

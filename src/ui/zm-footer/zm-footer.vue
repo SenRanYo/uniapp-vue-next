@@ -8,17 +8,18 @@
 </template>
 
 <script setup lang="ts">
+import { viewKey } from "../zm-view"
 import { footerEmits, footerProps } from "./index"
-import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
+import { useStyle, useColor, useUnitToPx, useElRect, useParent } from "../hooks"
 
 defineOptions({ name: "zm-footer" })
 const emits = defineEmits(footerEmits)
 const props = defineProps(footerProps)
 
-const view = inject<any>("zm-view", null)
 const rect = ref<UniApp.NodeInfo>({})
 const tabbarHeight = ref(0)
 const instance = getCurrentInstance()
+const { parent } = useParent(viewKey)
 
 const style = computed(() => {
   const style: any = {}
@@ -35,8 +36,8 @@ const placeholderStyle = computed(() => {
   return useStyle(style)
 })
 
-function event() {
-  view?.mitt.on("tabbar.rect", (rect: UniApp.NodeInfo) => {
+function onEvent() {
+  parent?.mitt.on("tabbar.rect", (rect: UniApp.NodeInfo) => {
     tabbarHeight.value = rect.height
   })
 }
@@ -46,10 +47,10 @@ async function resize() {
   rect.value = await useElRect(".zm-footer__inner", instance)
   emits("rect", rect.value)
   emits("height", rect.value.height)
-  view?.mitt.emit("tabbar.rect.emit")
+  parent?.mitt.emit("tabbar.rect.emit")
 }
 
-event()
+onEvent()
 onMounted(() => resize())
 defineExpose({ name: "zm-footer" })
 </script>

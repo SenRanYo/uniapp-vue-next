@@ -9,18 +9,19 @@
 
 <script setup lang="ts">
 import { pick } from "lodash-es"
+import { viewKey } from "../zm-view"
 import { tabbarEmits, tabbarProps } from "./index"
-import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
+import { useStyle, useColor, useUnitToPx, useElRect, useParent } from "../hooks"
 
 defineOptions({ name: "zm-tabbar" })
 const emits = defineEmits(tabbarEmits)
 const props = defineProps(tabbarProps)
 
-const view = inject<any>("zm-view", null)
 const rect = ref<UniApp.NodeInfo>({})
 const isExistFooter = ref(false)
 const safeAreaBottomHeight = ref(17)
 const instance = getCurrentInstance()
+const { parent } = useParent(viewKey)
 
 const modelValue = computed({
   get() {
@@ -49,9 +50,9 @@ const placeholderStyle = computed(() => {
   return useStyle({ height: rect.value?.height + "px" })
 })
 
-function event() {
-  view?.mitt.on("tabbar.rect.emit", async () => {
-    view.mitt.emit("tabbar.rect", await useElRect(".zm-tabbar__content", instance))
+function onEvent() {
+  parent?.mitt.on("tabbar.rect.emit", async () => {
+    parent.mitt.emit("tabbar.rect", await useElRect(".zm-tabbar__content", instance))
   })
 }
 
@@ -60,7 +61,7 @@ async function resize() {
   rect.value = await useElRect(".zm-tabbar__content", instance)
   emits("rect", rect.value)
   emits("height", rect.value.height)
-  view?.mitt.emit("tabbar.rect", rect.value)
+  parent?.mitt.emit("tabbar.rect", rect.value)
 }
 
 async function updateValue(value: string | number) {
@@ -69,7 +70,7 @@ async function updateValue(value: string | number) {
   emits("change", value)
 }
 
-event()
+onEvent()
 onMounted(() => resize())
 provide("zm-tabbar", { ...pick(toRefs(props), ["route", "activeColor", "inactiveColor"]), modelValue, updateValue })
 defineExpose({ name: "zm-tabbar", resize })

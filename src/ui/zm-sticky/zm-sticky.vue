@@ -4,17 +4,18 @@
   </view>
 </template>
 <script setup lang="ts">
+import { viewKey } from "../zm-view"
 import { stickyEmits, stickyProps } from "./index"
-import { useStyle, useColor, useUnitToPx, useElRect } from "../hooks"
+import { useStyle, useColor, useUnitToPx, useElRect, useParent } from "../hooks"
 
 defineOptions({ name: "zm-sticky" })
 const emits = defineEmits(stickyEmits)
 const props = defineProps(stickyProps)
 
-const view = inject<any>("zm-view", null)
 const isSticky = ref(false)
 const navbarHeight = ref(0)
 const instance = getCurrentInstance()
+const { parent } = useParent(viewKey)
 
 const style = computed(() => {
   const style: any = {}
@@ -31,7 +32,7 @@ watch(
 )
 
 function event() {
-  view?.mitt.on("scroll", () => updateSticky())
+  parent?.mitt.on("scroll", () => updateSticky())
 }
 
 async function resize() {

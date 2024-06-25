@@ -1,7 +1,7 @@
 <template>
   <view
     class="zm-view"
-    :class="[props.customClass]"
+    :class="[customClass]"
     :style="[style]"
     @touchend="onTouchend"
     @touchmove="onTouchmove"
@@ -14,28 +14,23 @@
 </template>
 <script setup lang="ts">
 import { colorVars } from "../config"
-import { uuid } from "../utils/utils"
 import { viewEmits, viewProps, viewKey } from "./index"
-import { useMitt, useUnit, useStyle, useElRect, useChildren } from "../hooks"
+import { useMitt, useUnit, useColor, useStyle, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-view" })
-
 const emits = defineEmits(viewEmits)
 const props = defineProps(viewProps)
 const { linkChildren } = useChildren(viewKey)
 
-const id = uuid()
-const mitt = useMitt()
 const rect = ref({})
+const mitt = useMitt()
 const scrollTop = ref(0)
 const instance = getCurrentInstance()
-
-linkChildren({ props, mitt, scrollTop })
 
 const style = computed(() => {
   const style: any = {}
   style.height = useUnit(props.height)
-  style.background = props.background
+  style.background = useColor(props.background)
   style["--primary-color"] = colorVars.primary
   style["--success-color"] = colorVars.success
   style["--warning-color"] = colorVars.warning
@@ -43,6 +38,8 @@ const style = computed(() => {
   style["--info-color"] = colorVars.info
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
+
+linkChildren({ props, mitt, rect, scrollTop })
 
 async function resize() {
   await nextTick()
@@ -91,8 +88,7 @@ function onMouseup(e: any) {
 }
 
 onBeforeMount(() => resize())
-provide("zm-view", { mitt, rect })
-defineExpose({ name: "zm-view", id, mitt, scroll, reachTop, reachBottom })
+defineExpose({ name: "zm-view", mitt, scroll, reachTop, reachBottom })
 </script>
 <script lang="ts">
 export default {

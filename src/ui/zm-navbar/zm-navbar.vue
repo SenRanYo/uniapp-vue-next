@@ -24,9 +24,10 @@
   </view>
 </template>
 <script setup lang="ts">
+import { viewKey } from "../zm-view"
 import { useRgb } from "../utils/style"
 import { navbarEmits, navbarProps } from "./index"
-import { useStyle, useUnit, useUnitToPx, useElRect } from "../hooks"
+import { useStyle, useUnit, useUnitToPx, useElRect, useParent } from "../hooks"
 
 defineOptions({ name: "zm-navbar" })
 const emits = defineEmits(navbarEmits)
@@ -36,7 +37,6 @@ const systemInfo = uni.getSystemInfoSync()
 // #ifdef MP-WEIXIN || MP-BAIDU || MP-TOUTIAO || MP-QQ
 const menuButtonInfo = uni.getMenuButtonBoundingClientRect()
 // #endif
-const view = inject<any>("zm-view", null)
 const rect = ref<UniApp.NodeInfo>({})
 const bRgb = ref<any>({})
 const route = ref("")
@@ -44,6 +44,7 @@ const routes = ref([])
 const scrollTop = ref(0)
 const statusBarHeight = systemInfo.statusBarHeight
 const instance = getCurrentInstance()
+const { parent } = useParent(viewKey)
 
 const backIcon = computed(() => {
   return routes.value.length == 1 ? "wap-home-o" : props.backIconName
@@ -135,12 +136,12 @@ watch(
   { immediate: true },
 )
 
-function event() {
-  view?.mitt.on("navbar.rect.emit", async () => {
-    view.mitt.emit("navbar.rect", await useElRect(".zm-navbar__inner", instance))
+function onEvent() {
+  parent?.mitt.on("navbar.rect.emit", async () => {
+    parent.mitt.emit("navbar.rect", await useElRect(".zm-navbar__inner", instance))
   })
 
-  view?.mitt.on("scroll", (options: Page.PageScrollOption) => {
+  parent?.mitt.on("scroll", (options: Page.PageScrollOption) => {
     if (props.gradient) {
       scrollTop.value = options.scrollTop
       emits("gradient", scrollTop.value)
@@ -155,7 +156,7 @@ async function resize() {
   rect.value = await useElRect(".zm-navbar__inner", instance)
   emits("rect", rect.value)
   emits("height", rect.value.height)
-  view?.mitt.emit("navbar.rect", rect.value)
+  parent?.mitt.emit("navbar.rect", rect.value)
 }
 
 function back() {
@@ -176,7 +177,7 @@ function back() {
   }
 }
 
-event()
+onEvent()
 onMounted(() => resize())
 defineExpose({ name: "zm-navbar" })
 </script>

@@ -1,5 +1,5 @@
 import View from "./zm-view.vue"
-import { Mitt } from "../utils/mitt"
+import type { ExtractPropTypes } from "vue"
 
 export const viewKey = Symbol("zm-view")
 export const viewProps = {
@@ -37,12 +37,5 @@ export const viewEmits = {
 }
 
 export type ViewEmits = typeof viewEmits
-export type ViewExpose = {
-  name: "zm-view"
-  mitt: Mitt
-  id: string
-  scroll: (options: { scrollTop: number }) => void
-  reachTop: () => void
-  reachBottom: () => void
-}
+export type ViewProps = ExtractPropTypes<typeof viewProps>
 export type ViewInstance = InstanceType<typeof View>

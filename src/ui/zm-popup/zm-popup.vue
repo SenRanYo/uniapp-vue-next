@@ -34,7 +34,7 @@
 import { popupEmits } from "./index"
 import { useStyle, useColor, useUnit } from "../hooks"
 
-defineOptions({ name: "zm-view" })
+defineOptions({ name: "zm-popup" })
 
 const emits = defineEmits(popupEmits)
 const props = defineProps({
