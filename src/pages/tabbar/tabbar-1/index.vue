@@ -1,12 +1,7 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-checkbox-group v-model="checkbox">
-      <zm-checkbox name="1">复选框1</zm-checkbox>
-      <zm-checkbox name="2">复选框2</zm-checkbox>
-      <zm-checkbox name="3">复选框3</zm-checkbox>
-    </zm-checkbox-group>
-    <zm-footer></zm-footer>
+    <zm-back-top></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
       <zm-tabbar-item name="2" icon="new-o" route="/pages/tabbar/tabbar-2/index">Tabbar-2</zm-tabbar-item>

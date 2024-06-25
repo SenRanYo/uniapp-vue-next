@@ -3,17 +3,29 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const backTopProps = {
   /**
-   * @description 索引字符列表
+   * @description 滚动高度达到此参数值时才显示组件
    */
-  indexList: { type: Array as PropType<(string | number)[]>, default: () => [] },
+  offset: { type: [String, Number], default: "200rpx" },
+  /**
+   * @description 距离页面右侧的距离
+   */
+  right: { type: [String, Number], default: "" },
+  /**
+   * @description 距离页面底部的距离
+   */
+  bottom: { type: [String, Number], default: "" },
   /**
    * @description 元素层级
    */
   zIndex: { type: [String, Number], default: "1" },
   /**
-   * @description 是否自动吸顶
+   * @description 返回顶部过程中的过渡时间，单位ms
    */
-  sticky: { type: Boolean, default: true },
+  duration: { type: [String, Number], default: "200" },
+  /**
+   * @description 背景颜色
+   */
+  background: { type: String, default: "" },
   /**
    * @description 自定义类名
    */
@@ -25,7 +37,7 @@ export const backTopProps = {
 }
 
 export const backTopEmits = {
-  select: (index: number | string) => true,
+  click: (event: TouchEvent) => true,
 }
 
 export type BackTopEmits = typeof backTopEmits
