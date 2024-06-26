@@ -152,13 +152,13 @@ export function useCurrentRouter() {
  * @param selector 元素的选择器
  * @param instance 调用组件实例
  */
-export function useElRect(selector: string, instance: ComponentInternalInstance) {
+export function useElRect(selector: string, instance: ComponentInternalInstance): Promise<UniApp.NodeInfo> {
   return new Promise((resolve) => {
     uni
       .createSelectorQuery()
       .in(instance)
       .select(selector)
-      .boundingClientRect((rect) => resolve(rect))
+      .boundingClientRect((rect) => resolve(rect as UniApp.NodeInfo))
       .exec()
   })
 }

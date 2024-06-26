@@ -230,3 +230,22 @@ export function padZero(num: string | number, size = 2): string {
   }
   return str
 }
+
+/**
+ * 在数组中查找与目标数值最接近的数字
+ * @param {number[]} arr 数字数组
+ * @param {number} target 目标数值
+ * @returns {number} 最接近目标数值的数字
+ */
+export function findClosestNumber(arr: number[], target: number): number {
+  let closestNumber = arr[0]
+  let minDiff = Math.abs(target - arr[0])
+  for (let i = 1; i < arr.length; i++) {
+    let diff = Math.abs(target - arr[i])
+    if (diff < minDiff) {
+      minDiff = diff
+      closestNumber = arr[i]
+    }
+  }
+  return closestNumber
+}
