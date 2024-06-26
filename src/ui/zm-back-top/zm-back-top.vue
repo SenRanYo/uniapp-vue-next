@@ -68,9 +68,7 @@ export default {
   transition: 0.3s cubic-bezier(0.25, 0.8, 0.5, 1);
 
   &--hover {
-    .zm-back-top__content {
-      opacity: 0.6;
-    }
+    opacity: 0.6;
   }
 
   &--active {
@@ -81,7 +79,9 @@ export default {
     width: 80rpx;
     height: 80rpx;
     display: flex;
+    /* #ifndef MP-WEIXIN */
     cursor: pointer;
+    /* #endif */
     align-items: center;
     border-radius: 999px;
     justify-content: center;

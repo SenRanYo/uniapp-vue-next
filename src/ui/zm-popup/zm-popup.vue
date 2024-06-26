@@ -17,13 +17,13 @@
         <view v-if="closeable" class="zm-popup__close" :style="[closeStyle]" @click.stop="onClickClose">
           <slot name="close"><zm-icon :name="closeIcon" size="36rpx" color="#333333" bold hover-class="active-opacity"></zm-icon></slot>
         </view>
-        <zm-safe-area-top :show="safeAreaInsetTop"></zm-safe-area-top>
+        <zm-safe-area-top v-if="safeAreaInsetTop" :background="background"></zm-safe-area-top>
         <slot name="header"></slot>
         <scroll-view enable-flex scroll-y :style="[scrollViewStyle]" @click.stop="onClickBody">
           <slot></slot>
         </scroll-view>
         <slot name="footer"></slot>
-        <zm-safe-area-bottom :show="safeAreaInsetBottom"></zm-safe-area-bottom>
+        <zm-safe-area-bottom v-if="safeAreaInsetBottom" :background="background"></zm-safe-area-bottom>
         <slot name="outside"></slot>
       </view>
     </zm-transition>
@@ -53,7 +53,7 @@ const props = defineProps({
   background: { type: [String, null], default: "#ffffff" },
   borderRadius: { type: [Number, String], default: "16rpx" },
   closeOnClickOverlay: { type: Boolean, default: true },
-  safeAreaInsetTop: { type: Boolean },
+  safeAreaInsetTop: { type: Boolean, default: false },
   safeAreaInsetBottom: { type: Boolean, default: true },
   overlayStyle: { type: [Object, String], default: "" },
   customClass: { type: String, default: "" },
