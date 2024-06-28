@@ -9,7 +9,7 @@ export const noticeBarProps = {
   /**
    * @description 滚动模式
    */
-  mode: { type: String as PropType<noticeBarMode>, default: "horizontal", validator: (v: string) => ["vertical", "horizontal"].includes(v) },
+  mode: { type: String as PropType<NoticeBarMode>, default: "horizontal", validator: (v: string) => ["vertical", "horizontal"].includes(v) },
   /**
    * @description 内容文本颜色
    */
@@ -92,7 +92,7 @@ export const noticeBarEmits = {
   click: (event: TouchEvent) => true,
 }
 
-export type noticeBarMode = "vertical" | "horizontal"
-export type noticeBarProps = ExtractPropTypes<typeof noticeBarProps>
-export type noticeBarExpose = { name: "zm-notice-bar" }
-export type noticeBarInstance = InstanceType<typeof NoticeBar>
+export type NoticeBarMode = "vertical" | "horizontal"
+export type NoticeBarProps = ExtractPropTypes<typeof noticeBarProps>
+export type NoticeBarExpose = { name: "zm-notice-bar" }
+export type NoticeBarInstance = InstanceType<typeof NoticeBar>
