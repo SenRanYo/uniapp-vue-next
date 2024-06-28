@@ -116,12 +116,12 @@ export default {
   }
 
   &__placeholder {
-    // top: 0;
-    // left: 0;
-    // right: 0;
-    // position: absolute;
-    // white-space: pre-wrap;
-    // overflow-wrap: break-word;
+    top: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
   }
 
   &__action {
