@@ -134,7 +134,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.zm-notice-bar {
+.zm-count-down {
   display: flex;
 }
 </style>
