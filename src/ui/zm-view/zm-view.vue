@@ -1,14 +1,5 @@
 <template>
-  <view
-    class="zm-view"
-    :class="[customClass]"
-    :style="[style]"
-    @touchend="onTouchend"
-    @touchmove="onTouchmove"
-    @touchstart="onTouchstart"
-    @mousedown="onMousedown"
-    @mouseup="onMouseup"
-  >
+  <view class="zm-view" :class="[customClass]" :style="[style]" @touchend="onTouchend" @touchmove="onTouchmove" @touchstart="onTouchstart">
     <slot></slot>
   </view>
 </template>
@@ -75,16 +66,6 @@ function onTouchend(e: any) {
 function onTouchmove(e: any) {
   emits("touchmove", e)
   mitt.emit("touchmove", e)
-}
-
-function onMousedown(e: any) {
-  emits("mousedown", e)
-  mitt.emit("mousedown", e)
-}
-
-function onMouseup(e: any) {
-  emits("mouseup", e)
-  mitt.emit("mouseup", e)
 }
 
 onBeforeMount(() => resize())

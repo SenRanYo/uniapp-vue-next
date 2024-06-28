@@ -32,8 +32,6 @@ export const viewEmits = {
   touchstart: (event: any) => true,
   touchend: (event: any) => true,
   touchmove: (event: any) => true,
-  mousedown: (event: any) => true,
-  mouseup: (event: any) => true,
 }
 
 export type ViewEmits = typeof viewEmits
