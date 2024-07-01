@@ -19,13 +19,13 @@
   display: inline-block;
   -webkit-font-smoothing: antialiased;
 
-  &::before {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  // &::before {
+  //   width: 100%;
+  //   height: 100%;
+  //   display: flex;
+  //   align-items: center;
+  //   justify-content: center;
+  // }
 }
 
 .zm-icon-document::before {

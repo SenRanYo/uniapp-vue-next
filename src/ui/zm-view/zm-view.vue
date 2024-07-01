@@ -9,8 +9,9 @@ import { viewEmits, viewProps, viewKey } from "./index"
 import { useMitt, useUnit, useColor, useStyle, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-view" })
-const emits = defineEmits(viewEmits)
+
 const props = defineProps(viewProps)
+const emits = defineEmits(viewEmits)
 const { linkChildren } = useChildren(viewKey)
 
 const rect = ref({})

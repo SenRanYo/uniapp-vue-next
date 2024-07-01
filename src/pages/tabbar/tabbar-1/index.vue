@@ -1,11 +1,21 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-progress :percentage="percentage">
-      <!-- <template #text="{ percentage }">
-        <text class="text">{{ percentage }}%</text>
-      </template> -->
-    </zm-progress>
+    <zm-progress :percentage="percentage"></zm-progress>
+    <zm-row>
+      <zm-col :span="4"><zm-tag text="标签一" type="primary"></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" text="标签二" type="success"></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" text="标签三" type="warning"></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" text="标签四" type="error"></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" text="标签五" type="info" closeable></zm-tag></zm-col>
+    </zm-row>
+    <zm-row>
+      <zm-col :span="4"><zm-tag type="primary" text="标签一" plain></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" type="success" text="标签二" plain></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" type="warning" text="标签三" plain></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" type="error" text="标签四" plain></zm-tag></zm-col>
+      <zm-col :span="4"><zm-tag icon="close" type="info" text="标签五" plain closeable></zm-tag></zm-col>
+    </zm-row>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
