@@ -102,7 +102,7 @@ function onClick(event: TouchEvent) {
     loadingText.value = text
   }
   const _disable = (state: boolean) => (disabled.value = state)
-  throttling(() => emits("click", event, { loading: _loading, disable: _disable }))
+  throttling(() => emits("click", event, { loading: _loading, disable: _disable }), +props.throttle)
 }
 
 function onError(event: ButtonOnErrorEvent) {

@@ -249,3 +249,19 @@ export function findClosestNumber(arr: number[], target: number): number {
   }
   return closestNumber
 }
+
+/**
+ * 将数组乱序
+ * @param array 要乱序的数组
+ * @returns 乱序后的数组
+ */
+export function shuffleArray<T>(array: T[]): T[] {
+  let len = array.length
+  for (var i = len - 1; i >= 0; i--) {
+    var randomIndex = Math.floor(Math.random() * (i + 1))
+    var temp = array[randomIndex]
+    array[randomIndex] = array[i]
+    array[i] = temp
+  }
+  return array
+}
