@@ -1,5 +1,12 @@
 <template>
-  <zm-popup v-model:show="visible" mode="bottom" :background="background" :safe-area-inset-bottom="safeAreaInsetBottom">
+  <zm-popup
+    v-model:show="visible"
+    mode="bottom"
+    :overlay="overlay"
+    :background="background"
+    :close-on-click-overlay="closeOnClickOverlay"
+    :safe-area-inset-bottom="safeAreaInsetBottom"
+  >
     <view class="zm-keyboard" :class="[classs, customClass]" :style="[style]">
       <slot name="header">
         <view class="zm-keyboard__header" v-if="showHeader">

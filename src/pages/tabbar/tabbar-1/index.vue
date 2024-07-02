@@ -1,10 +1,7 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-progress :percentage="percentage"></zm-progress>
-    <zm-keyboard v-model:show="show" showDot @input="onInput" @delete="onDelete"></zm-keyboard>
-    <!-- <zm-keyboard v-model:show="show" title="标题" mode="car"></zm-keyboard> -->
-    <!-- <zm-keyboard v-model:show="show" title="标题" mode="card"></zm-keyboard> -->
+    <zm-rate v-model="rate" size="32rpx" @change="onChange"></zm-rate>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -23,19 +20,14 @@ import { useView } from "@/ui"
 
 const { view, onPageScroll } = useView()
 
+const rate = ref(3.5)
 const tabbar = ref("1")
-const percentage = ref(100)
-const show = ref(true)
-
-setInterval(() => {
-  percentage.value = Number((Math.random() * 100).toFixed(2))
-}, 2000)
 
 function onInput(v) {
   console.log(v)
 }
 
-function onDelete(v) {
+function onChange(v) {
   console.log(v)
 }
 </script>
