@@ -49,7 +49,7 @@ export const rateProps = {
   /**
    * @description 图标禁用时的颜色
    */
-  disabledColor: { type: String, default: "" },
+  disabledColor: { type: String, default: "#c8c9cc" },
   /**
    * @description 是否允许半星选择
    */

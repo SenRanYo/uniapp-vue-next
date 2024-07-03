@@ -1,18 +1,18 @@
 <template>
   <view class="zm-rate" :class="[classs, customClass]" :style="[style]" @click="onClick" @touchstart.stop="onTouchstart" @touchmove.stop="onTouchmove">
-    <view class="zm-rate__item" :style="[itemStyle(item, index)]" v-for="(item, index) in list" :key="index">
+    <view class="zm-rate__item" :style="[itemStyle(index)]" v-for="(item, index) in list" :key="index">
       <view class="zm-rate__item__icon">
-        <zm-icon :name="voidIcon" :size="size" :weight="iconWeight" :color="voidColor"></zm-icon>
+        <zm-icon :name="icon(item)" :size="size" :weight="iconWeight" :color="iconColor(item)"></zm-icon>
       </view>
-      <view class="zm-rate__item__icon--absolute" :style="[absoluteStyle(item, index)]">
-        <zm-icon :name="icon" :size="size" :weight="iconWeight" :color="color"></zm-icon>
+      <view class="zm-rate__item__icon zm-rate__item__icon--half" :style="[iconHalfStyle(item, index)]" v-if="isShowHalf(item)">
+        <zm-icon :name="props.icon" :size="size" :weight="iconWeight" :color="color"></zm-icon>
       </view>
     </view>
   </view>
 </template>
 <script setup lang="ts">
 import { rateEmits, rateProps } from "./index"
-import { useUnit, useColor, useStyle, useElRect, useElRects, useUnitToPx } from "../hooks"
+import { useStyle, useElRect, useElRects, useUnitToPx } from "../hooks"
 
 defineOptions({ name: "zm-rate" })
 
@@ -26,56 +26,67 @@ const rects = ref<UniApp.NodeInfo[]>([])
 const instance = getCurrentInstance()
 
 const list = computed(() =>
-  Array(+props.count)
+  Array(props.count)
     .fill("")
     .map((_, i) => getRateStatus(props.modelValue, i + 1)),
 )
 
 const style = computed(() => {
   const style: any = {}
-  style.padding = `0 -${useUnitToPx(props.gutter) / 2}px`
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
 const classs = computed(() => {
   const list: string[] = []
+  if (props.disabled) list.push("zm-rate--disabled")
+  if (props.readonly) list.push("zm-rate--readonly")
   return list
 })
 
 const itemStyle = computed(() => {
-  return (item: any, index: number) => {
+  return (index: number) => {
     const style: any = {}
-    if (index !== props.count - 1) {
-      style.padding = `0 ${useUnitToPx(props.gutter) / 2}px`
+    if (index < list.value.length - 1) {
+      style.marginRight = `${useUnitToPx(props.gutter)}px`
     }
     return useStyle(style)
   }
 })
 
-const absoluteStyle = computed(() => {
+const iconHalfStyle = computed(() => {
   return (item: any, index: number) => {
     const style: any = {}
     if (item.status === "full") style.width = "100%"
     if (item.status === "half") style.width = item.value * 100 + "%"
-    if (index !== props.count - 1 && item.value) {
-      style.padding = `0 ${useUnitToPx(props.gutter) / 2}px`
-    }
     return useStyle(style)
   }
 })
 
-watch(
-  () => list.value,
-  (val) => {
-    console.log(val)
-  },
-  { immediate: true },
-)
+const icon = computed(() => {
+  return (item: any) => {
+    return item.status === "full" ? props.icon : props.voidIcon
+  }
+})
+
+const iconColor = computed(() => {
+  return (item: any) => {
+    return item.value && item.status === "full" ? props.color : props.voidColor
+  }
+})
+
+const isShowHalf = computed(() => {
+  return (item: any) => {
+    return item.value && item.status === "half"
+  }
+})
 
 async function resize() {
   await nextTick()
   rect.value = await useElRect(".zm-rate", instance)
   rects.value = await useElRects(".zm-rate__item", instance)
+  await nextTick()
+
+  updateRanges()
 }
 
 function getRateStatus(value: number, index: number) {
@@ -92,16 +103,23 @@ function getRateStatus(value: number, index: number) {
 }
 
 async function updateRanges() {
+  const gutter = useUnitToPx(props.gutter)
   rect.value = await useElRect(".zm-rate", instance)
   rects.value = await useElRects(".zm-rate__item", instance)
   ranges.value = []
   rects.value.forEach((rect, index) => {
     if (props.allowHalf) {
-      ranges.value.push({ score: index + 0.5, left: rect.left, right: rect.right - rect.width / 2 }, { score: index + 1, left: rect.left + rect.width / 2, right: rect.right })
+      let left = index === 0 ? rect.left : rect.left - gutter / 2
+      let right = index === 0 ? rect.width / 2 : rect.right - rect.width / 2
+      ranges.value.push({ score: index + 0.5, left, right }, { score: index + 1, left: rect.left + rect.width / 2, right: rect.right + gutter / 2 })
     } else {
-      ranges.value.push({ score: index + 1, left: rect.left, right: rect.right })
+      let left = index === 0 ? rect.left : rect.left - gutter / 2
+      let right = index === 0 ? rect.width + gutter / 2 : left + rect.width + gutter
+      ranges.value.push({ score: index + 1, left, right })
     }
   })
+
+  console.log(ranges.value)
 }
 
 function getScoreByPosition(x: number) {
@@ -114,7 +132,7 @@ function getScoreByPosition(x: number) {
   }
   if (x <= minLeft) return 0
   if (x >= maxRight) return props.count
-  return props.allowHalf ? 0.5 : 1
+  return props.modelValue
 }
 
 async function onClick(event: any) {
@@ -128,11 +146,14 @@ function onTouchstart() {
 }
 
 function onTouchmove(event: any) {
-  let value = getScoreByPosition(event.touches[0].clientX)
-  updateValue(value)
+  if (props.touchable) {
+    let value = getScoreByPosition(event.touches[0].clientX)
+    updateValue(value)
+  }
 }
 
 async function updateValue(value: number) {
+  if (props.disabled) return
   if (props.readonly) return
   if (value === score.value) return
   emits("change", value)
@@ -156,13 +177,16 @@ export default {
   align-items: center;
 
   &__item {
+    display: flex;
     position: relative;
+    align-items: center;
+    justify-content: center;
 
     &__icon {
       display: flex;
       overflow: hidden;
 
-      &--absolute {
+      &--half {
         top: 0;
         left: 0;
         width: 0;
