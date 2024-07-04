@@ -1,7 +1,9 @@
 <template>
   <zm-view ref="view" height="300vh" background="#fff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-stepper v-model="stepper" :min="5" :max="10" integer></zm-stepper>
+    <zm-switch v-model="switchValue" :loading="loading" :before-change="onBeforeChange">
+      <template #node>6</template>
+    </zm-switch>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -22,7 +24,17 @@ const { view, onPageScroll } = useView()
 
 const tabbar = ref("1")
 
-const stepper = ref(5)
+const loading = ref(false)
+const switchValue = ref("1")
+
+function onBeforeChange(val, next) {
+  console.log(val, next)
+  loading.value = true
+  setTimeout(() => {
+    loading.value = false
+    next()
+  }, 1000)
+}
 </script>
 
 <style lang="scss" scoped>
