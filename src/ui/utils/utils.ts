@@ -265,3 +265,14 @@ export function shuffleArray<T>(array: T[]): T[] {
   }
   return array
 }
+
+/**
+ * 将两个数字相加并返回结果，保留小数点后十位
+ * @param num1 第一个数字
+ * @param num2 第二个数字
+ * @returns 两个数字相加后的结果，保留小数点后十位
+ */
+export function addNumber(num1: number, num2: number) {
+  const cardinal = 10 ** 10
+  return Math.round((num1 + num2) * cardinal) / cardinal
+}

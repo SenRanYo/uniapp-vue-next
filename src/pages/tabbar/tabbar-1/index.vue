@@ -1,10 +1,7 @@
 <template>
-  <zm-view ref="view" height="300vh">
+  <zm-view ref="view" height="300vh" background="#fff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-rate v-model="rate" size="32rpx" :count="5" color="success" allow-half></zm-rate>
-    <zm-rate v-model="rate1" size="32rpx" :count="10" allow-half></zm-rate>
-    <zm-rate v-model="rate" size="32rpx" :count="15"></zm-rate>
-    <zm-rate v-model="rate" size="32rpx" :count="20" disabled readonly></zm-rate>
+    <zm-stepper v-model="stepper" :min="5" :max="10" integer></zm-stepper>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -23,17 +20,9 @@ import { useView } from "@/ui"
 
 const { view, onPageScroll } = useView()
 
-const rate = ref(3.5)
-const rate1 = ref(5.5)
 const tabbar = ref("1")
 
-function onInput(v) {
-  console.log(v)
-}
-
-function onChange(v) {
-  console.log(v)
-}
+const stepper = ref(5)
 </script>
 
 <style lang="scss" scoped>

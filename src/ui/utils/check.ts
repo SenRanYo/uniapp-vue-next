@@ -19,6 +19,17 @@ export function isEmail(value: any): boolean {
 }
 
 /**
+ * @description 校验两个值是否相同
+ * @param {*} value1 校验内容
+ * @param {*} value2 校验内容
+ * @return {Boolean}
+ * @example isEqual(value1, value2)
+ */
+export function isEqual(value1: any, value2: any): boolean {
+  return String(value1) === String(value2)
+}
+
+/**
  * @description 校验是否是电话号码
  * @param {String} value 校验内容
  * @return {Boolean}
