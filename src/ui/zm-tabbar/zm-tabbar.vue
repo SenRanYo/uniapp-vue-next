@@ -83,6 +83,7 @@ export default {
 <style lang="scss" scoped>
 .zm-tabbar {
   z-index: 1000;
+  margin-top: auto;
   position: relative;
 
   &__content {
@@ -104,6 +105,8 @@ export default {
   }
 
   &__placeholder {
+    user-select: none;
+    pointer-events: none;
     box-sizing: content-box;
   }
 }

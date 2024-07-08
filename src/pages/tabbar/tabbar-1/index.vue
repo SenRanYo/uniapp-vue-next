@@ -1,9 +1,9 @@
 <template>
-  <zm-view ref="view" height="300vh" background="#fff">
+  <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-switch v-model="switchValue" :loading="loading" :before-change="onBeforeChange">
-      <template #node>6</template>
-    </zm-switch>
+    <zm-dropdown-menu>
+      <zm-dropdown-item title="衣服" v-model="value" :options="options1"></zm-dropdown-item>
+    </zm-dropdown-menu>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -24,17 +24,45 @@ const { view, onPageScroll } = useView()
 
 const tabbar = ref("1")
 
+const popup = ref(false)
 const loading = ref(false)
 const switchValue = ref("1")
 
-function onBeforeChange(val, next) {
-  console.log(val, next)
-  loading.value = true
-  setTimeout(() => {
-    loading.value = false
-    next()
-  }, 1000)
-}
+const value = ref(1)
+const options1 = ref([
+  { label: "选项一", value: 1 },
+  { label: "选项二", value: 2 },
+  { label: "选项三", value: 3 },
+  { label: "选项四", value: 4 },
+  { label: "选项五", value: 5 },
+])
+
+const options2 = ref([
+  { label: "选项一", value: 1 },
+  { label: "选项二", value: 2 },
+  { label: "选项三", value: 3 },
+  { label: "选项四", value: 4 },
+  { label: "选项五", value: 5 },
+])
+
+const options3 = ref([
+  { label: "选项一", value: 1 },
+  { label: "选项二", value: 2 },
+  { label: "选项三", value: 3 },
+  { label: "选项四", value: 4 },
+  { label: "选项五", value: 5 },
+])
+
+watch(
+  () => value.value,
+  (newValue, oldValue) => {
+    console.log(newValue)
+  },
+)
+
+setTimeout(() => {
+  value.value = 2
+}, 5000)
 </script>
 
 <style lang="scss" scoped>

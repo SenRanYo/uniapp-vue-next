@@ -26,7 +26,7 @@ const style = computed(() => {
   let style: any = {}
   style.zIndex = props.zIndex
   style.pointerEvents = props.penetrate ? "none" : "auto"
-  style.transitionDuration = `${props.duration / 1000}s`
+  style.transitionDuration = `${+props.duration / 1000}s`
   return useStyle({ ...style, ...styles.value, ...useStyle(props.customStyle) })
 })
 
@@ -49,7 +49,7 @@ watch(
 function init(cof: any = {}) {
   config.value = {
     delay: props.enterDelay,
-    duration: props.duration,
+    duration: +props.duration,
     timingFunction: visible.value ? props.leaveTimingFunction : props.enterTimingFunction,
     transformOrigin: "50% 50%",
     ...cof,

@@ -1,5 +1,9 @@
 import { isNumber } from "./check"
 
+export function noop() {
+  return false
+}
+
 /**
  * @description uuid
  * @return {String}

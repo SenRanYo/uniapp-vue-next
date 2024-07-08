@@ -17,7 +17,7 @@ export const transitionProps = {
   /**
    * @description 过渡时间
    */
-  duration: { type: Number, default: 300 },
+  duration: { type: [Number, String], default: 300 },
   /**
    * @description 元素穿透
    */
