@@ -50,21 +50,20 @@ const { parent } = useParent(dropdownMenuKey)
 const closed = ref(true)
 const active = ref(false)
 const current = ref<any>("")
-const screenHeight = ref(0)
+const windowHeight = ref(0)
 
 const style = computed(() => {
   const style: any = {}
   style.zIndex = active.value ? 2 : 1
   if (prop("direction") === "up") {
     style.top = 0
-    style.bottom = screenHeight.value - parent?.rect.value.top + "px"
+    style.bottom = windowHeight.value - parent?.rect.value.top + "px"
   }
   if (prop("direction") === "down") {
     style.top = parent?.rect.value.bottom + "px"
     style.bottom = 0
   }
   if (!active.value && closed.value) style.display = "none"
-  if (props.mode === "switch") style.display = "none"
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
@@ -193,7 +192,6 @@ function onClickOption(option: DropdownItemOption) {
       const list = props.modelValue ? props.modelValue.split(",") : []
       const index = list.findIndex((val: any) => val === option[props.valueField])
       index >= 0 ? list.splice(index, 1) : list.push(option[props.valueField])
-      console.log(index, list)
       updateValue(list.join(","))
     }
   }
@@ -229,7 +227,7 @@ function onClosed() {
 }
 
 function resize() {
-  screenHeight.value = uni.getSystemInfoSync().screenHeight
+  windowHeight.value = uni.getSystemInfoSync().windowHeight
 }
 
 onMounted(() => resize())
