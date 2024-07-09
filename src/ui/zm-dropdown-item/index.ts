@@ -30,7 +30,7 @@ export const dropdownItemProps = {
   /**
    * @description 菜单最大高度
    */
-  maxHeight: { type: [String, Number], default: "auto" },
+  maxHeight: { type: [String, Number], default: "60vh" },
   /**
    * @description 标题颜色
    */

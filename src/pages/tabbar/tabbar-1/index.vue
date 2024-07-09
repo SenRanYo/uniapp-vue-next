@@ -1,25 +1,10 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <view style="margin-top: 600rpx">
-      <zm-dropdown-menu direction="up">
-        <zm-dropdown-item
-          borderRadius="32rpx"
-          title="全部商品"
-          v-model="value1"
-          :options="options1"
-          mode="multiple"
-          direction="down"
-          background="success"
-          option-size="32rpx"
-          option-color="red"
-          option-weight="bold"
-          activeOptionColor="pink"
-          @change="onChange"
-        ></zm-dropdown-item>
-        <zm-dropdown-item :duration="200" title="默认排序" v-model="value2" :options="options2" mode="single" @change="onChange"></zm-dropdown-item>
-      </zm-dropdown-menu>
-    </view>
+    <zm-dropdown-menu>
+      <zm-dropdown-item title="全部商品" v-model="value1" :options="options1" mode="multiple" @change="onChange"></zm-dropdown-item>
+      <zm-dropdown-item :duration="200" title="默认排序" v-model="value2" :options="options2" mode="single" @change="onChange"></zm-dropdown-item>
+    </zm-dropdown-menu>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -48,13 +33,7 @@ const value1 = ref("1")
 const value2 = ref(1)
 const value3 = ref(1)
 
-const options1 = ref([
-  { label: "全部商品", value: "1" },
-  { label: "新款商品", value: "2" },
-  { label: "活动商品", value: "3" },
-  { label: "爆款商品", value: "4" },
-  { label: "热卖商品", value: "5" },
-])
+const options1 = ref([{ label: "全部商品", value: "1" }])
 
 const options2 = ref([
   { label: "默认排序", value: 1 },

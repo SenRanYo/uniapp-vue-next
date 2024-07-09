@@ -27,6 +27,7 @@
               </view>
             </slot>
           </scroll-view>
+          <slot name="footer"></slot>
         </view>
       </zm-transition>
     </block>
@@ -295,13 +296,13 @@ export default {
 
   &--up {
     .zm-dropdown-item__content {
-      border-radius: 24rpx 24rpx 0 0;
+      border-radius: 16rpx 16rpx 0 0;
     }
   }
 
   &--down {
     .zm-dropdown-item__content {
-      border-radius: 0 0 24rpx 24rpx;
+      border-radius: 0 0 16rpx 16rpx;
     }
   }
 }
