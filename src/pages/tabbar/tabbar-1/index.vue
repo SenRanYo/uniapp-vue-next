@@ -1,9 +1,25 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-dropdown-menu>
-      <zm-dropdown-item title="衣服" v-model="value" :options="options1"></zm-dropdown-item>
-    </zm-dropdown-menu>
+    <view style="margin-top: 600rpx">
+      <zm-dropdown-menu direction="up">
+        <zm-dropdown-item
+          borderRadius="32rpx"
+          title="全部商品"
+          v-model="value1"
+          :options="options1"
+          mode="multiple"
+          direction="down"
+          background="success"
+          option-size="32rpx"
+          option-color="red"
+          option-weight="bold"
+          activeOptionColor="pink"
+          @change="onChange"
+        ></zm-dropdown-item>
+        <zm-dropdown-item :duration="200" title="默认排序" v-model="value2" :options="options2" mode="single" @change="onChange"></zm-dropdown-item>
+      </zm-dropdown-menu>
+    </view>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -28,41 +44,33 @@ const popup = ref(false)
 const loading = ref(false)
 const switchValue = ref("1")
 
-const value = ref(1)
+const value1 = ref("1")
+const value2 = ref(1)
+const value3 = ref(1)
+
 const options1 = ref([
-  { label: "选项一", value: 1 },
-  { label: "选项二", value: 2 },
-  { label: "选项三", value: 3 },
-  { label: "选项四", value: 4 },
-  { label: "选项五", value: 5 },
+  { label: "全部商品", value: "1" },
+  { label: "新款商品", value: "2" },
+  { label: "活动商品", value: "3" },
+  { label: "爆款商品", value: "4" },
+  { label: "热卖商品", value: "5" },
 ])
 
 const options2 = ref([
-  { label: "选项一", value: 1 },
-  { label: "选项二", value: 2 },
-  { label: "选项三", value: 3 },
-  { label: "选项四", value: 4 },
-  { label: "选项五", value: 5 },
+  { label: "默认排序", value: 1 },
+  { label: "好评排序", value: 2 },
+  { label: "销量排序", value: 3 },
 ])
 
 const options3 = ref([
-  { label: "选项一", value: 1 },
-  { label: "选项二", value: 2 },
-  { label: "选项三", value: 3 },
-  { label: "选项四", value: 4 },
-  { label: "选项五", value: 5 },
+  { label: "价格", icon: "arrow-sort", value: 1 },
+  { label: "价格", icon: "arrow-up", value: 2 },
+  { label: "价格", icon: "arrow-down", value: 3 },
 ])
 
-watch(
-  () => value.value,
-  (newValue, oldValue) => {
-    console.log(newValue)
-  },
-)
-
-setTimeout(() => {
-  value.value = 2
-}, 5000)
+function onChange(val) {
+  console.log("change", val)
+}
 </script>
 
 <style lang="scss" scoped>

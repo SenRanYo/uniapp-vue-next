@@ -1,22 +1,29 @@
 <template>
-  <view class="zm-dropdown-menu" :class="[classs, customClass]" :style="[style]">
-    <view class="zm-dropdown-menu__item" v-for="(item, index) in childrens" :key="index" @click="onClick(item, index)">
+  <view class="zm-dropdown-menu" :class="[customClass]" :style="[style]">
+    <view
+      class="zm-dropdown-menu__item"
+      :class="{ 'is-active': item.exposed.active, 'is-disabled': item.props.disabled }"
+      v-for="(item, index) in childrens"
+      :key="index"
+      @click="onClick(item, index)"
+    >
       <text class="zm-dropdown-menu__item__title" :style="[titleStyle(item)]">{{ item.exposed.title }}</text>
-      <view class="zm-dropdown-menu__item__icon">
-        <zm-icon v-if="showIcon" :name="icon" :size="iconSize" :color="iconColor"></zm-icon>
+      <view class="zm-dropdown-menu__item__icon" :style="[iconStyle(item)]" v-if="prop(item, 'showIcon')">
+        <zm-icon :name="prop(item, 'icon')" :size="prop(item, 'iconSize')" :weight="prop(item, 'iconWeight')" :color="iconColor(item)"></zm-icon>
       </view>
     </view>
     <slot></slot>
   </view>
 </template>
 <script setup lang="ts">
+import { useStyle, useColor, useUnit, useElRect, useChildren } from "../hooks"
 import { dropdownMenuEmits, dropdownMenuProps, dropdownMenuKey } from "./index"
-import { useStyle, useColor, useUnit, useUnitToPx, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-dropdown-menu" })
 
 const props = defineProps(dropdownMenuProps)
 const emits = defineEmits(dropdownMenuEmits)
+
 const { childrens, linkChildren } = useChildren(dropdownMenuKey)
 
 const rect = ref<UniApp.NodeInfo>({})
@@ -24,6 +31,9 @@ const instance = getCurrentInstance()
 
 linkChildren({ props, rect, close })
 
+/**
+ * 元素样式
+ */
 const style = computed(() => {
   const style: any = {}
   style.zIndex = props.zIndex
@@ -32,37 +42,77 @@ const style = computed(() => {
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-const classs = computed(() => {
-  const list: string[] = []
-  return list
-})
-
+/**
+ * 标题样式
+ */
 const titleStyle = computed(() => {
   return (item: any) => {
     const style: any = {}
-    style.color = useColor(props.titleColor)
-    style.fontSize = useUnit(props.titleSize)
-    style.fontWeight = props.titleWeight
+    style.color = item.exposed.active ? useColor(prop(item, "activeTitleColor")) : useColor(prop(item, "titleColor"))
+    style.fontSize = useUnit(prop(item, "titleSize"))
+    style.fontWeight = prop(item, "titleWeight")
     return useStyle(style)
   }
 })
 
+/**
+ * 图标样式，旋转样式
+ */
+const iconStyle = computed(() => {
+  return (item: any) => {
+    const style: any = {}
+    if (item.exposed.active) style.transform = "rotate(180deg)"
+    return useStyle(style)
+  }
+})
+
+/**
+ * 根据状态获取菜单图标颜色
+ */
+const iconColor = computed(() => {
+  return (item: any) => {
+    return item.exposed.active ? useColor(prop(item, "activeIconColor")) : useColor(prop(item, "iconColor"))
+  }
+})
+
+/**
+ * 获取指定菜单实例prop值
+ */
+function prop(item: any, name: string) {
+  return item.props[name] ?? props[name]
+}
+
+/**
+ * 获取节点信息
+ */
 async function resize() {
   rect.value = await useElRect(".zm-dropdown-menu", instance)
 }
 
+/**
+ * 点击菜单
+ * @param item 菜单项
+ * @param index 菜单索引
+ */
 function onClick(item: any, index: number) {
   if (item.props.disabled) return
   toggleItem(index)
 }
 
+/**
+ * 关闭所有菜单
+ */
 function close() {
   childrens.forEach((item: any) => item.exposed.toggle(false))
 }
 
+/**
+ * 切换菜单展开状态
+ * @param active 菜单索引
+ */
 async function toggleItem(active: number) {
   await resize()
-  childrens.forEach((item: any, index) => {
+  childrens.forEach((item, index) => {
     if (index === active) {
       item.exposed.toggle()
     } else if (item.exposed.active) {
@@ -100,6 +150,15 @@ export default {
 
     &__icon {
       margin-left: 8rpx;
+      transition: transform 0.3s ease-out;
+    }
+
+    &.is-active {
+      color: var(--primary-color);
+    }
+
+    &.is-disabled {
+      opacity: 0.6;
     }
   }
 }

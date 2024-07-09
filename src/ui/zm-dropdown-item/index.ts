@@ -8,9 +8,9 @@ export const dropdownItemProps = {
    */
   modelValue: { type: [String, Number, Array], default: "" },
   /**
-   * @description 菜单模式，可选值 single 单选模式 multiple 多选模式 switch 切换模式
+   * @description 菜单模式，可选值 single 单选模式 multiple 多选模式
    */
-  mode: { type: String, default: "single", validator: (v: string) => ["single", "multiple", "switch"].includes(v) },
+  mode: { type: String, default: "single", validator: (v: string) => ["single", "multiple"].includes(v) },
   /**
    * @description 菜单项标题
    */
@@ -24,9 +24,9 @@ export const dropdownItemProps = {
    */
   disabled: { type: Boolean, default: false },
   /**
-   * @description 菜单高度
+   * @description 菜单最小高度
    */
-  height: { type: [String, Number], default: "auto" },
+  minHeight: { type: [String, Number], default: "auto" },
   /**
    * @description 菜单最大高度
    */
@@ -50,7 +50,7 @@ export const dropdownItemProps = {
   /**
    * @description 图标
    */
-  icon: { type: String, default: "sharp-down" },
+  icon: { type: String, default: "arrow-down" },
   /**
    * @description 图标大小
    */
@@ -58,27 +58,31 @@ export const dropdownItemProps = {
   /**
    * @description 图标颜色
    */
-  iconColor: { type: String, default: "#e3e5e6" },
+  iconColor: { type: String, default: "" },
   /**
    * @description 图标粗细
    */
   iconWeight: { type: [Number, String], default: "" },
   /**
+   * @description 激活图标颜色
+   */
+  activeIconColor: { type: String, default: "" },
+  /**
    * @description 是否显示图标
    */
-  showIcon: { type: Boolean, default: true },
+  showIcon: { type: [Boolean, null], default: null },
   /**
    * @description 是否显示遮罩层
    */
-  overlay: { type: Boolean, default: true },
+  overlay: { type: [Boolean, null], default: null },
   /**
    * @description 动画时长，单位毫秒
    */
-  duration: { type: [Number, String], default: "200" },
+  duration: { type: [Number, String, null], default: null },
   /**
    * @description 菜单展开方向，可选值up、down
    */
-  direction: { type: String, default: "down", validator: (v: string) => ["up", "down"].includes(v) },
+  direction: { type: String, default: "", validator: (v: string) => ["up", "down", ""].includes(v) },
   /**
    * @description 选项菜单背景颜色
    */
@@ -88,25 +92,21 @@ export const dropdownItemProps = {
    */
   borderRadius: { type: [Number, String], default: "" },
   /**
-   * @description 选项文字大小
+   * @description 选项文字图标大小
    */
   optionSize: { type: [String, Number], default: "" },
   /**
-   * @description 选项文字颜色
+   * @description 选项文字图标颜色
    */
-  optionColor: { type: [String, Number], default: "" },
+  optionColor: { type: String, default: "" },
   /**
-   * @description 选项文字粗细
+   * @description 选项文字图标粗细
    */
   optionWeight: { type: [String, Number], default: "" },
   /**
-   * @description 激活选项文字颜色
+   * @description 激活选项文字图标颜色
    */
-  activeOptionColor: { type: [String, Number], default: "" },
-  /**
-   * @description option 图标字段
-   */
-  iconField: { type: String, default: "icon" },
+  activeOptionColor: { type: String, default: "" },
   /**
    * @description option 名称字段
    */
@@ -135,7 +135,6 @@ export const dropdownItemEmits = {
 }
 
 export type DropdownItemOption = {
-  icon?: string
   label: string | number
   value: string | number
 }

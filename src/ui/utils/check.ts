@@ -159,7 +159,7 @@ export function isArray<T>(value: any): value is Array<T> {
  * @param value 值
  * @return {Boolean} 是否不为空
  */
-export const isDef = <T>(value: T): value is NonNullable<T> => value !== undefined && value !== null
+export const isDef = <T>(value: T): value is NonNullable<T> => value !== undefined && value !== null && value !== ""
 
 /**
  * @description 校验是否是对象

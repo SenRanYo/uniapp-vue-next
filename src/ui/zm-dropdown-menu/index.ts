@@ -26,7 +26,7 @@ export const dropdownMenuProps = {
   /**
    * @description 图标
    */
-  icon: { type: String, default: "sharp-down" },
+  icon: { type: String, default: "arrow-down" },
   /**
    * @description 图标大小
    */
@@ -34,11 +34,15 @@ export const dropdownMenuProps = {
   /**
    * @description 图标颜色
    */
-  iconColor: { type: String, default: "#e3e5e6" },
+  iconColor: { type: String, default: "" },
   /**
    * @description 图标粗细
    */
   iconWeight: { type: [Number, String], default: "" },
+  /**
+   * @description 激活图标颜色
+   */
+  activeIconColor: { type: String, default: "" },
   /**
    * @description 是否显示图标
    */
@@ -68,10 +72,6 @@ export const dropdownMenuProps = {
    */
   closeOnClickOverlay: { type: Boolean, default: true },
   /**
-   * @description 是否在点击外部元素后关闭菜单
-   */
-  closeOnClickOutside: { type: Boolean, default: true },
-  /**
    * @description 自定义类名
    */
   customClass: { type: String, default: "" },
@@ -80,7 +80,6 @@ export const dropdownMenuProps = {
    */
   customStyle: { type: [String, Object], default: "" },
 }
-
 export const dropdownMenuEmits = {}
 
 export type DropdownMenuEmits = typeof dropdownMenuEmits
