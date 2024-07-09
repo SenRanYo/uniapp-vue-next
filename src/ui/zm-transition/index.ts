@@ -1,5 +1,6 @@
 import Transition from "./zm-transition.vue"
 import { isBoolean } from "../utils/check"
+import type { ExtractPropTypes } from "vue"
 
 export const transitionProps = {
   /**
@@ -7,9 +8,9 @@ export const transitionProps = {
    */
   show: { type: Boolean, default: false },
   /**
-   * @description 动画模式，有效值fade、zoom、fade-zoom、fade-top、fade-bottom、fade-left、fade-right、slide-top、slide-bottom、slide-left、slide-right
+   * @description 动画名称，有效值fade、zoom、fade-zoom、fade-up、fade-down、fade-left、fade-right、slide-up、slide-down、slide-left、slide-right
    */
-  mode: { type: [String, Array, null], default: "fade" },
+  name: { type: String, default: "fade" },
   /**
    * @description 元素层级
    */
@@ -22,14 +23,6 @@ export const transitionProps = {
    * @description 元素穿透
    */
   penetrate: { type: Boolean, default: false },
-  /**
-   * @description 进入延时
-   */
-  enterDelay: { type: Number, default: 0 },
-  /**
-   * @description 离开延时
-   */
-  leaveDelay: { type: Number, default: 0 },
   /**
    * @description 进入动画函数
    */
@@ -50,18 +43,15 @@ export const transitionProps = {
 
 export const transitionEmits = {
   "update:show": (show: boolean) => isBoolean(show),
-  open: () => true,
-  opened: () => true,
-  close: () => true,
-  closed: () => true,
   click: (event: TouchEvent) => true,
+  enter: () => true,
+  leave: () => true,
+  "before-enter": () => true,
+  "after-enter": () => true,
+  "after-leave": () => true,
+  "before-leave": () => true,
 }
 
 export type TransitionEmits = typeof transitionEmits
-export type TransitionExpose = {
-  name: "zm-transition"
-  open: () => void
-  close: () => void
-  step: () => void
-}
+export type TransitionProps = ExtractPropTypes<typeof transitionProps>
 export type TransitionInstance = InstanceType<typeof Transition>

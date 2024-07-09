@@ -75,4 +75,10 @@ setTimeout(() => {
   border-radius: 999px;
   background-color: red;
 }
+
+.box {
+  width: 200rpx;
+  height: 200rpx;
+  background-color: green;
+}
 </style>

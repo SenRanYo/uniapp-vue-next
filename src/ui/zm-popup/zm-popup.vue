@@ -3,14 +3,14 @@
     <zm-overlay v-if="overlay" :show="visible" :duration="duration" :custom-style="overlayStyle" @click="onClickOverlay"></zm-overlay>
     <zm-transition
       :show="visible"
-      :mode="mode"
+      :name="mode"
       :duration="duration"
       :custom-style="bodyTransitionStyle"
       @click="onClickBodyTransition"
-      @open="onOpen"
-      @opened="onOpened"
-      @close="onClose"
-      @closed="onClosed"
+      @before-enter="onOpen"
+      @after-enter="onOpened"
+      @before-leave="onClose"
+      @after-leave="onClosed"
       @touchmove.prevent.stop="noop"
     >
       <view class="zm-popup__body" :style="[bodyStyle]" @touchmove.prevent.stop="noop">
@@ -64,7 +64,7 @@ const action = ref("show")
 const visible = ref(false)
 
 const mode = computed(() => {
-  const modes = { top: "slide-bottom", left: "slide-left", right: "slide-right", bottom: "slide-top", center: "fade-zoom" }
+  const modes = { top: "slide-down", left: "slide-left", right: "slide-right", bottom: "slide-up", center: "fade-zoom" }
   return modes[props.mode]
 })
 

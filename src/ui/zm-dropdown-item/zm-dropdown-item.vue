@@ -4,13 +4,13 @@
       <zm-overlay v-if="overlay" :show="active" :duration="duration" :custom-style="overlayStyle" @click="onClickOverlay"></zm-overlay>
       <zm-transition
         :show="active"
-        :mode="transitionMode"
+        :name="transitionName"
         :duration="prop('duration')"
         :custom-style="transitionStyle"
-        @open="onOpen"
-        @opened="onOpened"
-        @close="onClose"
-        @closed="onClosed"
+        @before-enter="onOpen"
+        @after-enter="onOpened"
+        @before-leave="onClose"
+        @after-leave="onClosed"
         @touchmove.prevent.stop="noop"
       >
         <view class="zm-dropdown-item__content" :style="[contentStyle]">
@@ -80,10 +80,10 @@ const overlayStyle = computed(() => {
   return useStyle(style)
 })
 
-const transitionMode = computed(() => {
-  const modes = { up: "slide-top", down: "slide-bottom" }
+const transitionName = computed(() => {
+  const names = { up: "slide-up", down: "slide-down" }
   const direction = prop("direction")
-  return modes[direction || "down"]
+  return names[direction || "down"]
 })
 
 const transitionStyle = computed(() => {
@@ -152,6 +152,7 @@ function onOpen() {
 }
 
 function onOpened() {
+  console.log(closed.value, 333)
   closed.value = false
   emits("opened")
 }
@@ -161,7 +162,8 @@ function onClose() {
 }
 
 function onClosed() {
-  closed.value = true
+  console.log(closed.value)
+  // closed.value = true
   emits("closed")
 }
 

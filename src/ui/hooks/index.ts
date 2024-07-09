@@ -1,9 +1,14 @@
 import { Mitt } from "../utils/mitt"
 import { cssVars } from "../config"
 import { isNumber, isObject, isString, isEmpty } from "../utils/check"
-import { Ref, ComponentInternalInstance, nextTick, getCurrentInstance } from "vue"
-export * from "./useParent"
-export * from "./useChildren"
+import { ref, inject, computed, onUnmounted, getCurrentInstance, InjectionKey, ComponentInternalInstance } from "vue"
+
+/**
+ * 使用事件监听器
+ */
+export function useMitt() {
+  return new Mitt()
+}
 
 // 使用css变量
 export function useVar(name: string): string {
@@ -180,8 +185,102 @@ export function useElRects(selector: string, instance: ComponentInternalInstance
 }
 
 /**
- * 创建事件监听器
+ * 自定义 Promise 钩子函数，用于封装 Promise 对象
+ * @param executor Promise 执行函数
+ * @returns 包含自定义 Promise 对象及相关方法的对象
  */
-export function useMitt() {
-  return new Mitt()
+export function usePromise<T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void) {
+  let _reject: ((res?: any) => void) | null = null
+
+  const _promise = new Promise<T>((resolve, reject) => {
+    executor(resolve, reject)
+    _reject = reject
+  })
+
+  const _then = <TResult1 = T, TResult2 = never>(
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null,
+  ) => {
+    return _promise.then(onfulfilled, onrejected)
+  }
+
+  const _abort = (error?: any) => {
+    if (_reject) _reject(error)
+  }
+
+  const _catch = <TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null) => _promise.catch(onrejected)
+
+  return { promise: _promise, then: _then, abort: _abort, catch: _catch }
+}
+
+type ParentProvide<T> = T & {
+  link(child: ComponentInternalInstance): void
+  unlink(child: ComponentInternalInstance): void
+  childrens: ComponentInternalInstance[]
+}
+
+/**
+ * 用于获取父组件提供的数据和方法的自定义钩子函数
+ * @param key 父组件提供数据的 InjectionKey
+ * @returns 包含父组件提供数据和方法的对象
+ */
+export function useParent<T>(key: InjectionKey<ParentProvide<T>>) {
+  const parent = inject(key, null)
+  if (parent) {
+    const instance = getCurrentInstance()!
+    const { link, unlink, childrens } = parent
+
+    link(instance)
+    onUnmounted(() => unlink(instance))
+
+    const index = computed(() => childrens.indexOf(instance))
+
+    return { index, parent }
+  }
+
+  return { index: ref(-1), parent: null }
+}
+
+/**
+ * 用于管理子组件的数据和方法的自定义钩子函数
+ * @param key 提供数据的 InjectionKey
+ * @returns 包含子组件数据和方法的对象
+ */
+export function useChildren<Child extends ComponentInternalInstance, ProvideValue = never>(key: InjectionKey<ProvideValue>) {
+  const childrens: ComponentInternalInstance[] = reactive([])
+  const publicChildrens: ComponentPublicInstance[] = reactive([])
+
+  const linkChildren = (value?: any) => {
+    const link = (child: ComponentInternalInstance) => {
+      if (child.proxy) {
+        childrens.push(child as Child)
+        publicChildrens.push(child.proxy)
+      }
+    }
+
+    const unlink = (child: ComponentInternalInstance) => {
+      const index = childrens.indexOf(child)
+      publicChildrens.splice(index, 1)
+      childrens.splice(index, 1)
+    }
+
+    provide(key, Object.assign({ link, unlink, childrens }, value))
+  }
+
+  return { childrens, linkChildren }
+}
+
+/**
+ * 模拟 requestAnimationFrame 的自定义函数
+ * @param cb 回调函数
+ * @returns 包含 Promise 对象及相关方法的对象
+ */
+export function useRequestAnimationFrame(cb = () => {}) {
+  return usePromise((resolve) => {
+    const timer = setInterval(() => {
+      clearInterval(timer)
+      resolve(true)
+      cb()
+    }, 1000 / 30)
+  })
 }

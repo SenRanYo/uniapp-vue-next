@@ -2,14 +2,14 @@
   <view class="zm-dialog" :style="[style]" @touchmove.prevent.stop="noop">
     <zm-overlay v-if="useOptions.overlay" :show="visible" :duration="useOptions.duration" :custom-style="useOptions.overlayStyle" @click="clickOverlay"></zm-overlay>
     <zm-transition
-      mode="fade-zoom"
+      name="fade-zoom"
       :show="visible"
       :duration="useOptions.duration"
       :custom-style="transitionStyle"
-      @open="onOpen"
-      @opened="onOpened"
-      @close="onClose"
-      @closed="onClosed"
+      @before-enter="onOpen"
+      @after-enter="onOpened"
+      @before-leave="onClose"
+      @after-leave="onClosed"
       @click="clickOverlay"
     >
       <view class="zm-dialog__fixed" :style="[fixedStyle]">

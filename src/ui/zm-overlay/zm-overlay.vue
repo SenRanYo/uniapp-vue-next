@@ -1,14 +1,14 @@
 <template>
   <view class="zm-overlay" :class="[props.customClass]" :style="[style]" @touchmove.prevent.stop="noop">
     <zm-transition
-      mode="fade"
+      name="fade"
       v-model:show="visible"
       :duration="props.duration"
       :custom-style="transitionStyle"
-      @open="onOpen"
-      @close="onClose"
-      @opened="onOpened"
-      @closed="onClosed"
+      @before-enter="onOpen"
+      @after-enter="onOpened"
+      @before-leave="onClose"
+      @after-leave="onClosed"
       @click="onClick"
       @touchmove.prevent.stop="noop"
     >

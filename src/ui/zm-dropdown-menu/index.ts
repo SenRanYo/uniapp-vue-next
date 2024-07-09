@@ -54,7 +54,7 @@ export const dropdownMenuProps = {
   /**
    * @description 动画时长，单位毫秒
    */
-  duration: { type: [Number, String], default: "" },
+  duration: { type: [Number, String], default: "200" },
   /**
    * @description 菜单展开方向，可选值up、down
    */

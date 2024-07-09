@@ -129,6 +129,18 @@ export function isBoolean(value: any): boolean {
 }
 
 /**
+ * 检查给定值是否为 Promise 对象。
+ * @param {unknown} value 要检查的值
+ * @returns {value is Promise<any>} 如果是 Promise 对象则返回 true，否则返回 false
+ */
+export function isPromise(value: unknown): value is Promise<any> {
+  if (isObject(value) && isDef(value)) {
+    return isFunction((value as Promise<any>).then) && isFunction((value as Promise<any>).catch)
+  }
+  return false
+}
+
+/**
  * @description 校验是否是数组
  * @param {*} value 校验内容
  * @return {Boolean}
@@ -141,6 +153,13 @@ export function isArray<T>(value: any): value is Array<T> {
     return Object.prototype.toString.call(value) === "[object Array]"
   }
 }
+
+/**
+ * @description 检查值是否不为空
+ * @param value 值
+ * @return {Boolean} 是否不为空
+ */
+export const isDef = <T>(value: T): value is NonNullable<T> => value !== undefined && value !== null
 
 /**
  * @description 校验是否是对象
