@@ -1,9 +1,11 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-input v-model="value" prefixIcon="plus"></zm-input>
-    <zm-input v-model="value" round disabled></zm-input>
-    <zm-textarea v-model="textarea"></zm-textarea>
+    <zm-form>
+      <zm-field label="姓名" v-model="value1" clearable></zm-field>
+      <zm-field label="姓名" v-model="value2"></zm-field>
+      <zm-field label="姓名" v-model="value3"></zm-field>
+    </zm-form>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -31,22 +33,8 @@ const switchValue = ref("1")
 const value = ref("")
 const textarea = ref("")
 const value1 = ref("1")
-const value2 = ref(1)
-const value3 = ref(1)
-
-const options1 = ref([{ label: "全部商品", value: "1" }])
-
-const options2 = ref([
-  { label: "默认排序", value: 1 },
-  { label: "好评排序", value: 2 },
-  { label: "销量排序", value: 3 },
-])
-
-const options3 = ref([
-  { label: "价格", icon: "arrow-sort", value: 1 },
-  { label: "价格", icon: "arrow-up", value: 2 },
-  { label: "价格", icon: "arrow-down", value: 3 },
-])
+const value2 = ref("2")
+const value3 = ref("3")
 
 watch(
   () => textarea.value,

@@ -1,4 +1,5 @@
 import Footer from "./zm-footer.vue"
+import type { ExtractPropTypes } from "vue"
 
 export const footerProps = {
   /**
@@ -32,7 +33,5 @@ export const footerEmits = {
 }
 
 export type FooterEmits = typeof footerEmits
-export type FooterExpose = {
-  name: "zm-footer"
-}
+export type FooterProps = ExtractPropTypes<typeof footerProps>
 export type FooterInstance = InstanceType<typeof Footer>
