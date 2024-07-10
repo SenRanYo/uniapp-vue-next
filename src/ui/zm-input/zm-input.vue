@@ -134,7 +134,7 @@ function onClickClear() {
   upadteValue("")
 }
 
-defineExpose({ name: "zm-input", close })
+defineExpose({ name: "zm-input" })
 </script>
 <script lang="ts">
 export default {

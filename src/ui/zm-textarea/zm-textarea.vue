@@ -116,7 +116,7 @@ async function upadteValue(value: string) {
   emits("update:modelValue", value)
 }
 
-defineExpose({ name: "zm-textarea", close })
+defineExpose({ name: "zm-textarea" })
 </script>
 <script lang="ts">
 export default {
