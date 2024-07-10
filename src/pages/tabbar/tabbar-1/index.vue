@@ -1,10 +1,8 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-dropdown-menu>
-      <zm-dropdown-item title="全部商品" v-model="value1" :options="options1" mode="multiple" @change="onChange"></zm-dropdown-item>
-      <zm-dropdown-item :duration="200" title="默认排序" v-model="value2" :options="options2" mode="single" @change="onChange"></zm-dropdown-item>
-    </zm-dropdown-menu>
+    <zm-input v-model="value" prefixIcon="plus"></zm-input>
+    <zm-input v-model="value" round disabled></zm-input>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -29,6 +27,7 @@ const popup = ref(false)
 const loading = ref(false)
 const switchValue = ref("1")
 
+const value = ref("")
 const value1 = ref("1")
 const value2 = ref(1)
 const value3 = ref(1)
@@ -46,6 +45,13 @@ const options3 = ref([
   { label: "价格", icon: "arrow-up", value: 2 },
   { label: "价格", icon: "arrow-down", value: 3 },
 ])
+
+watch(
+  () => value.value,
+  (val) => {
+    console.log(val)
+  },
+)
 
 function onChange(val) {
   console.log("change", val)
