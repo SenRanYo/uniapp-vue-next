@@ -1,28 +1,12 @@
-import Input from "./zm-input.vue"
+import Textarea from "./zm-textarea.vue"
 import type { ExtractPropTypes, PropType } from "vue"
 import { InputConfirmType, InputType } from "@uni-helper/uni-app-types/index"
 
-export const inputProps = {
+export const textareaProps = {
   /**
    * @description 输入值
    */
   modelValue: { type: [String, Number], default: () => "" },
-  /**
-   * @description 输入框类型
-   */
-  type: { type: String as PropType<InputType>, default: () => "text" },
-  /**
-   * @description 是否圆形的
-   */
-  round: { type: Boolean, default: false },
-  /**
-   * @description 是否是密码类型
-   */
-  password: { type: Boolean, default: false },
-  /**
-   * @description 是否只读，与disabled不同之处在于disabled会置灰组件，而readonly则不会
-   */
-  readonly: { type: Boolean, default: false },
   /**
    * @description 是否禁用
    */
@@ -56,21 +40,13 @@ export const inputProps = {
    */
   confirmType: { type: String as PropType<InputConfirmType>, default: "done" },
   /**
-   * @description 点击键盘右下角按钮时是否保持键盘不收起，H5无效
-   */
-  confirmHold: { type: Boolean, default: false },
-  /**
-   * @description focus时，点击页面的时候不收起键盘，微信小程序有效
-   */
-  holdKeyboard: { type: Boolean, default: false },
-  /**
    * @description 自动获取焦点，在 H5 平台能否聚焦以及软键盘是否跟随弹出，取决于当前浏览器本身的实现。nvue 页面不支持，需使用组件的 focus()、blur() 方法控制焦点
    */
   focus: { type: Boolean, default: false },
   /**
-   * @description 键盘收起时，是否自动失去焦点，目前仅App3.0.0+有效
+   * @description 是否自动增加高度
    */
-  autoBlur: { type: Boolean, default: false },
+  autoHeight: { type: Boolean, default: false },
   /**
    * @description 是否忽略组件内对文本合成系统事件的处理。为 false 时将触发 compositionstart、compositionend、compositionupdate 事件，且在文本合成期间会触发 input 事件
    */
@@ -96,9 +72,13 @@ export const inputProps = {
    */
   adjustPosition: { type: Boolean, default: true },
   /**
-   * @description 输入框内容对齐方式
+   * @description 是否显示键盘上方带有”完成“按钮那一栏
    */
-  inputAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
+  showConfirmBar: { type: Boolean, default: true },
+  /**
+   * @description focus时，点击页面的时候不收起键盘，只微信小程序有效
+   */
+  holdKeyboard: { type: Boolean, default: false },
   /**
    * @description 输入框字体颜色
    */
@@ -119,38 +99,6 @@ export const inputProps = {
    * @description 输入框字体的粗细
    */
   fontWeight: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框前置图标
-   */
-  prefixIcon: { type: String, default: "" },
-  /**
-   * @description 输入框前置图标大小
-   */
-  prefixIconSize: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框前置图标颜色
-   */
-  prefixIconColor: { type: String, default: "" },
-  /**
-   * @description 输入框前置图标粗细
-   */
-  prefixIconWeight: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框后置图标
-   */
-  suffixIcon: { type: String, default: "" },
-  /**
-   * @description 输入框后置图标大小
-   */
-  suffixIconSize: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框后置图标颜色
-   */
-  suffixIconColor: { type: String, default: "" },
-  /**
-   * @description 输入框后置图标粗细
-   */
-  suffixIconWeight: { type: [String, Number], default: "" },
   /**
    * @description 输入框清除图标
    */
@@ -188,7 +136,7 @@ export const inputProps = {
    */
   customStyle: { type: [String, Object], default: "" },
 }
-export const inputEmits = {
+export const textareaEmits = {
   clear: () => true,
   focus: () => true,
   blur: (value: string) => true,
@@ -199,6 +147,6 @@ export const inputEmits = {
   "update:modelValue": (value: string) => true,
 }
 
-export type InputEmits = typeof inputEmits
-export type InputProps = ExtractPropTypes<typeof inputProps>
-export type InputInstance = InstanceType<typeof Input>
+export type TextareaEmits = typeof textareaEmits
+export type TextareaProps = ExtractPropTypes<typeof textareaProps>
+export type TextareaInstance = InstanceType<typeof Textarea>

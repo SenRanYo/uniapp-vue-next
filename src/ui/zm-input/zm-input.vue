@@ -7,7 +7,7 @@
       <input
         class="zm-input__input"
         :style="[inputStyle]"
-        :value="modelValue"
+        :value="value"
         :type="type"
         :focus="focus"
         :cursor="+cursor"
@@ -24,9 +24,13 @@
         :selection-start="+selectionStart"
         :placeholder-style="placeholderStyle"
         :ignoreCompositionEvent="ignoreCompositionEvent"
+        @blur="onBlur"
         @input="onInput"
+        @focus="onFocus"
+        @confirm="onConfirm"
+        @keyboardheightchange="onKeyboardheightchange"
       />
-      <view class="zm-input__clear" :style="[clearStyle]" v-if="clearable && modelValue" @click="onClickClear">
+      <view class="zm-input__clear" :style="[clearStyle]" v-if="clearable && value" @click="onClickClear">
         <zm-icon :name="clearIcon" :size="clearIconSize" :color="clearIconColor" :weight="clearIconWeight"></zm-icon>
       </view>
     </view>
@@ -44,6 +48,8 @@ defineOptions({ name: "zm-input" })
 
 const props = defineProps(inputProps)
 const emits = defineEmits(inputEmits)
+
+const value = ref("")
 
 const style = computed(() => {
   const style: any = {}
@@ -90,17 +96,37 @@ const disabled = computed(() => {
   return props.disabled || props.readonly
 })
 
-const modelValue = computed({
-  get: () => String(props.modelValue),
-  set: (val) => upadteValue(val),
-})
+watch(
+  () => props.modelValue,
+  (val) => {
+    value.value = String(val)
+  },
+  { immediate: true },
+)
 
 async function upadteValue(value: string) {
   emits("change", value)
   emits("update:modelValue", value)
 }
 
+function onBlur() {
+  emits("blur", value.value)
+}
+
+function onFocus() {
+  emits("focus")
+}
+
+function onConfirm() {
+  emits("confirm", value.value)
+}
+
+function onKeyboardheightchange() {
+  emits("keyboardheightchange")
+}
+
 function onInput(event: InputOnInputEvent) {
+  value.value = event.detail.value
   upadteValue(event.detail.value)
 }
 
