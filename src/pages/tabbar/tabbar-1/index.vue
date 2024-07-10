@@ -3,6 +3,7 @@
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
     <zm-input v-model="value" prefixIcon="plus"></zm-input>
     <zm-input v-model="value" round disabled></zm-input>
+    <zm-textarea v-model="textarea"></zm-textarea>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -28,6 +29,7 @@ const loading = ref(false)
 const switchValue = ref("1")
 
 const value = ref("")
+const textarea = ref("")
 const value1 = ref("1")
 const value2 = ref(1)
 const value3 = ref(1)
@@ -47,7 +49,7 @@ const options3 = ref([
 ])
 
 watch(
-  () => value.value,
+  () => textarea.value,
   (val) => {
     console.log(val)
   },

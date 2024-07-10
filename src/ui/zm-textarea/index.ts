@@ -1,12 +1,13 @@
 import Textarea from "./zm-textarea.vue"
 import type { ExtractPropTypes, PropType } from "vue"
-import { InputConfirmType, InputType } from "@uni-helper/uni-app-types/index"
+import { InputConfirmType, InputType, TextareaOnLinechangeEvent } from "@uni-helper/uni-app-types/index"
 
 export const textareaProps = {
   /**
    * @description 输入值
    */
   modelValue: { type: [String, Number], default: () => "" },
+
   /**
    * @description 是否禁用
    */
@@ -18,7 +19,7 @@ export const textareaProps = {
   /**
    * @description 最大输入长度，设置为 -1 的时候不限制最大长度
    */
-  maxlength: { type: [String, Number], default: -1 },
+  maxlength: { type: [String, Number], default: 200 },
   /**
    * @description 背景颜色
    */
@@ -43,6 +44,10 @@ export const textareaProps = {
    * @description 自动获取焦点，在 H5 平台能否聚焦以及软键盘是否跟随弹出，取决于当前浏览器本身的实现。nvue 页面不支持，需使用组件的 focus()、blur() 方法控制焦点
    */
   focus: { type: Boolean, default: false },
+  /**
+   * @description 如果 textarea 是在一个 position:fixed 的区域，需要显示指定属性 fixed 为 true
+   */
+  fixed: { type: Boolean, default: false },
   /**
    * @description 是否自动增加高度
    */
@@ -88,9 +93,9 @@ export const textareaProps = {
    */
   width: { type: [String, Number], default: "" },
   /**
-   * @description 输入框高度
+   * @description 最小输入框高度
    */
-  height: { type: [String, Number], default: "" },
+  minHeight: { type: [String, Number], default: "" },
   /**
    * @description 输入框字体的大小
    */
@@ -100,26 +105,6 @@ export const textareaProps = {
    */
   fontWeight: { type: [String, Number], default: "" },
   /**
-   * @description 输入框清除图标
-   */
-  clearIcon: { type: String, default: "cross" },
-  /**
-   * @description 输入框清除图标大小
-   */
-  clearIconSize: { type: [String, Number], default: "24rpx" },
-  /**
-   * @description 输入框清除图标颜色
-   */
-  clearIconColor: { type: String, default: "#fff" },
-  /**
-   * @description 输入框清除图标粗细
-   */
-  clearIconWeight: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框清除图标背景色
-   */
-  clearIconBackground: { type: String, default: "" },
-  /**
    * @description 边框样式
    */
   border: { type: String, default: "" },
@@ -127,6 +112,26 @@ export const textareaProps = {
    * @description 圆角值
    */
   borderRadius: { type: [String, Number], default: "" },
+  /**
+   * @description 是否显示字数统计
+   */
+  showCount: { type: Boolean, default: true },
+  /**
+   * @description 字数统计字体大小
+   */
+  countSize: { type: [String, Number], default: "" },
+  /**
+   * @description 字数统计字体颜色
+   */
+  countColor: { type: String, default: "" },
+  /**
+   * @description 字数统计字体粗细
+   */
+  countWeight: { type: [String, Number], default: "" },
+  /**
+   * @description 是否去掉 iOS 下的默认内边距
+   */
+  disableDefaultPadding: { type: Boolean, default: false },
   /**
    * @description 自定义类名
    */
@@ -141,6 +146,7 @@ export const textareaEmits = {
   focus: () => true,
   blur: (value: string) => true,
   confirm: (value: string) => true,
+  linechange: (event: TextareaOnLinechangeEvent) => true,
   keyboardheightchange: () => true,
   input: (value: string) => true,
   change: (value: string) => true,
