@@ -1,7 +1,7 @@
 <template>
   <view class="zm-field" :class="[classs, customClass]" :style="[style]">
     <view class="zm-field__label" :class="[labelClass]" :style="[labelStyle]" v-if="label || slots.label">
-      <slot name="label">{{ label }}</slot>
+      <slot name="label">{{ label }}{{ colon ? ":" : "" }}</slot>
     </view>
     <view class="zm-field__prefix" v-if="prefixIcon || slots.prefixIcon">
       <slot name="prefix">
@@ -30,11 +30,11 @@
         :maxlength="+maxlength"
         :confirm-type="confirmType"
         :ignore-composition-event="ignoreCompositionEvent"
-        @focus="onFocus"
         @blur="onBlur"
-        @linechange="onLinechange"
+        @focus="onFocus"
         @input="onInput"
         @confirm="onConfirm"
+        @linechange="onLinechange"
         @keyboardheightchange="onKeyboardheightchange"
       />
       <view class="zm-field__count" :style="[countStyle]" v-if="showCount">{{ valueLength }}</view>
@@ -77,7 +77,8 @@
 </template>
 <script setup lang="ts">
 import { formKey } from "../zm-form"
-import { fieldEmits, fieldProps } from "./index"
+import { isEmpty, isFunction, isNoEmpty, isPromise } from "../utils/check"
+import { fieldEmits, fieldProps, FieldRule, FieldValidateError, FieldValidationStatus } from "./index"
 import { useStyle, useColor, useUnit, useParent } from "../hooks"
 import { TextareaOnLinechangeEvent } from "@uni-helper/uni-app-types/index"
 
@@ -89,8 +90,13 @@ const emits = defineEmits(fieldEmits)
 
 const { index, parent } = useParent(formKey)
 
-const focus = ref(false)
 const current = ref("")
+const isFocus = ref(false)
+const state = reactive({
+  status: "unvalidated" as FieldValidationStatus,
+  focused: false,
+  validateMessage: "",
+})
 
 const style = computed(() => {
   const style: any = {}
@@ -170,6 +176,10 @@ const type = computed(() => {
   return props.type as any
 })
 
+const disabled = computed(() => {
+  return props.disabled || props.readonly
+})
+
 const showCount = computed(() => {
   return props.showCount && String(props.modelValue).length > 0
 })
@@ -184,18 +194,118 @@ watch(
   { immediate: true },
 )
 
+function runRules(rules: FieldRule[]): Promise<void> {
+  return rules.reduce(
+    (promise, rule) =>
+      promise.then(() => {
+        if (state.status === "failed") return
+        let value = props.modelValue
+        if (rule.formatter) {
+          value = rule.formatter(value, rule)
+        }
+
+        if (!runSyncRule(value, rule)) {
+          state.status = "failed"
+          state.validateMessage = getRuleMessage(value, rule)
+          return
+        }
+
+        if (rule.validator) {
+          if (isEmpty(value) && rule.validateEmpty === false) {
+            return
+          }
+
+          return runRuleValidator(value, rule).then((result) => {
+            if (result && typeof result === "string") {
+              state.status = "failed"
+              state.validateMessage = result
+            } else if (result === false) {
+              state.status = "failed"
+              state.validateMessage = getRuleMessage(value, rule)
+            }
+          })
+        }
+      }),
+    Promise.resolve(),
+  )
+}
+
+function runSyncRule(value: unknown, rule: FieldRule) {
+  if (isEmpty(value)) {
+    if (rule.required) {
+      return false
+    }
+    if (rule.validateEmpty === false) {
+      return true
+    }
+  }
+  if (rule.pattern && !rule.pattern.test(String(value))) {
+    return false
+  }
+  return true
+}
+
+function runRuleValidator(value: unknown, rule: FieldRule) {
+  return new Promise((resolve) => {
+    const returnVal = rule.validator!(value, rule)
+
+    if (isPromise(returnVal)) {
+      returnVal.then(resolve)
+      return
+    }
+
+    resolve(returnVal)
+  })
+}
+
+function getRuleMessage(value: unknown, rule: FieldRule) {
+  const { message } = rule
+
+  if (isFunction(message)) {
+    return message(value, rule)
+  }
+  return message || ""
+}
+
+function validate(rules = props.rules) {
+  console.log(rules)
+  return new Promise<FieldValidateError | void>((resolve, reject) => {
+    resetValidation()
+    if (isNoEmpty(props.rules)) {
+      emits("startValidate")
+      runRules(rules).then(() => {
+        if (state.status === "failed") {
+          resolve({ prop: props.prop, message: state.validateMessage })
+          emits("endValidate", { status: state.status, message: state.validateMessage })
+        } else {
+          state.status = "passed"
+          resolve()
+          emits("endValidate", { status: state.status, message: state.validateMessage })
+        }
+      })
+    } else {
+      resolve()
+    }
+  })
+}
+
+function resetValidation() {
+  state.status = "unvalidated"
+  state.validateMessage = ""
+}
+
 async function upadteValue(value: string) {
   emits("change", value)
   emits("update:modelValue", value)
 }
 
 function onBlur() {
-  setTimeout(() => (focus.value = false), 100)
+  setTimeout(() => (isFocus.value = false), 100)
   emits("blur", current.value)
 }
 
 function onFocus() {
-  focus.value = true
+  isFocus.value = true
   emits("focus")
 }
 
@@ -221,7 +331,7 @@ function onClickClear() {
   upadteValue("")
 }
 
-defineExpose({ name: "zm-field", prop: props.prop })
+defineExpose({ name: "zm-field", prop: props.prop, validate })
 </script>
 <script lang="ts">
 export default {
@@ -239,6 +349,20 @@ export default {
   &--top {
     display: flex;
     flex-direction: column;
+  }
+
+  &--center:not(&--textarea) {
+    display: flex;
+    align-items: center;
+  }
+
+  &--right:not(&--textarea) {
+    display: flex;
+    align-items: center;
+  }
+
+  &--disabled {
+    opacity: 0.6;
   }
 
   &__input {
@@ -261,6 +385,7 @@ export default {
   }
 
   &__label {
+    height: max-content;
     margin-right: 16rpx;
 
     &--top {

@@ -1,14 +1,15 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-form>
-      <zm-field label="可清除" v-model="value1" clearable label-align="top"></zm-field>
+    <zm-form ref="form">
+      <zm-field prop="name" label="可清除" v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
       <zm-field label="年级" v-model="value2" label-align="center" label-width="200rpx"></zm-field>
       <zm-field label="成绩" v-model="value3" label-align="right" label-width="200rpx"></zm-field>
       <zm-field label="默认Textarea" v-model="value4" type="textarea"></zm-field>
       <zm-field label="Top Label Textarea" v-model="value4" type="textarea" label-align="top"></zm-field>
       <zm-field label="Center Label Textarea" v-model="value4" type="textarea" label-align="center" label-width="200rpx"></zm-field>
       <zm-field label="Right Label Textarea" v-model="value4" type="textarea" label-align="right" label-width="200rpx"></zm-field>
+      <zm-button @click="submit">提交表单</zm-button>
     </zm-form>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
@@ -36,10 +37,17 @@ const switchValue = ref("1")
 
 const value = ref("")
 const textarea = ref("")
-const value1 = ref("1")
+const value1 = ref("")
 const value2 = ref("2")
 const value3 = ref("3")
 const value4 = ref("")
+const focus = ref(false)
+const form = ref(null)
+
+const rules = reactive({
+  name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+  age: [],
+})
 
 watch(
   () => textarea.value,
@@ -48,8 +56,23 @@ watch(
   },
 )
 
+setTimeout(() => {
+  focus.value = true
+}, 1000)
+
 function onChange(val) {
   console.log("change", val)
+}
+
+function submit() {
+  form?.value
+    .validate()
+    .then((res) => {
+      console.log("submit")
+    })
+    .catch((errors) => {
+      console.log(errors)
+    })
 }
 </script>
 

@@ -118,8 +118,6 @@ async function updateRanges() {
       ranges.value.push({ score: index + 1, left, right })
     }
   })
-
-  console.log(ranges.value)
 }
 
 function getScoreByPosition(x: number) {

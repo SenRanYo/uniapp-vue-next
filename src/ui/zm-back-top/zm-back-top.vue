@@ -39,7 +39,6 @@ const style = computed(() => {
 watch(
   () => parent.scrollTop.value,
   (top) => {
-    console.log(top)
     visible.value = top >= useUnitToPx(props.offset)
   },
 )

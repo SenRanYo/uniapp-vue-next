@@ -17,6 +17,7 @@ const status = ref("")
 const styles = ref<any>({})
 const inited = ref(false)
 const visible = ref(false)
+const display = ref("block")
 const classes = ref("")
 const duration = ref(0)
 const enterPromise = ref(null)
@@ -27,6 +28,7 @@ const transitionEnded = ref(false)
 const style = computed(() => {
   let style: any = {}
   style.zIndex = props.zIndex
+  style.display = display.value
   style.pointerEvents = props.penetrate ? "none" : "auto"
   style.transitionDuration = +props.duration / 1000 + "s"
   return useStyle({ ...style, ...styles.value, ...useStyle(props.customStyle) })
@@ -74,6 +76,7 @@ function enter() {
       await enterLifeCyclePromises.value
       inited.value = true
       visible.value = true
+      display.value = "block"
       enterLifeCyclePromises.value = useRequestAnimationFrame()
       await enterLifeCyclePromises.value
       enterLifeCyclePromises.value = null
@@ -120,9 +123,9 @@ function onTransitionEnd() {
   } else if (status.value === "enter") {
     emits("after-enter")
   }
-
-  if (!props.show && visible.value) {
+  if (!props.show && display.value === "block") {
     visible.value = false
+    display.value = "none"
   }
 }
 

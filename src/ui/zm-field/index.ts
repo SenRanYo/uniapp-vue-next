@@ -47,7 +47,7 @@ export const fieldProps = {
   /**
    * 表单校验规则
    */
-  rules: { type: [Array, Object], default: () => [] },
+  rules: { type: Array as PropType<FieldRule[]>, default: () => [] },
   /**
    * 是否显示表单必填星号
    */
@@ -274,10 +274,27 @@ export const fieldEmits = {
   input: (value: string) => true,
   change: (value: string) => true,
   linechange: (event: TextareaOnLinechangeEvent) => true,
+  startValidate: () => true,
+  endValidate: (result: { status: FieldValidationStatus; message: string }) => true,
   "update:modelValue": (value: string) => true,
 }
 
+export type FieldRule = {
+  pattern?: RegExp
+  trigger?: FieldValidateTrigger | FieldValidateTrigger[]
+  message?: FieldRuleMessage
+  required?: boolean
+  validator?: FieldRuleValidator
+  formatter?: FieldRuleFormatter
+  validateEmpty?: boolean
+}
 export type FieldType = "text" | "number" | "idcard" | "digit" | "tel" | "safe-password" | "nickname" | "password" | "textarea"
+export type FieldRuleMessage = string | ((value: any, rule: FieldRule) => string)
+export type FieldRuleFormatter = (value: any, rule: FieldRule) => string
+export type FieldRuleValidator = (value: any, rule: FieldRule) => boolean | string | Promise<boolean | string>
+export type FieldValidateError = { prop?: string; message: string }
+export type FieldValidateTrigger = "onBlur" | "onChange" | "onSubmit"
+export type FieldValidationStatus = "passed" | "failed" | "unvalidated"
 export type FieldEmits = typeof fieldEmits
 export type FieldProps = ExtractPropTypes<typeof fieldProps>
 export type FieldExpose = {

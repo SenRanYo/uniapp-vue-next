@@ -168,7 +168,6 @@ function longPressStep(type = "plus") {
 }
 
 function updateValue(val: number | string) {
-  console.log(val)
   const next = async () => {
     loading.value = false
     current.value = val

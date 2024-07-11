@@ -1,5 +1,6 @@
 import Form from "./zm-form.vue"
 import type { ExtractPropTypes } from "vue"
+import { FieldValidateError } from "../zm-field"
 
 export const formKey = Symbol("zm-form")
 export const formProps = {
@@ -72,11 +73,11 @@ export const formEmits = {
   /**
    * 提交表单且验证不通过后触发
    */
-  failed: (values: object) => true,
+  failed: (result: { values: Record<string, unknown>; errors: FieldValidateError[] }) => true,
   /**
    * 提交表单且验证通过后触发
    */
-  submit: (errorInfo: { values: object; errors: object[] }) => true,
+  submit: (values: Record<string, unknown>) => true,
 }
 
 export type FormEmits = typeof formEmits
