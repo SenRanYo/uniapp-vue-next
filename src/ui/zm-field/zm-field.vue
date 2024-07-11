@@ -1,6 +1,14 @@
 <template>
   <view class="zm-field" :class="[classs, customClass]" :style="[style]">
-    <block v-if="type === 'textarea'">
+    <view class="zm-field__label" :class="[labelClass]" :style="[labelStyle]" v-if="label || slots.label">
+      <slot name="label">{{ label }}</slot>
+    </view>
+    <view class="zm-field__prefix" v-if="prefixIcon || slots.prefixIcon">
+      <slot name="prefix">
+        <zm-icon :name="prefixIcon" :size="prefixIconSize" :color="prefixIconColor" :weight="prefixIconWeight"></zm-icon>
+      </slot>
+    </view>
+    <view class="zm-field__value" v-if="type === 'textarea'">
       <textarea
         class="zm-field__textarea"
         :style="[textareaStyle]"
@@ -29,17 +37,9 @@
         @confirm="onConfirm"
         @keyboardheightchange="onKeyboardheightchange"
       />
-      <view class="zm-field__count"></view>
-    </block>
-    <block v-else>
-      <view class="zm-field__label" :style="[labelStyle]" v-if="label || slots.label">
-        <slot name="label">{{ label }}</slot>
-      </view>
-      <view class="zm-field__prefix" v-if="prefixIcon || slots.prefixIcon">
-        <slot name="prefix">
-          <zm-icon :name="prefixIcon" :size="prefixIconSize" :color="prefixIconColor" :weight="prefixIconWeight"></zm-icon>
-        </slot>
-      </view>
+      <view class="zm-field__count" :style="[countStyle]" v-if="showCount">{{ valueLength }}</view>
+    </view>
+    <view class="zm-field__value" v-else>
       <input
         class="zm-field__input"
         :style="[inputStyle]"
@@ -69,10 +69,10 @@
       <view class="zm-field__clear" :style="[clearStyle]" v-if="clearable && current && focus" @click="onClickClear">
         <zm-icon :name="clearIcon" :size="clearIconSize" :color="clearIconColor" :weight="clearIconWeight"></zm-icon>
       </view>
-      <view class="zm-field__suffix" v-if="suffixIcon || slots.suffixIcon">
-        <zm-icon :name="suffixIcon" :size="suffixIconSize" :color="suffixIconColor" :weight="suffixIconWeight"></zm-icon>
-      </view>
-    </block>
+    </view>
+    <view class="zm-field__suffix" v-if="suffixIcon || slots.suffixIcon">
+      <zm-icon :name="suffixIcon" :size="suffixIconSize" :color="suffixIconColor" :weight="suffixIconWeight"></zm-icon>
+    </view>
   </view>
 </template>
 <script setup lang="ts">
@@ -106,8 +106,9 @@ const style = computed(() => {
 const classs = computed(() => {
   const list: string[] = []
   list.push(`zm-field--${props.type}`)
-  if (props.readonly) list.push("zm-field-readonly")
-  if (props.disabled) list.push("zm-field-disabled")
+  if (props.readonly) list.push("zm-field--readonly")
+  if (props.disabled) list.push("zm-field--disabled")
+  if (props.labelAlign) list.push(`zm-field--${props.labelAlign}`)
   return list
 })
 
@@ -137,11 +138,25 @@ const labelStyle = computed(() => {
   return useStyle(style)
 })
 
+const labelClass = computed(() => {
+  const list: string[] = []
+  if (props.labelAlign) list.push(`zm-field__label--${props.labelAlign}`)
+  return list
+})
+
 const textareaStyle = computed(() => {
   const style: any = {}
   style.color = useColor(props.color)
   style.fontSize = useUnit(props.fontSize)
   style.fontWeight = props.fontWeight
+  return useStyle(style)
+})
+
+const countStyle = computed(() => {
+  const style: any = {}
+  style.color = useColor(props.countColor)
+  style.fontSize = useUnit(props.countSize)
+  style.fontWeight = props.countWeight
   return useStyle(style)
 })
 
@@ -154,6 +169,20 @@ const placeholderStyle = computed(() => {
 const type = computed(() => {
   return props.type as any
 })
+
+const showCount = computed(() => {
+  return props.showCount && String(props.modelValue).length > 0
+})
+
+const valueLength = computed(() => {
+  return props.maxlength === -1 ? String(props.modelValue).length : `${String(props.modelValue).length}/${props.maxlength}`
+})
+
+watch(
+  () => props.modelValue,
+  (val) => (current.value = String(val)),
+  { immediate: true },
+)
 
 async function upadteValue(value: string) {
   emits("change", value)
@@ -204,26 +233,61 @@ export default {
 .zm-field {
   display: flex;
   padding: 16rpx;
-  align-items: center;
   border-radius: 8rpx;
   border: 1rpx solid #dadbde;
 
-  &--textarea {
-    display: block;
+  &--top {
+    display: flex;
+    flex-direction: column;
   }
 
   &__input {
     flex: 1;
     height: 100%;
+    display: flex;
     font-size: inherit;
   }
 
   &__textarea {
+    width: 100%;
     font-size: inherit;
+  }
+
+  &__count {
+    flex: 1;
+    color: #909193;
+    margin-top: 8rpx;
+    text-align: right;
   }
 
   &__label {
     margin-right: 16rpx;
+
+    &--top {
+      width: 100%;
+      display: flex;
+      text-align: left;
+      margin-bottom: 16rpx;
+      overflow-wrap: break-word;
+    }
+
+    &--center {
+      text-align: center;
+    }
+
+    &--right {
+      text-align: right;
+    }
+  }
+
+  &__value {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    overflow: hidden;
+    position: relative;
+    word-wrap: break-word;
+    vertical-align: middle;
   }
 
   &__clear {

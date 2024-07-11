@@ -2,9 +2,13 @@
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
     <zm-form>
-      <zm-field label="姓名" v-model="value1" clearable></zm-field>
-      <zm-field label="姓名" v-model="value2"></zm-field>
-      <zm-field label="姓名" v-model="value3"></zm-field>
+      <zm-field label="可清除" v-model="value1" clearable label-align="top"></zm-field>
+      <zm-field label="年级" v-model="value2" label-align="center" label-width="200rpx"></zm-field>
+      <zm-field label="成绩" v-model="value3" label-align="right" label-width="200rpx"></zm-field>
+      <zm-field label="默认Textarea" v-model="value4" type="textarea"></zm-field>
+      <zm-field label="Top Label Textarea" v-model="value4" type="textarea" label-align="top"></zm-field>
+      <zm-field label="Center Label Textarea" v-model="value4" type="textarea" label-align="center" label-width="200rpx"></zm-field>
+      <zm-field label="Right Label Textarea" v-model="value4" type="textarea" label-align="right" label-width="200rpx"></zm-field>
     </zm-form>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
@@ -35,6 +39,7 @@ const textarea = ref("")
 const value1 = ref("1")
 const value2 = ref("2")
 const value3 = ref("3")
+const value4 = ref("")
 
 watch(
   () => textarea.value,

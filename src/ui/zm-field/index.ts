@@ -19,11 +19,11 @@ export const fieldProps = {
   /**
    * 输入框类型
    */
-  type: { type: String as PropType<FieldType>, default: "" },
+  type: { type: String as PropType<FieldType>, default: "text" },
   /**
    * 最大输入长度，设置为 -1 的时候不限制最大长度
    */
-  maxlength: { type: [String, Number], default: -1 },
+  maxlength: { type: [String, Number], default: 2000 },
   /**
    * 是否禁用输入框
    */
