@@ -240,6 +240,7 @@ export default {
 </script>
 <style lang="scss">
 .zm-field {
+  flex: 1;
   display: flex;
 
   &--top {

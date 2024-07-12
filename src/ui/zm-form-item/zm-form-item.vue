@@ -1,14 +1,14 @@
 <template>
-  <view class="zm-form-item" :class="[classs, customClass]" :style="[style]">
-    <view class="zm-form-item__label" :class="[labelClass]" :style="[labelStyle]">
-      <slot name="label">{{ label }}{{ colon ? ":" : "" }}</slot>
-    </view>
-    <view class="zm-form-item__content">
+  <view class="zm-form-item" :class="[customClass]" :style="[style]">
+    <view class="zm-form-item__content" :class="[contentClass]">
+      <view class="zm-form-item__label" :class="[labelClass]" :style="[labelStyle]">
+        <slot name="label">{{ label }}{{ colon ? ":" : "" }}</slot>
+      </view>
       <slot></slot>
-      <view class="zm-form-item__error" :style="[errorStyle]">
-        <view class="zm-form-item__error__text">
-          <slot name="error">{{ state.validateMessage }}</slot>
-        </view>
+    </view>
+    <view class="zm-form-item__error" :style="[errorStyle]">
+      <view class="zm-form-item__error__text">
+        <slot name="error">{{ state.validateMessage }}</slot>
       </view>
     </view>
   </view>
@@ -18,7 +18,7 @@ import { getDeepValue } from "../utils/utils"
 import { formKey, FormValidateRule } from "../zm-form"
 import { formItemEmits, formItemProps, formItemKey } from "./index"
 import { FieldValidateError, FieldValidationStatus } from "../zm-field"
-import { isEmpty, isFunction, isPromise, isNoEmpty } from "../utils/check"
+import { isDef, isEmpty, isFunction, isPromise, isNoEmpty } from "../utils/check"
 import { useStyle, useColor, useUnit, useParent, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-form-item" })
@@ -27,37 +27,40 @@ const props = defineProps(formItemProps)
 const emits = defineEmits(formItemEmits)
 const instance = getCurrentInstance()
 
+const state = reactive({ status: "unvalidated" as FieldValidationStatus, focused: false, validateMessage: "" })
+const errorRect = ref<UniApp.NodeInfo>({})
+const labelRect = ref<UniApp.NodeInfo>({})
+
 const { parent } = useParent(formKey)
 const { childrens, linkChildren } = useChildren(formItemKey)
 linkChildren({ props, prop: props.prop })
-
-const state = reactive({ status: "unvalidated" as FieldValidationStatus, focused: false, validateMessage: "" })
-const errorRect = ref<UniApp.NodeInfo>({})
 
 const style = computed(() => {
   const style: any = {}
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-const classs = computed(() => {
+const contentClass = computed(() => {
   const list: string[] = []
-  list.push(`zm-form-item--${props.labelAlign}`)
+  list.push(`zm-form-item__content--align-${props.labelAlign}`)
+  list.push(`zm-form-item__content--position-${props.labelPosition}`)
   return list
 })
 
 const labelClass = computed(() => {
   const list: string[] = []
-  list.push(`zm-form-item__label--${props.labelAlign}`)
+  list.push(`zm-form-item__label--position-${props.labelPosition}`)
   return list
 })
 
 const labelStyle = computed(() => {
   const style: any = {}
-  style.width = useUnit(props.labelWidth)
   style.color = useColor(props.labelColor)
   style.fontSize = useUnit(props.labelSize)
-  style.fontWeight = props.labelWeight
+  style.lineHeight = useUnit(props.labelLineHeight)
   style.textAlign = props.labelAlign
+  style.fontWeight = props.labelWeight
+  style.width = prop("labelWidth") === "auto" ? parent.maxLabelWidth.value + "px" : useUnit(prop("labelWidth"))
   return useStyle(style)
 })
 
@@ -67,11 +70,19 @@ const errorStyle = computed(() => {
   style.fontSize = useUnit(props.errorSize)
   style.fontWeight = props.errorWeight
   style.textAlign = props.errorAlign
+  style.paddingLeft = labelRect.value.width + "px"
   if (state.status === "failed") {
+    style.marginTop = "8rpx"
     style.maxHeight = errorRect.value.height + "px"
   }
   return useStyle(style)
 })
+
+function prop(name: string) {
+  if (isDef(props[name])) return props[name]
+  if (isDef(parent.props[name])) return parent.props[name]
+  return ""
+}
 
 /**
  * 执行一组验证规则
@@ -230,10 +241,12 @@ function getPropRules() {
  * 重新获取元素rect
  */
 async function resize() {
+  labelRect.value = await useElRect(".zm-form-item__label", instance)
   errorRect.value = await useElRect(".zm-form-item__error__text", instance)
 }
 
-defineExpose({ name: "zm-form-item", validate, resetField, resetValidate })
+onMounted(() => resize())
+defineExpose({ name: "zm-form-item", labelRect, validate, resetField, resetValidate })
 </script>
 <script lang="ts">
 export default {
@@ -246,29 +259,53 @@ export default {
   flex: 1;
   display: flex;
   padding: 16rpx;
+  flex-direction: column;
 
-  &--top {
+  &__content {
+    flex: 1;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+
+    &--align-top {
+      align-items: flex-start;
+    }
+
+    &--align-center {
+      align-items: center;
+    }
+
+    &--align-bottom {
+      align-items: flex-end;
+    }
+
+    &--position-top {
+      flex-direction: column;
+    }
+
+    &--position-left {
+      text-align: left;
+    }
+
+    &--position-center {
+      text-align: center;
+    }
+
+    &--position-right {
+      text-align: right;
+    }
   }
 
   &__label {
-    margin-right: 16rpx;
-
-    &--top {
-      margin-bottom: 8rpx;
-    }
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    padding-right: 16rpx;
   }
 
   &__error {
     max-height: 0;
     overflow: hidden;
-    margin-top: 8rpx;
     transition: 0.3s ease-out;
-  }
-
-  &__content {
-    flex: 1;
   }
 }
 </style>

@@ -15,9 +15,7 @@ defineOptions({ name: "zm-form" })
 const props = defineProps(formProps)
 const emits = defineEmits(formEmits)
 const originModel = ref(clone(props.model))
-
 const { childrens, linkChildren } = useChildren(formKey)
-linkChildren({ props, model: props.model, rules: props.rules, originModel })
 
 const style = computed(() => {
   const style: any = {}
@@ -29,6 +27,10 @@ const classs = computed(() => {
   if (props.readonly) list.push("zm-form-readonly")
   if (props.disabled) list.push("zm-form-disabled")
   return list
+})
+
+const maxLabelWidth = computed(() => {
+  return Math.max(...childrens.map((child) => toRef(child.exposed.labelRect).value.width))
 })
 
 /**
@@ -184,6 +186,7 @@ function getValidateStatus() {
   }, {})
 }
 
+linkChildren({ props, model: props.model, rules: props.rules, originModel, maxLabelWidth })
 defineExpose({ name: "zm-form", submit, validate, validateField, resetFields, getValues, clearValidate, getValidateStatus })
 </script>
 <script lang="ts">

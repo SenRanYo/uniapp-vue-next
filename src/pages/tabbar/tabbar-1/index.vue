@@ -1,31 +1,25 @@
 <template>
-  <zm-view ref="view" height="300vh">
+  <zm-view ref="view" background="#ffffff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
     <zm-form ref="formRef" :model="form" :rules="rules">
-      <zm-form-item label="默认" label-width="200rpx" prop="name">
-        <zm-field v-model="form.name" clearable :rules="rules.name" colon></zm-field>
+      <zm-form-item label="昵称" prop="name">
+        <zm-field v-model="form.name" clearable :rules="rules.name" placeholder="请输入昵称"></zm-field>
       </zm-form-item>
-      <zm-form-item label="顶部label" label-align="top" label-width="200rpx">
-        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
+      <zm-form-item label="年龄" prop="age">
+        <zm-field v-model="form.age" clearable type="number" label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入年龄"></zm-field>
       </zm-form-item>
-      <zm-form-item label="居中label" label-align="center" label-width="200rpx">
-        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
+      <zm-form-item label="生日" prop="birthday">
+        <zm-field v-model="form.birthday" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入生日"></zm-field>
       </zm-form-item>
-      <zm-form-item label="居右label" label-align="right" label-width="200rpx">
-        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
+      <zm-form-item label="性别" prop="sec">
+        <zm-field v-model="form.sec" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请选择性别"></zm-field>
       </zm-form-item>
-      <zm-form-item label="默认" label-width="200rpx">
-        <zm-field v-model="value1" clearable :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
+      <zm-form-item label="家乡地址" prop="address">
+        <zm-field v-model="form.address" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入家乡地址"></zm-field>
       </zm-form-item>
-      <zm-form-item label="顶部label" label-align="top" label-width="200rpx">
-        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
+      <zm-form-item label="详细说明" prop="explain" label-align="top">
+        <zm-field v-model="form.explain" clearable :focus="focus" :rules="rules.name" type="textarea" placeholder="请选择职业"></zm-field>
       </zm-form-item>
-      <zm-form-item label="居中label" label-align="center" label-width="200rpx">
-        <zm-field v-model="value1" clearable label-align="center" :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
-      </zm-form-item>
-      <!-- <zm-form-item label="居右label" label-align="right" label-width="200rpx">
-        <zm-field v-model="value1" clearable label-align="right" :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
-      </zm-form-item> -->
       <zm-button @click="submit">提交表单</zm-button>
       <zm-button @click="resetForm">重置表单</zm-button>
       <zm-button @click="resetFormValidate">重置表单验证</zm-button>
@@ -61,14 +55,16 @@ const value2 = ref("2")
 const value3 = ref("3")
 const value4 = ref("")
 const focus = ref(false)
-const form = ref({
-  name: "1",
-})
+const form = ref({ name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
 const formRef = ref(null)
 
 const rules = reactive({
   name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
-  age: [],
+  age: [{ required: true, message: "请输入年龄", trigger: "blur" }],
+  birthday: [{ required: true, message: "请输入生日", trigger: "blur" }],
+  sec: [{ required: true, message: "请选择性别", trigger: "blur" }],
+  address: [{ required: true, message: "请输入家乡地址", trigger: "blur" }],
+  explain: [{ required: true, message: "请选择职业", trigger: "blur" }],
 })
 
 watch(

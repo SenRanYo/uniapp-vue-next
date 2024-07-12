@@ -25,14 +25,6 @@ export const formItemProps = {
    */
   required: { type: Boolean, default: false },
   /**
-   * 标签文字宽度
-   */
-  labelWidth: { type: [String, Number], default: "" },
-  /**
-   * 标签文字高度
-   */
-  labelHeight: { type: [String, Number], default: "" },
-  /**
    * 标签文字大小
    */
   labelSize: { type: [String, Number], default: "" },
@@ -45,9 +37,29 @@ export const formItemProps = {
    */
   labelWeight: { type: [String, Number], default: "" },
   /**
-   * 标签文字显示位置，可选值为 left center right top
+   * 标签文字宽度
    */
-  labelAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right", "top"].includes(v) },
+  labelWidth: { type: [String, Number], default: "" },
+  /**
+   * 标签文字高度
+   */
+  labelHeight: { type: [String, Number], default: "" },
+  /**
+   * 标签文字行高
+   */
+  labelLineHeight: { type: [String, Number], default: "" },
+  /**
+   * 标签文字垂直对齐方式，可选值为 top center bottom
+   */
+  labelAlign: { type: String, default: "center", validator: (v: string) => ["top", "center", "bottom"].includes(v) },
+  /**
+   * 标签文字显示位置，可选值为 top left center right
+   */
+  labelPosition: { type: String, default: "left", validator: (v: string) => ["top", "left", "center", "right"].includes(v) },
+  /**
+   * 标签文字样式
+   */
+  labelStyle: { type: [String, Object], default: "" },
   /**
    * 错误文字大小
    */
