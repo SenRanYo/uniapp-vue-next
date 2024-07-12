@@ -1,9 +1,17 @@
 import Form from "./zm-form.vue"
-import type { ExtractPropTypes } from "vue"
+import type { ExtractPropTypes, PropType } from "vue"
 import { FieldValidateError } from "../zm-field"
 
 export const formKey = Symbol("zm-form")
 export const formProps = {
+  /**
+   * 表单数据对象
+   */
+  model: { type: Object, default: () => ({}) },
+  /**
+   * 表单验证规则
+   */
+  rules: { type: Object as PropType<FormValidateRules>, default: () => ({}) },
   /**
    * 表单项 label 宽度
    */
@@ -80,6 +88,22 @@ export const formEmits = {
   submit: (values: Record<string, unknown>) => true,
 }
 
+export type FormValidateRule = {
+  pattern?: RegExp
+  trigger?: FormValidateTrigger | FormValidateTrigger[]
+  message?: FormRuleMessage
+  required?: boolean
+  validator?: FormRuleValidator
+  formatter?: FormRuleFormatter
+  validateEmpty?: boolean
+}
+export type FormValidateRules = Record<string, FormValidateRule>[]
+export type FormRuleMessage = string | ((value: any, rule: FormValidateRule) => string)
+export type FormRuleFormatter = (value: any, rule: FormValidateRule) => string
+export type FormRuleValidator = (value: any, rule: FormValidateRule) => boolean | string | Promise<boolean | string>
+export type FormValidateError = { prop?: string; message: string }
+export type FormValidateTrigger = "onBlur" | "onChange" | "onSubmit"
+export type FormValidationStatus = "passed" | "failed" | "unvalidated"
 export type FormEmits = typeof formEmits
 export type FormProps = ExtractPropTypes<typeof formProps>
 export type FormExpose = {

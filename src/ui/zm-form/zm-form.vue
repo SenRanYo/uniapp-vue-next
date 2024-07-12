@@ -4,6 +4,7 @@
   </view>
 </template>
 <script setup lang="ts">
+import { clone } from "../utils/utils"
 import { formKey } from "../zm-form"
 import { formEmits, formProps } from "./index"
 import { useStyle, useColor, useUnit, useChildren } from "../hooks"
@@ -13,9 +14,10 @@ defineOptions({ name: "zm-form" })
 
 const props = defineProps(formProps)
 const emits = defineEmits(formEmits)
+const originModel = ref(clone(props.model))
 
 const { childrens, linkChildren } = useChildren(formKey)
-linkChildren({ props })
+linkChildren({ props, model: props.model, rules: props.rules, originModel })
 
 const style = computed(() => {
   const style: any = {}
@@ -124,16 +126,28 @@ function validateField(prop: string) {
 }
 
 /**
- * 重置字段验证
+ * 重置单项，将其重置为初始值，并移除校验结果
+ * @param prop 字段属性
+ */
+function resetFields(prop?: string | string[]) {
+  if (typeof prop === "string") {
+    prop = [prop]
+  }
+  const fields = getFieldsByProps(prop)
+  fields.forEach((item) => item.exposed.resetField())
+}
+
+/**
+ * 清除字段验证
  * @param prop 待重置验证的属性，可以是字符串或字符串数组
  */
-function resetValidation(prop?: string | string[]) {
+function clearValidate(prop?: string | string[]) {
   if (typeof prop === "string") {
     prop = [prop]
   }
   const fields = getFieldsByProps(prop)
   fields.forEach((item) => {
-    item.exposed.resetValidation()
+    item.exposed.resetValidate()
   })
 }
 
@@ -163,14 +177,14 @@ function getFieldsByProps(props?: string[]) {
  * 获取所有字段的验证状态
  * @returns 所有字段的验证状态组成的对象
  */
-function getValidationStatus() {
+function getValidateStatus() {
   childrens.reduce<Record<string, FieldValidationStatus>>((form, field) => {
     form[field.exposed.prop] = field.exposed.getValidationStatus()
     return form
   }, {})
 }
 
-defineExpose({ name: "zm-form", submit, validate, validateField, getValues, resetValidation, getValidationStatus })
+defineExpose({ name: "zm-form", submit, validate, validateField, resetFields, getValues, clearValidate, getValidateStatus })
 </script>
 <script lang="ts">
 export default {

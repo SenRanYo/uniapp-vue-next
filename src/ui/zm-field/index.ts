@@ -45,10 +45,6 @@ export const fieldProps = {
    */
   colon: { type: Boolean, default: false },
   /**
-   * 表单校验规则
-   */
-  rules: { type: Array as PropType<FieldRule[]>, default: () => [] },
-  /**
    * 是否显示表单必填星号
    */
   required: { type: Boolean, default: false },
@@ -60,18 +56,6 @@ export const fieldProps = {
    * 背景颜色
    */
   background: { type: String, default: "" },
-  /**
-   * 是否将输入内容标红
-   */
-  error: { type: Boolean, default: false },
-  /**
-   * 底部错误提示文案，为空时不展示
-   */
-  errorMessage: { type: String, default: "" },
-  /**
-   * 错误提示文案对齐方式，可选值为 left center right
-   */
-  errorMessageAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
   /**
    * 是否启用清除图标，点击清除图标后会清空输入框
    */
@@ -297,30 +281,5 @@ export type FieldValidateTrigger = "onBlur" | "onChange" | "onSubmit"
 export type FieldValidationStatus = "passed" | "failed" | "unvalidated"
 export type FieldEmits = typeof fieldEmits
 export type FieldProps = ExtractPropTypes<typeof fieldProps>
-export type FieldExpose = {
-  /**
-   * 提交表单，与点击提交按钮的效果等价
-   */
-  submit: () => void
-  /**
-   * 获取所有表单项当前的值
-   */
-  getValues: () => Record<string, unknown>
-  /**
-   * 验证表单，支持传入一个或多个 name 来验证单个或部分表单项，不传入 name 时，会验证所有表单项
-   */
-  validate: (name?: string | string[]) => Promise<void>
-  /**
-   * 重置表单项的验证提示，支持传入一个或多个 name 来重置单个或部分表单项，不传入 name 时，会重置所有表单项
-   */
-  resetValidation: (name?: string | string[]) => void
-  /**
-   * 获取所有表单项的校验状态，状态包括 passed failed unvalidated
-   */
-  getValidationStatus: () => Record<string, unknown>
-  /**
-   * 滚动到对应表单项的位置，默认滚动到顶部，第二个参数传 false 可滚动至底部
-   */
-  scrollToField: (name: string, alignToTop: boolean) => void
-}
+export type FieldExpose = {}
 export type FieldInstance = InstanceType<typeof Field>

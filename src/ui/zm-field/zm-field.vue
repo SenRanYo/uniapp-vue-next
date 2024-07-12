@@ -66,7 +66,7 @@
         @confirm="onConfirm"
         @keyboardheightchange="onKeyboardheightchange"
       />
-      <view class="zm-field__clear" :style="[clearStyle]" v-if="clearable && current && focus" @click="onClickClear">
+      <view class="zm-field__clear" :style="[clearStyle]" v-if="clearable && current && isFocus" @click="onClickClear">
         <zm-icon :name="clearIcon" :size="clearIconSize" :color="clearIconColor" :weight="clearIconWeight"></zm-icon>
       </view>
     </view>
@@ -76,10 +76,9 @@
   </view>
 </template>
 <script setup lang="ts">
-import { formKey } from "../zm-form"
-import { isEmpty, isFunction, isNoEmpty, isPromise } from "../utils/check"
-import { fieldEmits, fieldProps, FieldRule, FieldValidateError, FieldValidationStatus } from "./index"
+import { formItemKey } from "../zm-form-item"
 import { useStyle, useColor, useUnit, useParent } from "../hooks"
+import { fieldEmits, fieldProps, FieldValidationStatus } from "./index"
 import { TextareaOnLinechangeEvent } from "@uni-helper/uni-app-types/index"
 
 defineOptions({ name: "zm-field" })
@@ -88,15 +87,10 @@ const slots = useSlots()
 const props = defineProps(fieldProps)
 const emits = defineEmits(fieldEmits)
 
-const { index, parent } = useParent(formKey)
+const { parent } = useParent(formItemKey)
 
 const current = ref("")
 const isFocus = ref(false)
-const state = reactive({
-  status: "unvalidated" as FieldValidationStatus,
-  focused: false,
-  validateMessage: "",
-})
 
 const style = computed(() => {
   const style: any = {}
@@ -194,104 +188,9 @@ watch(
   { immediate: true },
 )
 
-function runRules(rules: FieldRule[]): Promise<void> {
-  return rules.reduce(
-    (promise, rule) =>
-      promise.then(() => {
-        if (state.status === "failed") return
-        let value = props.modelValue
-        if (rule.formatter) {
-          value = rule.formatter(value, rule)
-        }
-
-        if (!runSyncRule(value, rule)) {
-          state.status = "failed"
-          state.validateMessage = getRuleMessage(value, rule)
-          return
-        }
-
-        if (rule.validator) {
-          if (isEmpty(value) && rule.validateEmpty === false) {
-            return
-          }
-
-          return runRuleValidator(value, rule).then((result) => {
-            if (result && typeof result === "string") {
-              state.status = "failed"
-              state.validateMessage = result
-            } else if (result === false) {
-              state.status = "failed"
-              state.validateMessage = getRuleMessage(value, rule)
-            }
-          })
-        }
-      }),
-    Promise.resolve(),
-  )
-}
-
-function runSyncRule(value: unknown, rule: FieldRule) {
-  if (isEmpty(value)) {
-    if (rule.required) {
-      return false
-    }
-    if (rule.validateEmpty === false) {
-      return true
-    }
-  }
-  if (rule.pattern && !rule.pattern.test(String(value))) {
-    return false
-  }
-  return true
-}
-
-function runRuleValidator(value: unknown, rule: FieldRule) {
-  return new Promise((resolve) => {
-    const returnVal = rule.validator!(value, rule)
-
-    if (isPromise(returnVal)) {
-      returnVal.then(resolve)
-      return
-    }
-
-    resolve(returnVal)
-  })
-}
-
-function getRuleMessage(value: unknown, rule: FieldRule) {
-  const { message } = rule
-
-  if (isFunction(message)) {
-    return message(value, rule)
-  }
-  return message || ""
-}
-
-function validate(rules = props.rules) {
-  console.log(rules)
-  return new Promise<FieldValidateError | void>((resolve, reject) => {
-    resetValidation()
-    if (isNoEmpty(props.rules)) {
-      emits("startValidate")
-      runRules(rules).then(() => {
-        if (state.status === "failed") {
-          resolve({ prop: props.prop, message: state.validateMessage })
-          emits("endValidate", { status: state.status, message: state.validateMessage })
-        } else {
-          state.status = "passed"
-          resolve()
-          emits("endValidate", { status: state.status, message: state.validateMessage })
-        }
-      })
-    } else {
-      resolve()
-    }
-  })
-}
-
-function resetValidation() {
-  state.status = "unvalidated"
-  state.validateMessage = ""
+function reset(value: any) {
+  current.value = value
+  upadteValue(value)
 }
 
 async function upadteValue(value: string) {
@@ -331,7 +230,7 @@ function onClickClear() {
   upadteValue("")
 }
 
-defineExpose({ name: "zm-field", prop: props.prop, validate })
+defineExpose({ name: "zm-field", prop: props.prop, modelValue: props.modelValue, reset })
 </script>
 <script lang="ts">
 export default {
@@ -342,9 +241,6 @@ export default {
 <style lang="scss">
 .zm-field {
   display: flex;
-  padding: 16rpx;
-  border-radius: 8rpx;
-  border: 1rpx solid #dadbde;
 
   &--top {
     display: flex;

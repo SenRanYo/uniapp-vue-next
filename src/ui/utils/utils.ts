@@ -280,3 +280,24 @@ export function addNumber(num1: number, num2: number) {
   const cardinal = 10 ** 10
   return Math.round((num1 + num2) * cardinal) / cardinal
 }
+
+/**
+ * 根据对象和键名获取深层次属性值
+ * @param obj 待获取属性的对象
+ * @param keyName 深层次属性的键名，支持a.b.c格式
+ * @returns 返回对应属性的值，如果属性不存在则返回undefined
+ */
+export function getDeepValue(obj: Record<string, any>, keyName: string): any {
+  // 按照'.'分隔键名，得到键名数组
+  const keys: string[] = keyName.split(".")
+
+  // 利用reduce方法逐层获取属性值
+  return keys.reduce((acc: any, key: string) => {
+    // 如果acc为undefined或者不是对象，则返回undefined
+    if (acc === undefined || typeof acc !== "object") {
+      return undefined
+    }
+    // 获取当前层级的属性值
+    return acc[key]
+  }, obj)
+}

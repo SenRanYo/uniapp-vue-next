@@ -1,15 +1,34 @@
 <template>
   <zm-view ref="view" height="300vh">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-form ref="form">
-      <zm-field prop="name" label="可清除" v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
-      <zm-field label="年级" v-model="value2" label-align="center" label-width="200rpx"></zm-field>
-      <zm-field label="成绩" v-model="value3" label-align="right" label-width="200rpx"></zm-field>
-      <zm-field label="默认Textarea" v-model="value4" type="textarea"></zm-field>
-      <zm-field label="Top Label Textarea" v-model="value4" type="textarea" label-align="top"></zm-field>
-      <zm-field label="Center Label Textarea" v-model="value4" type="textarea" label-align="center" label-width="200rpx"></zm-field>
-      <zm-field label="Right Label Textarea" v-model="value4" type="textarea" label-align="right" label-width="200rpx"></zm-field>
+    <zm-form ref="formRef" :model="form" :rules="rules">
+      <zm-form-item label="默认" label-width="200rpx" prop="name">
+        <zm-field v-model="form.name" clearable :rules="rules.name" colon></zm-field>
+      </zm-form-item>
+      <zm-form-item label="顶部label" label-align="top" label-width="200rpx">
+        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
+      </zm-form-item>
+      <zm-form-item label="居中label" label-align="center" label-width="200rpx">
+        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
+      </zm-form-item>
+      <zm-form-item label="居右label" label-align="right" label-width="200rpx">
+        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon></zm-field>
+      </zm-form-item>
+      <zm-form-item label="默认" label-width="200rpx">
+        <zm-field v-model="value1" clearable :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
+      </zm-form-item>
+      <zm-form-item label="顶部label" label-align="top" label-width="200rpx">
+        <zm-field v-model="value1" clearable label-align="top" :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
+      </zm-form-item>
+      <zm-form-item label="居中label" label-align="center" label-width="200rpx">
+        <zm-field v-model="value1" clearable label-align="center" :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
+      </zm-form-item>
+      <!-- <zm-form-item label="居右label" label-align="right" label-width="200rpx">
+        <zm-field v-model="value1" clearable label-align="right" :focus="focus" :rules="rules.name" colon type="textarea"></zm-field>
+      </zm-form-item> -->
       <zm-button @click="submit">提交表单</zm-button>
+      <zm-button @click="resetForm">重置表单</zm-button>
+      <zm-button @click="resetFormValidate">重置表单验证</zm-button>
     </zm-form>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
@@ -42,7 +61,10 @@ const value2 = ref("2")
 const value3 = ref("3")
 const value4 = ref("")
 const focus = ref(false)
-const form = ref(null)
+const form = ref({
+  name: "1",
+})
+const formRef = ref(null)
 
 const rules = reactive({
   name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
@@ -56,16 +78,12 @@ watch(
   },
 )
 
-setTimeout(() => {
-  focus.value = true
-}, 1000)
-
 function onChange(val) {
   console.log("change", val)
 }
 
 function submit() {
-  form?.value
+  formRef?.value
     .validate()
     .then((res) => {
       console.log("submit")
@@ -73,6 +91,13 @@ function submit() {
     .catch((errors) => {
       console.log(errors)
     })
+}
+
+function resetForm() {
+  formRef?.value.resetFields()
+}
+function resetFormValidate() {
+  formRef?.value.clearValidate()
 }
 </script>
 
