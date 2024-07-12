@@ -236,6 +236,14 @@ export function padZero(num: string | number, size = 2): string {
 }
 
 /**
+ * 将传入的参数转换为数组
+ * @param item 待转换为数组的元素或数组
+ */
+export function toArray<T>(item: T | T[]): T[] {
+  return Array.isArray(item) ? item : [item]
+}
+
+/**
  * 在数组中查找与目标数值最接近的数字
  * @param {number[]} arr 数字数组
  * @param {number} target 目标数值

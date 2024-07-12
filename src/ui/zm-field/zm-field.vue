@@ -201,6 +201,7 @@ async function upadteValue(value: string) {
 function onBlur() {
   setTimeout(() => (isFocus.value = false), 100)
   emits("blur", current.value)
+  parent?.onBlur(current.value)
 }
 
 function onFocus() {
@@ -223,6 +224,7 @@ function onKeyboardheightchange() {
 function onInput(event: any) {
   current.value = event.detail.value
   upadteValue(event.detail.value)
+  parent?.onChange(current.value)
 }
 
 function onClickClear() {

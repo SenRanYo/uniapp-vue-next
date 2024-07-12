@@ -29,9 +29,9 @@ export const formProps = {
    */
   errorMessageAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
   /**
-   * 表单校验触发时机，可选值为 onBlur onChange onSubmit 支持通过数组同时设置多个值，具体用法见下方表格
+   * 表单校验触发时机，可选值为 blur change submit 支持通过数组同时设置多个值，具体用法见下方表格
    */
-  validateTrigger: { type: String, default: "onBlur", validator: (v: string) => ["onBlur", "onChange", "onSubmit"].includes(v) },
+  validateTrigger: { type: [String, Array], default: "blur", validator: (v: string) => ["blur", "change", "submit"].includes(v) },
   /**
    * 是否在 label 后面添加冒号
    */
@@ -102,7 +102,7 @@ export type FormRuleMessage = string | ((value: any, rule: FormValidateRule) => 
 export type FormRuleFormatter = (value: any, rule: FormValidateRule) => string
 export type FormRuleValidator = (value: any, rule: FormValidateRule) => boolean | string | Promise<boolean | string>
 export type FormValidateError = { prop?: string; message: string }
-export type FormValidateTrigger = "onBlur" | "onChange" | "onSubmit"
+export type FormValidateTrigger = "blur" | "change"
 export type FormValidationStatus = "passed" | "failed" | "unvalidated"
 export type FormEmits = typeof formEmits
 export type FormProps = ExtractPropTypes<typeof formProps>

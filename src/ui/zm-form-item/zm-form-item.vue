@@ -14,11 +14,11 @@
   </view>
 </template>
 <script setup lang="ts">
-import { getDeepValue } from "../utils/utils"
-import { formKey, FormValidateRule } from "../zm-form"
+import { toArray, getDeepValue } from "../utils/utils"
+import { formKey, FormValidateRule, FormValidateTrigger } from "../zm-form"
 import { formItemEmits, formItemProps, formItemKey } from "./index"
 import { FieldValidateError, FieldValidationStatus } from "../zm-field"
-import { isDef, isEmpty, isFunction, isPromise, isNoEmpty } from "../utils/check"
+import { isDef, isEmpty, isFunction, isPromise, isNoEmpty, isArray, isString } from "../utils/check"
 import { useStyle, useColor, useUnit, useParent, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-form-item" })
@@ -33,7 +33,7 @@ const labelRect = ref<UniApp.NodeInfo>({})
 
 const { parent } = useParent(formKey)
 const { childrens, linkChildren } = useChildren(formItemKey)
-linkChildren({ props, prop: props.prop })
+linkChildren({ props, prop: props.prop, onBlur, onChange })
 
 const style = computed(() => {
   const style: any = {}
@@ -154,7 +154,7 @@ function runSyncRule(value: unknown, rule: FormValidateRule) {
  */
 function runRuleValidator(value: unknown, rule: FormValidateRule) {
   return new Promise((resolve) => {
-    const returnVal = rule.validator!(value, rule)
+    const returnVal = rule.validator!(value, toRaw(rule))
 
     if (isPromise(returnVal)) {
       returnVal.then(resolve)
@@ -203,6 +203,23 @@ function validate(rules = getPropRules()) {
   })
 }
 
+function validateWithTrigger(trigger: FormValidateTrigger) {
+  const rules = getPropRules()
+  if (parent && isNoEmpty(rules)) {
+    const { validateTrigger } = parent.props
+    const defaultTrigger = toArray(validateTrigger).includes(trigger)
+    const result = rules.filter((rule: FormValidateRule) => {
+      if (rule.trigger) {
+        return toArray(rule.trigger).includes(trigger)
+      }
+      return defaultTrigger
+    })
+    if (result.length) {
+      validate(rules)
+    }
+  }
+}
+
 /**
  * 重置字段状态
  */
@@ -243,6 +260,20 @@ function getPropRules() {
 async function resize() {
   labelRect.value = await useElRect(".zm-form-item__label", instance)
   errorRect.value = await useElRect(".zm-form-item__error__text", instance)
+}
+
+/**
+ * 失去焦点事件处理函数
+ */
+function onBlur() {
+  validateWithTrigger("blur")
+}
+
+/**
+ * 值变化处理函数
+ */
+function onChange() {
+  validateWithTrigger("change")
 }
 
 onMounted(() => resize())

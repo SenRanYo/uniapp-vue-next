@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useView } from "@/ui"
+import { FormValidateRule } from "@/ui/zm-form"
 
 const { view, onPageScroll } = useView()
 
@@ -58,8 +59,28 @@ const focus = ref(false)
 const form = ref({ name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
 const formRef = ref(null)
 
-const rules = reactive({
-  name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
+const rules = reactive<Record<string, FormValidateRule[]>>({
+  name: [
+    { required: true, message: "请输入姓名", trigger: "blur" },
+    {
+      required: true,
+      message: "请输入姓名",
+      trigger: "change",
+      validator: (value, rule) => {
+        console.log(value, rule)
+        return "失败"
+      },
+    },
+    {
+      required: true,
+      message: "请输入姓名",
+      trigger: "submit",
+      validator: (value, rule) => {
+        console.log(value, rule)
+        return "失败123"
+      },
+    },
+  ],
   age: [{ required: true, message: "请输入年龄", trigger: "blur" }],
   birthday: [{ required: true, message: "请输入生日", trigger: "blur" }],
   sec: [{ required: true, message: "请选择性别", trigger: "blur" }],
