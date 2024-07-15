@@ -12,9 +12,25 @@ export const inputProps = {
    */
   type: { type: String as PropType<InputType>, default: () => "text" },
   /**
-   * @description 是否圆形的
+   * @description 输入框字体颜色
    */
-  round: { type: Boolean, default: false },
+  color: { type: String, default: "" },
+  /**
+   * @description 输入框宽度
+   */
+  width: { type: [String, Number], default: "" },
+  /**
+   * @description 输入框高度
+   */
+  height: { type: [String, Number], default: "" },
+  /**
+   * @description 输入框字体的大小
+   */
+  fontSize: { type: [String, Number], default: "" },
+  /**
+   * @description 输入框字体的粗细
+   */
+  fontWeight: { type: [String, Number], default: "" },
   /**
    * @description 是否是密码类型
    */
@@ -100,58 +116,6 @@ export const inputProps = {
    */
   inputAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
   /**
-   * @description 输入框字体颜色
-   */
-  color: { type: String, default: "" },
-  /**
-   * @description 输入框宽度
-   */
-  width: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框高度
-   */
-  height: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框字体的大小
-   */
-  fontSize: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框字体的粗细
-   */
-  fontWeight: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框前置图标
-   */
-  prefixIcon: { type: String, default: "" },
-  /**
-   * @description 输入框前置图标大小
-   */
-  prefixIconSize: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框前置图标颜色
-   */
-  prefixIconColor: { type: String, default: "" },
-  /**
-   * @description 输入框前置图标粗细
-   */
-  prefixIconWeight: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框后置图标
-   */
-  suffixIcon: { type: String, default: "" },
-  /**
-   * @description 输入框后置图标大小
-   */
-  suffixIconSize: { type: [String, Number], default: "" },
-  /**
-   * @description 输入框后置图标颜色
-   */
-  suffixIconColor: { type: String, default: "" },
-  /**
-   * @description 输入框后置图标粗细
-   */
-  suffixIconWeight: { type: [String, Number], default: "" },
-  /**
    * @description 输入框清除图标
    */
   clearIcon: { type: String, default: "cross" },
@@ -171,14 +135,6 @@ export const inputProps = {
    * @description 输入框清除图标背景色
    */
   clearIconBackground: { type: String, default: "" },
-  /**
-   * @description 边框样式
-   */
-  border: { type: String, default: "" },
-  /**
-   * @description 圆角值
-   */
-  borderRadius: { type: [String, Number], default: "" },
   /**
    * @description 自定义类名
    */
