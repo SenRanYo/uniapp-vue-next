@@ -7,6 +7,7 @@
       :type="type"
       :focus="focus"
       :cursor="+cursor"
+      :password="password"
       :disabled="disabled"
       :maxlength="+maxlength"
       :auto-blur="autoBlur"
@@ -14,12 +15,13 @@
       :confirm-hold="confirmHold"
       :hold-keyboard="holdKeyboard"
       :placeholder="placeholder"
+      :cursor-color="cursorColor"
       :adjust-position="adjustPosition"
       :cursor-spacing="+cursorSpacing"
       :selection-end="+selectionEnd"
       :selection-start="+selectionStart"
       :placeholder-style="placeholderStyle"
-      :ignoreCompositionEvent="ignoreCompositionEvent"
+      :ignore-composition-event="ignoreCompositionEvent"
       @blur="onBlur"
       @input="onInput"
       @focus="onFocus"
@@ -83,6 +85,14 @@ const placeholderStyle = computed(() => {
   const style: any = {}
   style.color = useColor(props.placeholderColor)
   return useStyle({ ...style, ...useStyle(props.placeholderStyle) }, "string")
+})
+
+const type = computed(() => {
+  return props.type === "password" ? "text" : props.type
+})
+
+const password = computed(() => {
+  return props.type === "password" ? true : props.password
 })
 
 const disabled = computed(() => {

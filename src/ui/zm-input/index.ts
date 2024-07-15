@@ -1,6 +1,6 @@
 import Input from "./zm-input.vue"
 import type { ExtractPropTypes, PropType } from "vue"
-import { InputConfirmType, InputType } from "@uni-helper/uni-app-types/index"
+import { InputConfirmType, InputType as _InputType } from "@uni-helper/uni-app-types/index"
 
 export const inputProps = {
   /**
@@ -96,6 +96,10 @@ export const inputProps = {
    */
   cursor: { type: [String, Number], default: -1 },
   /**
+   * @description 光标颜色
+   */
+  cursorColor: { type: String, default: "" },
+  /**
    * @description 输入框聚焦时底部与键盘的距离
    */
   cursorSpacing: { type: [String, Number], default: 30 },
@@ -155,6 +159,7 @@ export const inputEmits = {
   "update:modelValue": (value: string) => true,
 }
 
+export type InputType = _InputType | "password"
 export type InputEmits = typeof inputEmits
 export type InputProps = ExtractPropTypes<typeof inputProps>
 export type InputInstance = InstanceType<typeof Input>
