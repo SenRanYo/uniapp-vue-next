@@ -68,7 +68,7 @@ const rules = reactive<Record<string, FormValidateRule[]>>({
       trigger: "change",
       validator: (value, rule) => {
         console.log(value, rule)
-        return "失败"
+        return true
       },
     },
     {
@@ -77,7 +77,7 @@ const rules = reactive<Record<string, FormValidateRule[]>>({
       trigger: "submit",
       validator: (value, rule) => {
         console.log(value, rule)
-        return "失败123"
+        return "失败321"
       },
     },
   ],

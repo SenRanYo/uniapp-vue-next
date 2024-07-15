@@ -102,7 +102,7 @@ export type FormRuleMessage = string | ((value: any, rule: FormValidateRule) => 
 export type FormRuleFormatter = (value: any, rule: FormValidateRule) => string
 export type FormRuleValidator = (value: any, rule: FormValidateRule) => boolean | string | Promise<boolean | string>
 export type FormValidateError = { prop?: string; message: string }
-export type FormValidateTrigger = "blur" | "change"
+export type FormValidateTrigger = "blur" | "change" | "submit"
 export type FormValidationStatus = "passed" | "failed" | "unvalidated"
 export type FormEmits = typeof formEmits
 export type FormProps = ExtractPropTypes<typeof formProps>

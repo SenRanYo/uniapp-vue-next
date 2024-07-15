@@ -104,7 +104,6 @@ function runRules(rules: FormValidateRule[]): Promise<void> {
           state.validateMessage = getRuleMessage(value, rule)
           return
         }
-
         if (rule.validator) {
           if (isEmpty(value) && rule.validateEmpty === false) {
             return
@@ -215,7 +214,7 @@ function validateWithTrigger(trigger: FormValidateTrigger) {
       return defaultTrigger
     })
     if (result.length) {
-      validate(rules)
+      validate(result)
     }
   }
 }
