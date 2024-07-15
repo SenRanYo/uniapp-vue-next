@@ -1,13 +1,12 @@
 import Textarea from "./zm-textarea.vue"
 import type { ExtractPropTypes, PropType } from "vue"
-import { InputConfirmType, InputType, TextareaOnLinechangeEvent } from "@uni-helper/uni-app-types/index"
+import { InputConfirmType, TextareaOnLinechangeEvent } from "@uni-helper/uni-app-types/index"
 
 export const textareaProps = {
   /**
    * @description 输入值
    */
   modelValue: { type: [String, Number], default: () => "" },
-
   /**
    * @description 是否禁用
    */
@@ -41,6 +40,14 @@ export const textareaProps = {
    */
   confirmType: { type: String as PropType<InputConfirmType>, default: "done" },
   /**
+   * @description 点击键盘右下角按钮时是否保持键盘不收起，H5无效
+   */
+  confirmHold: { type: Boolean, default: false },
+  /**
+   * @description 是否显示键盘上方带有”完成“按钮那一栏
+   */
+  showConfirmBar: { type: Boolean, default: true },
+  /**
    * @description 自动获取焦点，在 H5 平台能否聚焦以及软键盘是否跟随弹出，取决于当前浏览器本身的实现。nvue 页面不支持，需使用组件的 focus()、blur() 方法控制焦点
    */
   focus: { type: Boolean, default: false },
@@ -61,6 +68,10 @@ export const textareaProps = {
    */
   cursor: { type: [String, Number], default: -1 },
   /**
+   * @description 光标颜色
+   */
+  cursorColor: { type: String, default: "" },
+  /**
    * @description 输入框聚焦时底部与键盘的距离
    */
   cursorSpacing: { type: [String, Number], default: 30 },
@@ -76,10 +87,6 @@ export const textareaProps = {
    * @description 键盘弹起时，是否自动上推页面
    */
   adjustPosition: { type: Boolean, default: true },
-  /**
-   * @description 是否显示键盘上方带有”完成“按钮那一栏
-   */
-  showConfirmBar: { type: Boolean, default: true },
   /**
    * @description focus时，点击页面的时候不收起键盘，只微信小程序有效
    */
@@ -132,6 +139,26 @@ export const textareaProps = {
    * @description 是否去掉 iOS 下的默认内边距
    */
   disableDefaultPadding: { type: Boolean, default: false },
+  /**
+   * @description 输入框清除图标
+   */
+  clearIcon: { type: String, default: "cross" },
+  /**
+   * @description 输入框清除图标大小
+   */
+  clearIconSize: { type: [String, Number], default: "24rpx" },
+  /**
+   * @description 输入框清除图标颜色
+   */
+  clearIconColor: { type: String, default: "#fff" },
+  /**
+   * @description 输入框清除图标粗细
+   */
+  clearIconWeight: { type: [String, Number], default: "" },
+  /**
+   * @description 输入框清除图标背景色
+   */
+  clearIconBackground: { type: String, default: "" },
   /**
    * @description 自定义类名
    */
