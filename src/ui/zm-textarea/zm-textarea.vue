@@ -102,6 +102,17 @@ const valueLength = computed(() => {
   return props.maxlength === -1 ? String(props.modelValue).length : `${String(props.modelValue).length}/${props.maxlength}`
 })
 
+function reset(value: any) {
+  current.value = value
+  upadteValue(value)
+}
+
+async function upadteValue(value: string) {
+  emits("input", value)
+  emits("change", value)
+  emits("update:modelValue", value)
+}
+
 function onBlur() {
   setTimeout(() => (isFocus.value = false), 100)
   emits("blur", current.value)
@@ -131,17 +142,13 @@ function onInput(event: InputOnInputEvent) {
   parent?.onChange(current.value)
 }
 
-async function upadteValue(value: string) {
-  emits("change", value)
-  emits("update:modelValue", value)
-}
-
 function onClickClear() {
   current.value = ""
   upadteValue("")
+  emits("clear")
 }
 
-defineExpose({ name: "zm-textarea" })
+defineExpose({ name: "zm-textarea", reset })
 </script>
 <script lang="ts">
 export default {

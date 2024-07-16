@@ -107,7 +107,13 @@ watch(
   { immediate: true },
 )
 
+function reset(value: any) {
+  current.value = value
+  upadteValue(value)
+}
+
 async function upadteValue(value: string) {
+  emits("input", value)
   emits("change", value)
   emits("update:modelValue", value)
 }
@@ -140,9 +146,10 @@ function onInput(event: InputOnInputEvent) {
 function onClickClear() {
   current.value = ""
   upadteValue("")
+  emits("clear")
 }
 
-defineExpose({ name: "zm-input" })
+defineExpose({ name: "zm-input", reset })
 </script>
 <script lang="ts">
 export default {

@@ -8,75 +8,68 @@
         <zm-icon :name="prefixIcon" :size="prefixIconSize" :color="prefixIconColor" :weight="prefixIconWeight"></zm-icon>
       </slot>
     </view>
-    <view class="zm-field__value" v-if="type === 'textarea'">
-      <textarea
-        class="zm-field__textarea"
-        :style="[textareaStyle]"
-        :value="current"
-        :fixed="fixed"
-        :focus="focus"
-        :disabled="disabled"
-        :placeholder="placeholder"
-        :placeholder-style="placeholderStyle"
-        :cursor="+cursor"
-        :cursor-spacing="+cursorSpacing"
-        :auto-height="autosize"
-        :show-confirm-bar="showConfirmBar"
-        :selection-start="+selectionStart"
-        :selection-end="+selectionEnd"
-        :adjust-position="adjustPosition"
-        :disable-default-padding="disableDefaultPadding"
-        :hold-keyboard="holdKeyboard"
-        :maxlength="+maxlength"
-        :confirm-type="confirmType"
-        :ignore-composition-event="ignoreCompositionEvent"
-        @blur="onBlur"
-        @focus="onFocus"
-        @input="onInput"
-        @confirm="onConfirm"
-        @linechange="onLinechange"
-        @keyboardheightchange="onKeyboardheightchange"
-      />
-      <view class="zm-field__count" :style="[countStyle]" v-if="showCount">{{ valueLength }}</view>
-    </view>
-    <view class="zm-field__value" v-else>
-      <input
-        class="zm-field__input"
-        :style="[inputStyle]"
-        :value="current"
-        :type="type"
-        :focus="focus"
-        :cursor="+cursor"
-        :disabled="disabled"
-        :maxlength="+maxlength"
-        :auto-blur="autoBlur"
-        :confirm-type="confirmType"
-        :confirm-hold="confirmHold"
-        :hold-keyboard="holdKeyboard"
-        :placeholder="placeholder"
-        :adjust-position="adjustPosition"
-        :cursor-spacing="+cursorSpacing"
-        :selection-end="+selectionEnd"
-        :selection-start="+selectionStart"
-        :placeholder-style="placeholderStyle"
-        :ignoreCompositionEvent="ignoreCompositionEvent"
-        @blur="onBlur"
-        @input="onInput"
-        @focus="onFocus"
-        @confirm="onConfirm"
-        @keyboardheightchange="onKeyboardheightchange"
-      />
-      <view class="zm-field__clear" :style="[clearStyle]" v-if="clearable && current && isFocus" @click="onClickClear">
-        <zm-icon :name="clearIcon" :size="clearIconSize" :color="clearIconColor" :weight="clearIconWeight"></zm-icon>
-      </view>
-    </view>
+    <zm-textarea
+      v-if="type === 'textarea'"
+      :style="[textareaStyle]"
+      v-model="current"
+      :fixed="fixed"
+      :focus="focus"
+      :disabled="disabled"
+      :placeholder="placeholder"
+      :placeholder-style="placeholderStyle"
+      :cursor="+cursor"
+      :cursor-spacing="+cursorSpacing"
+      :auto-height="autosize"
+      :show-confirm-bar="showConfirmBar"
+      :selection-start="+selectionStart"
+      :selection-end="+selectionEnd"
+      :adjust-position="adjustPosition"
+      :disable-default-padding="disableDefaultPadding"
+      :hold-keyboard="holdKeyboard"
+      :maxlength="+maxlength"
+      :confirm-type="confirmType"
+      :ignore-composition-event="ignoreCompositionEvent"
+      @blur="onBlur"
+      @focus="onFocus"
+      @input="onInput"
+      @clear="onClear"
+      @confirm="onConfirm"
+      @linechange="onLinechange"
+      @keyboardheightchange="onKeyboardheightchange"
+    />
+    <zm-input
+      v-else
+      :style="[inputStyle]"
+      v-model="current"
+      :type="type"
+      :focus="focus"
+      :cursor="+cursor"
+      :disabled="disabled"
+      :maxlength="+maxlength"
+      :auto-blur="autoBlur"
+      :confirm-type="confirmType"
+      :confirm-hold="confirmHold"
+      :hold-keyboard="holdKeyboard"
+      :placeholder="placeholder"
+      :adjust-position="adjustPosition"
+      :cursor-spacing="+cursorSpacing"
+      :selection-end="+selectionEnd"
+      :selection-start="+selectionStart"
+      :placeholder-style="placeholderStyle"
+      :ignoreCompositionEvent="ignoreCompositionEvent"
+      @blur="onBlur"
+      @input="onInput"
+      @clear="onClear"
+      @focus="onFocus"
+      @confirm="onConfirm"
+      @keyboardheightchange="onKeyboardheightchange"
+    />
     <view class="zm-field__suffix" v-if="suffixIcon || slots.suffixIcon">
       <zm-icon :name="suffixIcon" :size="suffixIconSize" :color="suffixIconColor" :weight="suffixIconWeight"></zm-icon>
     </view>
   </view>
 </template>
 <script setup lang="ts">
-import { formItemKey } from "../zm-form-item"
 import { useStyle, useColor, useUnit, useParent } from "../hooks"
 import { fieldEmits, fieldProps, FieldValidationStatus } from "./index"
 import { TextareaOnLinechangeEvent } from "@uni-helper/uni-app-types/index"
@@ -86,8 +79,6 @@ defineOptions({ name: "zm-field" })
 const slots = useSlots()
 const props = defineProps(fieldProps)
 const emits = defineEmits(fieldEmits)
-
-const { parent } = useParent(formItemKey)
 
 const current = ref("")
 const isFocus = ref(false)
@@ -121,13 +112,6 @@ const inputStyle = computed(() => {
   return useStyle(style)
 })
 
-const clearStyle = computed(() => {
-  const style: any = {}
-  style.width = useUnit(props.clearIconSize)
-  style.height = useUnit(props.clearIconSize)
-  return useStyle(style)
-})
-
 const labelStyle = computed(() => {
   const style: any = {}
   style.width = useUnit(props.labelWidth)
@@ -152,14 +136,6 @@ const textareaStyle = computed(() => {
   return useStyle(style)
 })
 
-const countStyle = computed(() => {
-  const style: any = {}
-  style.color = useColor(props.countColor)
-  style.fontSize = useUnit(props.countSize)
-  style.fontWeight = props.countWeight
-  return useStyle(style)
-})
-
 const placeholderStyle = computed(() => {
   const style: any = {}
   style.color = useColor(props.placeholderColor)
@@ -172,14 +148,6 @@ const type = computed(() => {
 
 const disabled = computed(() => {
   return props.disabled || props.readonly
-})
-
-const showCount = computed(() => {
-  return props.showCount && String(props.modelValue).length > 0
-})
-
-const valueLength = computed(() => {
-  return props.maxlength === -1 ? String(props.modelValue).length : `${String(props.modelValue).length}/${props.maxlength}`
 })
 
 watch(
@@ -198,10 +166,19 @@ async function upadteValue(value: string) {
   emits("update:modelValue", value)
 }
 
+function onInput(value: any) {
+  current.value = value
+  upadteValue(value)
+}
+
+function onClear() {
+  emits("clear")
+  upadteValue("")
+}
+
 function onBlur() {
   setTimeout(() => (isFocus.value = false), 100)
   emits("blur", current.value)
-  parent?.onBlur(current.value)
 }
 
 function onFocus() {
@@ -219,17 +196,6 @@ function onLinechange(event: TextareaOnLinechangeEvent) {
 
 function onKeyboardheightchange() {
   emits("keyboardheightchange")
-}
-
-function onInput(event: any) {
-  current.value = event.detail.value
-  upadteValue(event.detail.value)
-  parent?.onChange(current.value)
-}
-
-function onClickClear() {
-  current.value = ""
-  upadteValue("")
 }
 
 defineExpose({ name: "zm-field", prop: props.prop, modelValue: props.modelValue, reset })

@@ -18,7 +18,7 @@
         <zm-field v-model="form.address" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入家乡地址"></zm-field>
       </zm-form-item>
       <zm-form-item label="详细说明" prop="explain" label-align="top">
-        <zm-field v-model="form.explain" clearable :focus="focus" :rules="rules.name" type="textarea" placeholder="请选择职业"></zm-field>
+        <zm-textarea v-model="form.explain" clearable placeholder="请选择职业" show-count></zm-textarea>
       </zm-form-item>
       <zm-button @click="submit">提交表单</zm-button>
       <zm-button @click="resetForm">重置表单</zm-button>

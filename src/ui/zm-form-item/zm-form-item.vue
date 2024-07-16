@@ -223,11 +223,11 @@ function validateWithTrigger(trigger: FormValidateTrigger) {
  * 重置字段状态
  */
 function resetField() {
-  state.status = "unvalidated"
   childrens.forEach((children) => {
     const value = parent.originModel.value[props.prop]
     children.exposed?.reset(value)
   })
+  state.status = "unvalidated"
 }
 
 /**
