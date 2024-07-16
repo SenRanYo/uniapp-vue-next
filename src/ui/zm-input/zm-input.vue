@@ -178,6 +178,7 @@ export default {
   &__clear {
     display: flex;
     padding: 4rpx;
+    margin-left: 8rpx;
     align-items: center;
     border-radius: 9999px;
     justify-content: center;

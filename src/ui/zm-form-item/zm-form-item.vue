@@ -1,7 +1,7 @@
 <template>
   <view class="zm-form-item" :class="[customClass]" :style="[style]">
     <view class="zm-form-item__content" :class="[contentClass]">
-      <view class="zm-form-item__label" :class="[labelClass]" :style="[labelStyle]">
+      <view class="zm-form-item__label" :class="[labelClass]" :style="[labelStyle]" v-if="label || slots.label">
         <slot name="label">{{ label }}{{ colon ? ":" : "" }}</slot>
       </view>
       <slot></slot>
@@ -23,6 +23,7 @@ import { useStyle, useColor, useUnit, useParent, useElRect, useChildren } from "
 
 defineOptions({ name: "zm-form-item" })
 
+const slots = useSlots()
 const props = defineProps(formItemProps)
 const emits = defineEmits(formItemEmits)
 const instance = getCurrentInstance()
