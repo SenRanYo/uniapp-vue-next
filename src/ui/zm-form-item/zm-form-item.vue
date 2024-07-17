@@ -14,11 +14,11 @@
   </view>
 </template>
 <script setup lang="ts">
-import { toArray, getDeepValue } from "../utils/utils"
-import { formKey, FormValidateRule, FormValidateTrigger } from "../zm-form"
+import { toArray, getDeepValue, clone } from "../utils/utils"
 import { formItemEmits, formItemProps, formItemKey } from "./index"
 import { FieldValidateError, FieldValidationStatus } from "../zm-field"
-import { isDef, isEmpty, isFunction, isPromise, isNoEmpty, isArray, isString } from "../utils/check"
+import { formKey, FormValidateRule, FormValidateTrigger } from "../zm-form"
+import { isDef, isEmpty, isFunction, isPromise, isNoEmpty } from "../utils/check"
 import { useStyle, useColor, useUnit, useParent, useElRect, useChildren } from "../hooks"
 
 defineOptions({ name: "zm-form-item" })
@@ -32,7 +32,7 @@ const state = reactive({ status: "unvalidated" as FieldValidationStatus, focused
 const errorRect = ref<UniApp.NodeInfo>({})
 const labelRect = ref<UniApp.NodeInfo>({})
 
-const { parent } = useParent(formKey)
+const { parent: form } = useParent(formKey)
 const { childrens, linkChildren } = useChildren(formItemKey)
 linkChildren({ props, prop: props.prop, onBlur, onChange })
 
@@ -61,7 +61,7 @@ const labelStyle = computed(() => {
   style.lineHeight = useUnit(props.labelLineHeight)
   style.textAlign = props.labelAlign
   style.fontWeight = props.labelWeight
-  style.width = prop("labelWidth") === "auto" ? parent.maxLabelWidth.value + "px" : useUnit(prop("labelWidth"))
+  style.width = prop("labelWidth") === "auto" ? form.maxLabelWidth.value + "px" : useUnit(prop("labelWidth"))
   return useStyle(style)
 })
 
@@ -81,7 +81,7 @@ const errorStyle = computed(() => {
 
 function prop(name: string) {
   if (isDef(props[name])) return props[name]
-  if (isDef(parent.props[name])) return parent.props[name]
+  if (isDef(form.props[name])) return form.props[name]
   return ""
 }
 
@@ -205,8 +205,8 @@ function validate(rules = getPropRules()) {
 
 function validateWithTrigger(trigger: FormValidateTrigger) {
   const rules = getPropRules()
-  if (parent && isNoEmpty(rules)) {
-    const { validateTrigger } = parent.props
+  if (form && isNoEmpty(rules)) {
+    const { validateTrigger } = form.props
     const defaultTrigger = toArray(validateTrigger).includes(trigger)
     const result = rules.filter((rule: FormValidateRule) => {
       if (rule.trigger) {
@@ -223,12 +223,11 @@ function validateWithTrigger(trigger: FormValidateTrigger) {
 /**
  * 重置字段状态
  */
-function resetField() {
-  childrens.forEach((children) => {
-    const value = parent.originModel.value[props.prop]
-    children.exposed?.reset(value)
-  })
-  state.status = "unvalidated"
+async function resetField() {
+  const value = form.initialModel.value[props.prop]
+  form.model[props.prop] = clone(value)
+  await nextTick()
+  resetValidate()
 }
 
 /**
@@ -243,7 +242,7 @@ function resetValidate() {
  * @returns 返回属性值
  */
 function getPropValue() {
-  return getDeepValue(parent.model, props.prop)
+  return getDeepValue(form.model, props.prop)
 }
 
 /**
@@ -251,7 +250,7 @@ function getPropValue() {
  * @returns 返回属性值
  */
 function getPropRules() {
-  return getDeepValue(parent.rules, props.prop)
+  return getDeepValue(form.rules, props.prop)
 }
 
 /**

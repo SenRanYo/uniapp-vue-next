@@ -14,7 +14,7 @@ defineOptions({ name: "zm-form" })
 
 const props = defineProps(formProps)
 const emits = defineEmits(formEmits)
-const originModel = ref(clone(props.model))
+const initialModel = ref(clone(props.model))
 const { childrens, linkChildren } = useChildren(formKey)
 
 const style = computed(() => {
@@ -132,9 +132,7 @@ function validateField(prop: string) {
  * @param prop 字段属性
  */
 function resetFields(prop?: string | string[]) {
-  if (typeof prop === "string") {
-    prop = [prop]
-  }
+  if (typeof prop === "string") prop = [prop]
   const fields = getFieldsByProps(prop)
   fields.forEach((item) => item.exposed.resetField())
 }
@@ -186,7 +184,7 @@ function getValidateStatus() {
   }, {})
 }
 
-linkChildren({ props, model: props.model, rules: props.rules, originModel, maxLabelWidth })
+linkChildren({ props, model: props.model, rules: props.rules, initialModel, maxLabelWidth })
 defineExpose({ name: "zm-form", submit, validate, validateField, resetFields, getValues, clearValidate, getValidateStatus })
 </script>
 <script lang="ts">

@@ -4,6 +4,7 @@
     <zm-form ref="formRef" :model="form" :rules="rules">
       <zm-form-item label="昵称" prop="name">
         <zm-field v-model="form.name" clearable :rules="rules.name" placeholder="请输入昵称"></zm-field>
+        <zm-field v-model="form.aaa" clearable :rules="rules.aaa" placeholder="请输入年龄"></zm-field>
       </zm-form-item>
       <zm-form-item label="年龄" prop="age">
         <zm-field v-model="form.age" clearable type="number" label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入年龄"></zm-field>
@@ -56,7 +57,7 @@ const value2 = ref("2")
 const value3 = ref("3")
 const value4 = ref("")
 const focus = ref(false)
-const form = ref({ name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
+const form = ref({ aaa: "12", name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
 const formRef = ref(null)
 
 const rules = reactive<Record<string, FormValidateRule[]>>({
