@@ -60,6 +60,10 @@ export const textareaProps = {
    */
   autoHeight: { type: Boolean, default: false },
   /**
+   * 输入对齐方式，可选值为 left center right
+   */
+  inputAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
+  /**
    * @description 是否忽略组件内对文本合成系统事件的处理。为 false 时将触发 compositionstart、compositionend、compositionupdate 事件，且在文本合成期间会触发 input 事件
    */
   ignoreCompositionEvent: { type: Boolean, default: true },

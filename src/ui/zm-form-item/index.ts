@@ -61,6 +61,10 @@ export const formItemProps = {
    */
   labelStyle: { type: [String, Object], default: "" },
   /**
+   * 输入内容对齐方式，可选值为 left center right
+   */
+  contentAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
+  /**
    * 错误文字大小
    */
   errorSize: { type: [String, Number], default: "" },

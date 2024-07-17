@@ -2,9 +2,8 @@
   <zm-view ref="view" background="#ffffff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
     <zm-form ref="formRef" :model="form" :rules="rules">
-      <zm-form-item label="昵称" prop="name">
+      <zm-form-item label="昵称" prop="name" content-align="right">
         <zm-field v-model="form.name" clearable :rules="rules.name" placeholder="请输入昵称"></zm-field>
-        <zm-field v-model="form.aaa" clearable :rules="rules.aaa" placeholder="请输入年龄"></zm-field>
       </zm-form-item>
       <zm-form-item label="年龄" prop="age">
         <zm-field v-model="form.age" clearable type="number" label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入年龄"></zm-field>

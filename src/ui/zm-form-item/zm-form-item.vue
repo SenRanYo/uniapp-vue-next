@@ -1,10 +1,12 @@
 <template>
   <view class="zm-form-item" :class="[customClass]" :style="[style]">
-    <view class="zm-form-item__content" :class="[contentClass]">
+    <view class="zm-form-item__main" :class="[mainClass]">
       <view class="zm-form-item__label" :class="[labelClass]" :style="[labelStyle]" v-if="label || slots.label">
         <slot name="label">{{ label }}{{ colon ? ":" : "" }}</slot>
       </view>
-      <slot></slot>
+      <view class="zm-form-item__content" :class="[contentClass]">
+        <slot></slot>
+      </view>
     </view>
     <view class="zm-form-item__error" :style="[errorStyle]">
       <view class="zm-form-item__error__text">
@@ -41,10 +43,10 @@ const style = computed(() => {
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-const contentClass = computed(() => {
+const mainClass = computed(() => {
   const list: string[] = []
-  list.push(`zm-form-item__content--align-${props.labelAlign}`)
-  list.push(`zm-form-item__content--position-${props.labelPosition}`)
+  list.push(`zm-form-item__main--align-${props.labelAlign}`)
+  list.push(`zm-form-item__main--position-${props.labelPosition}`)
   return list
 })
 
@@ -63,6 +65,12 @@ const labelStyle = computed(() => {
   style.fontWeight = props.labelWeight
   style.width = prop("labelWidth") === "auto" ? form.maxLabelWidth.value + "px" : useUnit(prop("labelWidth"))
   return useStyle(style)
+})
+
+const contentClass = computed(() => {
+  const list: string[] = []
+  list.push(`zm-form-item__content--${props.contentAlign}`)
+  return list
 })
 
 const errorStyle = computed(() => {
@@ -291,7 +299,7 @@ export default {
   padding: 16rpx;
   flex-direction: column;
 
-  &__content {
+  &__main {
     flex: 1;
     display: flex;
     align-items: center;
@@ -330,6 +338,19 @@ export default {
     flex-shrink: 0;
     align-items: center;
     padding-right: 16rpx;
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+
+    &--center {
+      justify-content: center;
+    }
+
+    &--right {
+      justify-content: flex-end;
+    }
   }
 
   &__error {

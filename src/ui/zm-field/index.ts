@@ -141,7 +141,7 @@ export const fieldProps = {
    */
   labelAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right", "top"].includes(v) },
   /**
-   * 输入框对齐方式，可选值为 left center right
+   * 输入对齐方式，可选值为 left center right
    */
   inputAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
   /**

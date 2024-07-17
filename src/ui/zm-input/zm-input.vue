@@ -3,6 +3,7 @@
     <input
       class="zm-input__input"
       :style="[inputStyle]"
+      :class="[inputClass]"
       :value="current"
       :type="type"
       :focus="focus"
@@ -72,6 +73,12 @@ const inputStyle = computed(() => {
   style.fontWeight = props.fontWeight
   style.textAlign = props.inputAlign
   return useStyle(style)
+})
+
+const inputClass = computed(() => {
+  const list: string[] = []
+  list.push(`zm-input__input--${props.inputAlign}`)
+  return list
 })
 
 const clearStyle = computed(() => {
@@ -173,6 +180,14 @@ export default {
     flex: 1;
     height: 100%;
     font-size: 24rpx;
+
+    &--center {
+      text-align: center;
+    }
+
+    &--right {
+      text-align: right;
+    }
   }
 
   &__clear {

@@ -4,6 +4,7 @@
       <textarea
         class="zm-textarea__textarea"
         :style="[textareaStyle]"
+        :class="[textareaClass]"
         :value="current"
         :fixed="fixed"
         :focus="focus"
@@ -75,6 +76,12 @@ const textareaStyle = computed(() => {
   style.fontSize = useUnit(props.fontSize)
   style.fontWeight = props.fontWeight
   return useStyle(style)
+})
+
+const textareaClass = computed(() => {
+  const list: string[] = []
+  list.push(`zm-textarea__textarea--${props.inputAlign}`)
+  return list
 })
 
 const placeholderStyle = computed(() => {
@@ -170,6 +177,14 @@ export default {
   &__textarea {
     width: 100%;
     font-size: inherit;
+
+    &--center {
+      text-align: center;
+    }
+
+    &--right {
+      text-align: right;
+    }
   }
 
   &__content {

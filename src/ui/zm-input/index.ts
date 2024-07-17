@@ -116,7 +116,7 @@ export const inputProps = {
    */
   adjustPosition: { type: Boolean, default: true },
   /**
-   * @description 输入框内容对齐方式
+   * @description 输入内容对齐方式
    */
   inputAlign: { type: String, default: "left", validator: (v: string) => ["left", "center", "right"].includes(v) },
   /**
