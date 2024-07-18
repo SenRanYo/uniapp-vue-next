@@ -41,7 +41,7 @@
       text="重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证"
       decoration="line-through"
     ></zm-text>
-
+    <zm-footer></zm-footer>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -82,7 +82,6 @@ const content = ref(`
 					<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" />
 				`)
 
-console.log(getCurrentInstance())
 const rules = reactive<Record<string, FormValidateRule[]>>({
   name: [
     { required: true, message: "请输入姓名", trigger: "blur" },

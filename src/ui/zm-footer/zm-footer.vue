@@ -13,13 +13,14 @@ import { footerEmits, footerProps } from "./index"
 import { useStyle, useColor, useUnitToPx, useElRect, useParent } from "../hooks"
 
 defineOptions({ name: "zm-footer" })
+
 const emits = defineEmits(footerEmits)
 const props = defineProps(footerProps)
 
 const rect = ref<UniApp.NodeInfo>({})
 const tabbarHeight = ref(0)
 const instance = getCurrentInstance()
-const { parent } = useParent(viewKey)
+const { parent: view } = useParent(viewKey)
 
 const style = computed(() => {
   const style: any = {}
@@ -37,7 +38,7 @@ const placeholderStyle = computed(() => {
 })
 
 function onEvent() {
-  parent?.mitt.on("tabbar.rect", (rect: UniApp.NodeInfo) => {
+  view?.mitt.on("tabbar.rect", (rect: UniApp.NodeInfo) => {
     tabbarHeight.value = rect.height
   })
 }
@@ -47,7 +48,7 @@ async function resize() {
   rect.value = await useElRect(".zm-footer__inner", instance)
   emits("rect", rect.value)
   emits("height", rect.value.height)
-  parent?.mitt.emit("tabbar.rect.emit")
+  view?.mitt.emit("tabbar.rect.emit")
 }
 
 onEvent()
