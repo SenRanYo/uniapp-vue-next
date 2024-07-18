@@ -122,8 +122,8 @@ export const actionSheetEmits = {
   closed: (action: string) => isString(action),
   open: () => true,
   opened: () => true,
-  select: (item: Object, index: number) => isObject(item) || isNumber(index),
   cancel: () => true,
+  select: (item: Object, index: number) => isObject(item) || isNumber(index),
 }
 export type Action = "show" | "close" | "action"
 export type ActionItem = {

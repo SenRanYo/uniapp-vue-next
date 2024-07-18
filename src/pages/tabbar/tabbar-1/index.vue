@@ -27,7 +27,20 @@
       <zm-button @click="resetForm">重置表单</zm-button>
       <zm-button @click="resetFormValidate">重置表单验证</zm-button>
     </zm-form>
-    <zm-richtext :content="content"></zm-richtext>
+    <zm-text
+      rows="2"
+      clickable
+      prefix="¥"
+      prefix-size="24rpx"
+      prefix-color="red"
+      prefix-gutter="8rpx"
+      prefix-weight="bold"
+      size="32rpx"
+      color="red"
+      weight="bold"
+      text="重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证"
+      decoration="line-through"
+    ></zm-text>
 
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>

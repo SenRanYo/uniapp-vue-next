@@ -3,7 +3,7 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const textEllipsisProps = {
   /**
-   * 自定义类名
+   * 文本内容
    */
   text: { type: String, default: "" },
   /**
