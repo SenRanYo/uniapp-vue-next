@@ -14,6 +14,9 @@
       <zm-form-item label="性别" prop="sec">
         <zm-field v-model="form.sec" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请选择性别"></zm-field>
       </zm-form-item>
+      <zm-form-item label="开关" prop="sec" content-align="right">
+        <zm-switch v-model="form.use"></zm-switch>
+      </zm-form-item>
       <zm-form-item label="家乡地址" prop="address">
         <zm-field v-model="form.address" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入家乡地址"></zm-field>
       </zm-form-item>
@@ -24,6 +27,13 @@
       <zm-button @click="resetForm">重置表单</zm-button>
       <zm-button @click="resetFormValidate">重置表单验证</zm-button>
     </zm-form>
+    <zm-cell-group>
+      <zm-cell>1</zm-cell>
+      <zm-cell>2</zm-cell>
+      <zm-cell>3</zm-cell>
+      <zm-cell>4</zm-cell>
+      <zm-cell>5</zm-cell>
+    </zm-cell-group>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -56,7 +66,7 @@ const value2 = ref("2")
 const value3 = ref("3")
 const value4 = ref("")
 const focus = ref(false)
-const form = ref({ aaa: "12", name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
+const form = ref({ aaa: "12", use: false, name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
 const formRef = ref(null)
 
 const rules = reactive<Record<string, FormValidateRule[]>>({

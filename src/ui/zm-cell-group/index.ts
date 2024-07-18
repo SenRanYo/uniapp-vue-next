@@ -1,6 +1,7 @@
 import CellGroup from "./zm-cell-group.vue"
 import type { ExtractPropTypes } from "vue"
 
+export const cellGroupKey = Symbol("zm-cell-group")
 export const cellGroupProps = {
   /**
    * @description 标题大小

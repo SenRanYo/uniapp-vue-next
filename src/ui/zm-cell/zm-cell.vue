@@ -31,17 +31,15 @@
   </view>
 </template>
 <script setup lang="ts">
-import { uuid } from "../utils/utils"
+import { cellGroupKey } from "../zm-cell-group"
 import { cellEmits, cellProps } from "./index"
-import { useStyle, useUnit, useColor } from "../hooks"
+import { useStyle, useUnit, useColor, useParent } from "../hooks"
 
 defineOptions({ name: "zm-cell" })
 const emits = defineEmits(cellEmits)
 const props = defineProps(cellProps)
-const cellGroup = inject("zm-cell-group", null)
 
-const id = uuid()
-const index = ref(null)
+const { index, parent: cellGroup } = useParent(cellGroupKey)
 
 const style = computed(() => {
   const style: any = {}
@@ -55,10 +53,7 @@ const classs = computed(() => {
   const list = []
   const state = ["center", "clickable"]
   state.forEach((state) => props[state] && list.push(`zm-cell--${state}`))
-  if (cellGroup?.border || props.border) {
-    if (!props.border && index.value === cellGroup?.childrens.value.length - 1) return
-    list.push("zm-cell--border")
-  }
+  if (index.value !== cellGroup.childrens.length - 1) list.push("zm-cell--border")
   return list
 })
 
@@ -68,47 +63,46 @@ const hoverClass = computed(() => {
 
 const iconStyle = computed(() => {
   return {
-    color: useColor(cellGroup?.iconColor.value || props.iconColor),
-    size: useUnit(cellGroup?.iconSize.value || props.iconSize),
-    weight: cellGroup?.iconWeight.value || props.iconWeight,
+    color: useColor(prop("iconColor")),
+    size: useUnit(prop("iconSize")),
+    weight: prop("iconWeight"),
   }
 })
 
 const rightIconStyle = computed(() => {
   return {
-    color: useColor(cellGroup?.rightIconColor.value || props.rightIconColor),
-    size: useUnit(cellGroup?.rightIconSize.value || props.rightIconSize),
-    weight: cellGroup?.rightIconWeight.value || props.rightIconWeight,
+    color: useColor(prop("rightIconColor")),
+    size: useUnit(prop("rightIconSize")),
+    weight: prop("rightIconWeight"),
   }
 })
 
 const titleStyle = computed(() => {
   let style: any = {}
-  style.color = useColor(cellGroup?.titleColor.value || props.titleColor)
-  style.fontSize = useUnit(cellGroup?.titleSize.value || props.titleSize)
-  style.fontWeight = cellGroup?.titleWeight.value || props.titleWeight
+  style.color = useColor(prop("titleColor"))
+  style.fontSize = useUnit(prop("titleSize"))
+  style.fontWeight = prop("titleWeight")
   return useStyle(style)
 })
 
 const descStyle = computed(() => {
   let style: any = {}
-  style.color = useColor(cellGroup?.descColor.value || props.descColor)
-  style.fontSize = useUnit(cellGroup?.descSize.value || props.descSize)
-  style.fontWeight = cellGroup?.descWeight.value || props.descWeight
+  style.color = useColor(prop("descColor"))
+  style.fontSize = useUnit(prop("descSize"))
+  style.fontWeight = prop("descWeight")
   return useStyle(style)
 })
 
 const contentStyle = computed(() => {
   let style: any = {}
-  style.color = useColor(cellGroup?.contentColor.value || props.contentColor)
-  style.fontSize = useUnit(cellGroup?.contentSize.value || props.contentSize)
-  style.fontWeight = cellGroup?.contentWeight.value || props.contentWeight
+  style.color = useColor(prop("contentColor"))
+  style.fontSize = useUnit(prop("contentSize"))
+  style.fontWeight = prop("contentWeight")
   return useStyle(style)
 })
 
-function resize() {
-  cellGroup?.addChildren(id)
-  index.value = cellGroup?.childrens.value.findIndex((cellId: string) => cellId === id)
+function prop(name: string) {
+  return props[name] || cellGroup?.props[name] || ""
 }
 
 function onClick(event: TouchEvent) {
@@ -121,8 +115,7 @@ function onClick(event: TouchEvent) {
   }
 }
 
-onMounted(() => resize())
-defineExpose({ name: "zm-cell" })
+defineExpose({ name: "zm-cell", index })
 </script>
 <script lang="ts">
 export default {

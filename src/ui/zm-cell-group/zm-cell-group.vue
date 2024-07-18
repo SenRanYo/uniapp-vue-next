@@ -5,13 +5,14 @@
 </template>
 
 <script setup lang="ts">
-import { cellGroupEmits, cellGroupProps } from "./index"
-import { useStyle, useUnit, useColor } from "../hooks"
+import { useStyle, useUnit, useColor, useChildren } from "../hooks"
+import { cellGroupEmits, cellGroupProps, cellGroupKey } from "./index"
 
 defineOptions({ name: "zm-cell-group" })
-const emits = defineEmits(cellGroupEmits)
+
 const props = defineProps(cellGroupProps)
-const childrens = ref([])
+const emits = defineEmits(cellGroupEmits)
+const { childrens, linkChildren } = useChildren(cellGroupKey)
 
 const style = computed(() => {
   const style: any = {}
@@ -20,12 +21,7 @@ const style = computed(() => {
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-function addChildren(id: string) {
-  const index = childrens.value.findIndex((cellId) => cellId === id)
-  if (index === -1) childrens.value.push(id)
-}
-
-provide("zm-cell-group", { ...toRefs(props), childrens, addChildren })
+linkChildren({ props, childrens })
 defineExpose({ name: "zm-cell-group" })
 </script>
 <script lang="ts">
