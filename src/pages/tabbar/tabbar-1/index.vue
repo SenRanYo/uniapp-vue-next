@@ -27,13 +27,8 @@
       <zm-button @click="resetForm">重置表单</zm-button>
       <zm-button @click="resetFormValidate">重置表单验证</zm-button>
     </zm-form>
-    <zm-cell-group>
-      <zm-cell>1</zm-cell>
-      <zm-cell>2</zm-cell>
-      <zm-cell>3</zm-cell>
-      <zm-cell>4</zm-cell>
-      <zm-cell>5</zm-cell>
-    </zm-cell-group>
+    <zm-richtext :content="content"></zm-richtext>
+
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>
@@ -69,6 +64,12 @@ const focus = ref(false)
 const form = ref({ aaa: "12", use: false, name: "", age: "", birthday: "", sec: "", address: "", explain: "" })
 const formRef = ref(null)
 
+const content = ref(`
+					<p>露从今夜白，月是故乡明</p>
+					<img src="https://cdn.uviewui.com/uview/swiper/2.jpg" />
+				`)
+
+console.log(getCurrentInstance())
 const rules = reactive<Record<string, FormValidateRule[]>>({
   name: [
     { required: true, message: "请输入姓名", trigger: "blur" },
@@ -126,6 +127,8 @@ function resetForm() {
 function resetFormValidate() {
   formRef?.value.clearValidate()
 }
+
+defineExpose({ name: "aa" })
 </script>
 
 <style lang="scss" scoped>
