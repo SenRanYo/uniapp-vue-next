@@ -35,7 +35,7 @@ const errorRect = ref<UniApp.NodeInfo>({})
 const labelRect = ref<UniApp.NodeInfo>({})
 
 const { parent: form } = useParent(formKey)
-const { childrens, linkChildren } = useChildren(formItemKey)
+const { linkChildren } = useChildren(formItemKey)
 linkChildren({ props, prop: props.prop, onBlur, onChange })
 
 const style = computed(() => {

@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { isBoolean } from "../utils/check"
+import { isBoolean, isDef } from "../utils/check"
 import { checkboxGroupKey } from "../zm-checkbox-group"
 import { useStyle, useUnit, useColor, useParent } from "../hooks"
 import { checkboxEmits, checkboxProps, CheckboxValueType } from "./index"
@@ -99,7 +99,9 @@ const isChecked = computed(() => {
 })
 
 function prop(name: string) {
-  return props[name] || parent?.props[name] || ""
+  if (isDef(props[name])) return props[name]
+  if (isDef(parent.props[name])) return parent.props[name]
+  return ""
 }
 
 async function updateValue(value: CheckboxValueType) {

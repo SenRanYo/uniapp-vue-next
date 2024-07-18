@@ -31,6 +31,7 @@
   </view>
 </template>
 <script setup lang="ts">
+import { isDef } from "../utils/check"
 import { cellGroupKey } from "../zm-cell-group"
 import { cellEmits, cellProps } from "./index"
 import { useStyle, useUnit, useColor, useParent } from "../hooks"
@@ -102,7 +103,9 @@ const contentStyle = computed(() => {
 })
 
 function prop(name: string) {
-  return props[name] || cellGroup?.props[name] || ""
+  if (isDef(props[name])) return props[name]
+  if (isDef(cellGroup.props[name])) return cellGroup.props[name]
+  return ""
 }
 
 function onClick(event: TouchEvent) {

@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { isDef } from "../utils/check"
 import { sidebarKey } from "../zm-sidebar"
 import { sidebarItemEmits, sidebarItemProps } from "./index"
 import { useStyle, useColor, useUnit, useParent, useElRect } from "../hooks"
@@ -50,7 +51,9 @@ const titleStyle = computed(() => {
 })
 
 function prop(name: string) {
-  return props[name] || parent?.props[name] || ""
+  if (isDef(props[name])) return props[name]
+  if (isDef(parent.props[name])) return parent.props[name]
+  return ""
 }
 
 async function resize() {

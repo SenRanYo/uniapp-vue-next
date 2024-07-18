@@ -7,13 +7,13 @@
 import { clone } from "../utils/utils"
 import { formKey } from "../zm-form"
 import { formEmits, formProps } from "./index"
-import { useStyle, useColor, useUnit, useChildren } from "../hooks"
+import { useStyle, useChildren } from "../hooks"
 import { FieldValidateError, FieldValidationStatus } from "../zm-field"
 
 defineOptions({ name: "zm-form" })
 
-const props = defineProps(formProps)
 const emits = defineEmits(formEmits)
+const props = defineProps(formProps)
 const initialModel = ref(clone(props.model))
 const { childrens, linkChildren } = useChildren(formKey)
 
@@ -29,6 +29,9 @@ const classs = computed(() => {
   return list
 })
 
+/**
+ * 计算最长label宽度
+ */
 const maxLabelWidth = computed(() => {
   return Math.max(...childrens.map((child) => toRef(child.exposed.labelRect).value.width))
 })

@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { isDef } from "../utils/check"
 import { radioGroupKey } from "../zm-radio-group"
 import { radioEmits, radioProps } from "./index"
 import { useStyle, useUnit, useColor, useParent } from "../hooks"
@@ -69,7 +70,9 @@ const isChecked = computed(() => {
 })
 
 function prop(name: string) {
-  return props[name] || parent?.props[name] || ""
+  if (isDef(props[name])) return props[name]
+  if (isDef(parent.props[name])) return parent.props[name]
+  return ""
 }
 
 function toggle() {
