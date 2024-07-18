@@ -1,5 +1,5 @@
 /**
- * @description 校验是否是十六进制颜色
+ * 校验是否是十六进制颜色
  * @param {String} value 校验内容
  * @return {Boolean}
  * @example isHexColor(value)
@@ -9,7 +9,7 @@ export function isHexColor(value: any): boolean {
 }
 
 /**
- * @description 校验是否是邮箱
+ * 校验是否是邮箱
  * @param {String} value 校验内容
  * @return {Boolean}
  * @example isEmail(value)
@@ -19,7 +19,7 @@ export function isEmail(value: any): boolean {
 }
 
 /**
- * @description 校验两个值是否相同
+ * 校验两个值是否相同
  * @param {*} value1 校验内容
  * @param {*} value2 校验内容
  * @return {Boolean}
@@ -30,7 +30,7 @@ export function isEqual(value1: any, value2: any): boolean {
 }
 
 /**
- * @description 校验是否是电话号码
+ * 校验是否是电话号码
  * @param {String} value 校验内容
  * @return {Boolean}
  * @example isPhoneNo(value)
@@ -40,7 +40,7 @@ export function isPhoneNo(value: any): boolean {
 }
 
 /**
- * @description 校验是否是URL格式
+ * 校验是否是URL格式
  * @param {String} value 校验内容
  * @return {Boolean}
  * @example isUrl(value)
@@ -71,7 +71,7 @@ export function isDocument(link: any): boolean {
 }
 
 /**
- * @description 校验是否是日期格式
+ * 校验是否是日期格式
  * @param {String|Date} value 校验内容
  * @return {Boolean}
  * @example isDate(value)
@@ -81,7 +81,7 @@ export function isDate(value: any): boolean {
 }
 
 /**
- * @description 校验是否是整数
+ * 校验是否是整数
  * @param {*} value 校验内容
  * @return {Boolean}
  * @example isDigits(value)
@@ -91,7 +91,7 @@ export function isDigits(value: any): boolean {
 }
 
 /**
- * @description 校验是否是数字
+ * 校验是否是数字
  * @param {String|Number} value 校验内容
  * @return {Boolean}
  * @example isNumber(value)
@@ -119,7 +119,7 @@ export function isFunction(fn: any): fn is Function {
 }
 
 /**
- * @description 是否布尔值
+ * 是否布尔值
  * @param {*} value 校验内容
  * @return {Boolean}
  * @example isBoolean(value)
@@ -141,7 +141,7 @@ export function isPromise(value: unknown): value is Promise<any> {
 }
 
 /**
- * @description 校验是否是数组
+ * 校验是否是数组
  * @param {*} value 校验内容
  * @return {Boolean}
  * @example isArray(value)
@@ -155,14 +155,14 @@ export function isArray<T>(value: any): value is Array<T> {
 }
 
 /**
- * @description 检查值是否不为空
+ * 检查值是否不为空
  * @param value 值
  * @return {Boolean} 是否不为空
  */
 export const isDef = <T>(value: T): value is NonNullable<T> => value !== undefined && value !== null && value !== ""
 
 /**
- * @description 校验是否是对象
+ * 校验是否是对象
  * @param {*} value 校验内容
  * @return {Boolean}
  * @example isObject(value)
@@ -172,7 +172,7 @@ export function isObject(value: any): boolean {
 }
 
 /**
- * @description 校验是否为空
+ * 校验是否为空
  * @param {*} value 校验内容
  * @return {Boolean}
  * @example isEmpty(value)
@@ -201,7 +201,7 @@ export function isEmpty(value: any): boolean {
 }
 
 /**
- * @description 校验是否为空数据
+ * 校验是否为空数据
  * @param {*} value 校验内容
  * @return {Boolean}
  * @example isNoEmpty(value)
@@ -211,7 +211,7 @@ export function isNoEmpty(value: any): boolean {
 }
 
 /**
- * @description 校验是否包含某个值
+ * 校验是否包含某个值
  * @param {String} value 校验内容
  * @param {String|Number} param 包含内容
  * @return {Boolean}
@@ -222,7 +222,7 @@ export function isContains(value: any, param: any): boolean {
 }
 
 /**
- * @description 校验是否移动端，用在WEB平台
+ * 校验是否移动端，用在WEB平台
  * @return {Boolean}
  * @example isMobile()
  */

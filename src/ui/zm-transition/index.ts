@@ -4,39 +4,39 @@ import type { ExtractPropTypes } from "vue"
 
 export const transitionProps = {
   /**
-   * @description 是否显示
+   * 是否显示
    */
   show: { type: Boolean, default: false },
   /**
-   * @description 动画名称，有效值fade、zoom、fade-zoom、fade-up、fade-down、fade-left、fade-right、slide-up、slide-down、slide-left、slide-right
+   * 动画名称，有效值fade、zoom、fade-zoom、fade-up、fade-down、fade-left、fade-right、slide-up、slide-down、slide-left、slide-right
    */
   name: { type: String, default: "fade" },
   /**
-   * @description 元素层级
+   * 元素层级
    */
   zIndex: { type: [String, Number], default: "" },
   /**
-   * @description 过渡时间
+   * 过渡时间
    */
   duration: { type: [Number, String], default: 300 },
   /**
-   * @description 元素穿透
+   * 元素穿透
    */
   penetrate: { type: Boolean, default: false },
   /**
-   * @description 进入动画函数
+   * 进入动画函数
    */
   enterTimingFunction: { type: String, default: "ease-out" },
   /**
-   * @description 离开动画函数
+   * 离开动画函数
    */
   leaveTimingFunction: { type: String, default: "ease-in" },
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }

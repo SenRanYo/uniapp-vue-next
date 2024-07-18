@@ -3,51 +3,51 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const indexAnchorProps = {
   /**
-   * @description 索引字符
+   * 索引字符
    */
   index: { type: [String, Number], default: "" },
   /**
-   * @description 字符颜色
+   * 字符颜色
    */
   color: { type: String, default: "" },
   /**
-   * @description 高度
+   * 高度
    */
   height: { type: [String, Number], default: "" },
   /**
-   * @description 字符大小
+   * 字符大小
    */
   fontSize: { type: [String, Number], default: "" },
   /**
-   * @description 字符粗细
+   * 字符粗细
    */
   fontWeight: { type: [String, Number], default: "" },
   /**
-   * @description 背景颜色
+   * 背景颜色
    */
   background: { type: String, default: "" },
   /**
-   * @description 吸顶时字符颜色
+   * 吸顶时字符颜色
    */
   stickyColor: { type: String, default: "" },
   /**
-   * @description 吸顶时字符大小
+   * 吸顶时字符大小
    */
   stickyFontSize: { type: [String, Number], default: "" },
   /**
-   * @description 吸顶时字符粗细
+   * 吸顶时字符粗细
    */
   stickyFontWeight: { type: [String, Number], default: "" },
   /**
-   * @description 吸顶时背景颜色
+   * 吸顶时背景颜色
    */
   stickyBackground: { type: String, default: "" },
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }

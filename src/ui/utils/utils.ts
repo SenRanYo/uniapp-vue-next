@@ -5,7 +5,7 @@ export function noop() {
 }
 
 /**
- * @description uuid
+ * uuid
  * @return {String}
  */
 export function uuid(): string {
@@ -19,7 +19,7 @@ export function uuid(): string {
 }
 
 /**
- * @description 对象深度克隆
+ * 对象深度克隆
  * @param {Object} obj 克隆对象
  * @return {Object}
  */
@@ -41,7 +41,7 @@ export function clone(obj: any): any {
 }
 
 /**
- * @description 对象深度合并
+ * 对象深度合并
  * @param {Object} target 目标对象
  * @param {Object} source 源对象
  * @return {Object}
@@ -74,7 +74,7 @@ export function merge(target: any = {}, source: any = {}): any {
 }
 
 /**
- * @description 转换对象为url参数
+ * 转换对象为url参数
  * @return url参数字符串
  */
 export function encodeParams(params: any, isPrefix: boolean = true): string {
@@ -138,7 +138,7 @@ export function delay(delay: number): Promise<void> {
 }
 
 /**
- * @description 函数防抖 短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行
+ * 函数防抖 短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行
  * @param Function func 目标函数
  * @param Number wait 延迟执行毫秒数
  * @param Booleans immediate true - 立即执行， false - 延迟执行
@@ -166,7 +166,7 @@ export function debounce(func: Function, wait: number = 500, immediate: boolean 
 }
 
 /**
- * @description 函数节流 连续触发事件但是在 n 秒中只执行一次函数。即 2n 秒内执行 2 次
+ * 函数节流 连续触发事件但是在 n 秒中只执行一次函数。即 2n 秒内执行 2 次
  * @param Function func 函数
  * @param Number wait 延迟执行毫秒数
  * @param Number type 1 表时间戳版，2 表定时器版

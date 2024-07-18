@@ -2,75 +2,75 @@ import IconText from "./zm-icon-text.vue"
 
 export const iconTextProps = {
   /**
-   * @description 图标名称或者图片地址
+   * 图标名称或者图片地址
    */
   name: { type: String, default: "" },
   /**
-   * @description 图标大小
+   * 图标大小
    */
   size: { type: [String, Number], default: "" },
   /**
-   * @description 图标颜色
+   * 图标颜色
    */
   color: { type: String, default: "" },
   /**
-   * @description 图标圆角
+   * 图标圆角
    */
   radius: { type: [String, Number], default: "" },
   /**
-   * @description 图标粗细
+   * 图标粗细
    */
   weight: { type: String, default: "" },
   /**
-   * @description 文本内容
+   * 文本内容
    */
   text: { type: [String, Number], default: "" },
   /**
-   * @description 文本大小
+   * 文本大小
    */
   textSize: { type: [String, Number], default: "" },
   /**
-   * @description 文本颜色
+   * 文本颜色
    */
   textColor: { type: String, default: "" },
   /**
-   * @description 文本粗细
+   * 文本粗细
    */
   textWeight: { type: String, default: "" },
   /**
-   * @description 文本和图标的间隔
+   * 文本和图标的间隔
    */
   textGap: { type: [String, Number], default: "" },
   /**
-   * @description 文本在图标左边
+   * 文本在图标左边
    */
   textLeft: { type: Boolean, default: false },
   /**
-   * @description 图标为图片时的宽度
+   * 图标为图片时的宽度
    */
   width: { type: [String, Number], default: "" },
   /**
-   * @description 图标为图片时的高度
+   * 图标为图片时的高度
    */
   height: { type: [String, Number], default: "" },
   /**
-   * @description 图标为图片时的显示模式
+   * 图标为图片时的显示模式
    */
   imageMode: { type: String, default: "scaleToFill" },
   /**
-   * @description 背景颜色
+   * 背景颜色
    */
   background: { type: String, default: "" },
   /**
-   * @description 自定义图标名称前缀
+   * 自定义图标名称前缀
    */
   customPrefix: { type: String, default: "zm-icon" },
   /**
-   * @description 激活时的样式
+   * 激活时的样式
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }

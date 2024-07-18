@@ -3,39 +3,39 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const backTopProps = {
   /**
-   * @description 滚动高度达到此参数值时才显示组件
+   * 滚动高度达到此参数值时才显示组件
    */
   offset: { type: [String, Number], default: "200rpx" },
   /**
-   * @description 距离页面右侧的距离
+   * 距离页面右侧的距离
    */
   right: { type: [String, Number], default: "" },
   /**
-   * @description 距离页面底部的距离
+   * 距离页面底部的距离
    */
   bottom: { type: [String, Number], default: "" },
   /**
-   * @description 元素层级
+   * 元素层级
    */
   zIndex: { type: [String, Number], default: "1" },
   /**
-   * @description 返回顶部过程中的过渡时间，单位ms
+   * 返回顶部过程中的过渡时间，单位ms
    */
   duration: { type: [String, Number], default: "200" },
   /**
-   * @description 背景颜色
+   * 背景颜色
    */
   background: { type: String, default: "" },
   /**
-   * @description 圆角值
+   * 圆角值
    */
   borderRadius: { type: [String, Number], default: "" },
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }

@@ -3,15 +3,15 @@ import { isNumber } from "../utils/check"
 
 export const safeAreaTopProps = {
   /**
-   * @description 背景色
+   * 背景色
    */
   background: { type: String, default: "" },
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }

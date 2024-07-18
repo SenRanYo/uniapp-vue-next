@@ -3,51 +3,51 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const notifyProps = {
   /**
-   * @description 是否显示
+   * 是否显示
    */
   show: { type: Boolean, default: false },
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   type: { type: String as PropType<NotifyType>, default: "primary", validator: (t: string) => ["primary", "success", "warning", "error"].includes(t) },
   /**
-   * @description 展示内容
+   * 展示内容
    */
   content: { type: String, default: "" },
   /**
-   * @description 展示时长，单位ms
+   * 展示时长，单位ms
    */
   duration: { type: [String, Number], default: "3000" },
   /**
-   * @description 字体颜色
+   * 字体颜色
    */
   color: { type: String, default: "" },
   /**
-   * @description 字体大小
+   * 字体大小
    */
   fontSize: { type: [String, Number], default: "" },
   /**
-   * @description 字体粗细
+   * 字体粗细
    */
   fontWeight: { type: String, default: "" },
   /**
-   * @description 背景色
+   * 背景色
    */
   background: { type: String, default: "" },
   /**
-   * @description 元素层级
+   * 元素层级
    */
   zIndex: { type: [String, Number], default: "2000" },
   /**
-   * @description 距离顶部偏移
+   * 距离顶部偏移
    */
   offsetTop: { type: [String, Number], default: "" },
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }

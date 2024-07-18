@@ -3,11 +3,11 @@ import type { ExtractPropTypes, PropType } from "vue"
 
 export const swiperItemProps = {
   /**
-   * @description 自定义类名
+   * 自定义类名
    */
   customClass: { type: String, default: "" },
   /**
-   * @description 自定义样式
+   * 自定义样式
    */
   customStyle: { type: [String, Object], default: "" },
 }
