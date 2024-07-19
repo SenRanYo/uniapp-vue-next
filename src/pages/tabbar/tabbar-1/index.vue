@@ -1,47 +1,7 @@
 <template>
   <zm-view ref="view" background="#ffffff">
     <zm-navbar title="首页" gradient background="#ec0400"></zm-navbar>
-    <zm-form ref="formRef" :model="form" :rules="rules">
-      <zm-form-item label="昵称" prop="name" content-align="right">
-        <zm-field v-model="form.name" clearable :rules="rules.name" placeholder="请输入昵称"></zm-field>
-      </zm-form-item>
-      <zm-form-item label="年龄" prop="age">
-        <zm-field v-model="form.age" clearable type="number" label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入年龄"></zm-field>
-      </zm-form-item>
-      <zm-form-item label="生日" prop="birthday">
-        <zm-field v-model="form.birthday" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入生日"></zm-field>
-      </zm-form-item>
-      <zm-form-item label="性别" prop="sec">
-        <zm-field v-model="form.sec" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请选择性别"></zm-field>
-      </zm-form-item>
-      <zm-form-item label="开关" prop="sec" content-align="right">
-        <zm-switch v-model="form.use"></zm-switch>
-      </zm-form-item>
-      <zm-form-item label="家乡地址" prop="address">
-        <zm-field v-model="form.address" clearable label-align="top" :focus="focus" :rules="rules.name" placeholder="请输入家乡地址"></zm-field>
-      </zm-form-item>
-      <zm-form-item label="详细说明" prop="explain" label-align="top">
-        <zm-textarea v-model="form.explain" clearable placeholder="请选择职业" show-count></zm-textarea>
-      </zm-form-item>
-      <zm-button @click="submit">提交表单</zm-button>
-      <zm-button @click="resetForm">重置表单</zm-button>
-      <zm-button @click="resetFormValidate">重置表单验证</zm-button>
-    </zm-form>
-    <zm-text
-      rows="2"
-      clickable
-      prefix="¥"
-      prefix-size="24rpx"
-      prefix-color="red"
-      prefix-gutter="8rpx"
-      prefix-weight="bold"
-      size="32rpx"
-      color="red"
-      weight="bold"
-      text="重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证重置表单验证"
-      decoration="line-through"
-    ></zm-text>
-    <zm-footer></zm-footer>
+    <zm-calendar></zm-calendar>
     <zm-back-top background="red" border-radius="999px"></zm-back-top>
     <zm-tabbar v-model="tabbar" route>
       <zm-tabbar-item name="1" icon="wap-home-o" route="/pages/tabbar/tabbar-1/index">Tabbar-1</zm-tabbar-item>

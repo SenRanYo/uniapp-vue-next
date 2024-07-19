@@ -441,12 +441,12 @@ export default defineComponent({
 
 <style lang="scss">
 .zm-list {
-  position: relative;
-  display: flex;
   flex: 1;
-  flex-direction: column;
   width: 100%;
   height: 100%;
+  display: flex;
+  position: relative;
+  flex-direction: column;
 
   &__inner {
     flex: 1;
