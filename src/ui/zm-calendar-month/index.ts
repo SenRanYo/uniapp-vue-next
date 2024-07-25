@@ -97,7 +97,7 @@ export const calendarEmits = {
 }
 
 export type CalendarDate = Dayjs | string | Date | null
-export type CalendarDefaultDate = Array<string | Date> | string | Date | null
+export type CalendarDefaultDate = Array<string | Date | Dayjs> | Dayjs | string | Date | null
 export type CalendarEmits = typeof calendarEmits
 export type CalendarProps = ExtractPropTypes<typeof calendarProps>
 export type CalendarExpose = {}
