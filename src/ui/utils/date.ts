@@ -1,3 +1,5 @@
+import dayjs, { Dayjs, UnitType, ManipulateType } from "dayjs"
+
 /**
  * 格式化时间
  * @param value 日期值
@@ -48,32 +50,30 @@ export function getMonthByOffset(date: Date, offset: number) {
 }
 
 /**
- * 计算两个日期之间的月份差异
- * @param date1 第一个日期
- * @param date2 第二个日期
+ * 计算两个日期之间的时间差
+ * @param date1 第一个日期，可以是字符串、Date对象或Dayjs对象
+ * @param date2 第二个日期，可以是字符串、Date对象或Dayjs对象
+ * @param type 时间差的单位类型，例如'day', 'month', 'year'等
+ * @returns 两个日期之间的时间差
  */
-export function diffMonth(date1: Date, date2: Date) {
-  const year1 = date1.getFullYear()
-  const year2 = date2.getFullYear()
-  if (year1 === year2) {
-    const month1 = date1.getMonth()
-    const month2 = date2.getMonth()
-    return month1 === month2 ? 0 : month1 > month2 ? 1 : -1
-  }
-  return year1 > year2 ? 1 : -1
+export function diffDate(date1: string | Date | Dayjs, date2: string | Date | Dayjs, type: UnitType = "day") {
+  return dayjs(date1).diff(dayjs(date2), type)
 }
 
 /**
- * 计算两个日期之间的天数差异
- * @param day1 第一个日期
- * @param day2 第二个日期
+ * 通过偏移量获取日期
+ * @param date 日期字符串或Date对象或Dayjs对象
+ * @param offset 偏移量，默认为0
+ * @param type 操作类型，默认为"day"
+ * @param format 返回日期格式，默认为"YYYY-MM-DD"
+ * @return 返回经过偏移处理后的日期字符串
  */
-export function diffDay(day1: Date, day2: Date) {
-  const compareMonthResult = diffMonth(day1, day2)
-  if (compareMonthResult === 0) {
-    const date1 = day1.getDate()
-    const date2 = day2.getDate()
-    return date1 === date2 ? 0 : date1 > date2 ? 1 : -1
+export function getDateByOffset(date: string | Date | Dayjs, offset: number = 0, type: ManipulateType = "day", format: string = "YYYY-MM-DD") {
+  if (offset > 0) {
+    return dayjs(date).add(offset, type).format(format)
   }
-  return compareMonthResult
+  if (offset < 0) {
+    return dayjs(date).subtract(Math.abs(offset), type).format(format)
+  }
+  return dayjs(date).format(format)
 }

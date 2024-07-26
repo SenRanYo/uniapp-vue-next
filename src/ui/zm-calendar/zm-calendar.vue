@@ -1,58 +1,49 @@
 <template>
-  <view class="zm-calendar" :class="[classs, customClass]" :style="[style]">
-    <zm-calendar-header :date="currentMonth" @change="onPanelChange"></zm-calendar-header>
+  <view class="zm-calendar" :class="[customClass]" :style="[style]">
+    <zm-calendar-header @change="onPanelChange"></zm-calendar-header>
     <view class="zm-calendar__body">
-      <scroll-view class="zm-calendar__view" scroll-y>
-        <template v-if="switchMode === 'default'">
-          <view class="zm-calendar__month" v-for="(month, monthIndex) in months" :key="monthIndex">
-            <view class="zm-calendar__title">{{ month.title }}</view>
-            <view class="zm-calendar__days">
-              <view class="zm-calendar__day" :class="[dayClass(day)]" v-for="(day, dayIndex) in month.days" :key="dayIndex">{{ day.day }}</view>
-            </view>
-          </view>
-        </template>
-        <template v-else></template>
+      <scroll-view class="zm-calendar__view" scroll-y enable-flex>
+        <zm-calendar-month :date="month" v-for="(month, index) in months" :key="index"></zm-calendar-month>
       </scroll-view>
     </view>
-    <view class="zm-calendar__footer">
-      <zm-button round>确认</zm-button>
-    </view>
+    <zm-calendar-footer></zm-calendar-footer>
   </view>
 </template>
 <script setup lang="ts">
-import dayjs, { Dayjs, UnitType } from "dayjs"
+import zmCalendarMonth from "./zm-calendar-month.vue"
+import zmCalendarHeader from "./zm-calendar-header.vue"
+import zmCalendarFooter from "./zm-calendar-footer.vue"
+import dayjs from "dayjs"
+import { clone } from "../utils/utils"
 import { isArray, isEmpty } from "../utils/check"
-import { calendarEmits, calendarProps, CalendarDate } from "./index"
-import { diffDay, diffMonth, getMonthByOffset } from "../utils/date"
-import { useStyle, useColor, useUnit, useParent } from "../hooks"
+import { diffDate, getDateByOffset } from "../utils/date"
+import { useStyle, useColor, useUnit, useParent, useChildren } from "../hooks"
+import { calendarKey, calendarEmits, calendarProps, CalendarDate } from "./index"
 
 defineOptions({ name: "zm-calendar" })
 
 const props = defineProps(calendarProps)
 const emits = defineEmits(calendarEmits)
+const { linkChildren } = useChildren(calendarKey)
 
-const subtitle = ref("2024年7月")
-const currentDate = ref(getInitialDate())
-const currentMonth = ref(getInitialDate())
-const currentPanelDate = ref(getInitialPanelDate())
+const date = ref<CalendarDate | CalendarDate[]>("")
+const month = ref<CalendarDate | CalendarDate[]>("")
+const panelDate = ref<CalendarDate | CalendarDate[]>("")
 
 const style = computed(() => {
   const style: any = {}
-
   return useStyle({ ...style, ...useStyle(props.customStyle) })
 })
 
-const classs = computed(() => {
-  const list: string[] = []
+const months = computed(() => {
+  const list: any[] = []
+  if (!minDate.value || !maxDate.value) return list
+  let cursor = dayjs(minDate.value).date(1)
+  do {
+    list.push(cursor.format("YYYY-MM-DD"))
+    cursor = cursor.month(cursor.month() + 1)
+  } while (cursor.diff(maxDate.value, "month") < 0)
   return list
-})
-
-const dayClass = computed(() => {
-  return (day: any) => {
-    const list: string[] = []
-    if (day.state) list.push(`zm-calendar__day--${day.state}`)
-    return list
-  }
 })
 
 const minDate = computed(() => {
@@ -61,122 +52,120 @@ const minDate = computed(() => {
 })
 
 const maxDate = computed(() => {
-  if (isEmpty(props.maxDate) && props.switchMode === "default") return dayjs(getToday()).add(6, "month")
+  if (isEmpty(props.maxDate) && props.switchMode === "default") return getDateByOffset(getToday(), 6, "month")
   return getDate(props.maxDate)
 })
 
-const months = computed(() => {
-  const list: any[] = []
-  if (!minDate.value || !maxDate.value) return list
-  let cursor = dayjs(minDate.value)
-  do {
-    list.push({
-      title: cursor.format("YYYY年M月"),
-      days: Array.from({ length: cursor.daysInMonth() }, (_, i) => {
-        return {
-          day: cursor.date(i + 1).format("D"),
-          date: cursor.date(i + 1).format("YYYY-MM-DD"),
-          state: getDayType(cursor.date(i + 1)),
-        }
-      }),
-    })
-    cursor = cursor.month(cursor.month() + 1)
-  } while (cursor.diff(maxDate.value, "month") < 0)
-  return list
-})
-
-console.log(months.value)
-
-const confirmDisabled = computed(() => {
-  if (currentDate.value) {
-    if (props.mode === "range") {
-      return !(currentDate.value as Date[])[0] || !(currentDate.value as Date[])[1]
-    }
-    if (props.mode === "multiple") {
-      return !(currentDate.value as Date[]).length
-    }
-  }
-  return !currentDate.value
-})
-
-function onPanelChange(date: string) {
-  console.log(date)
+function init() {
+  date.value = getInitialDate()
+  month.value = getInitialDate()
+  panelDate.value = getInitialPanelDate()
 }
 
-/**
- * 根据类型比较时间，返回时间的差值
- */
-function diffDate(date1: CalendarDate, date2: CalendarDate, type: UnitType) {
-  return dayjs(date1).diff(dayjs(date2), type)
+function select(val: string | string[]) {
+  const setDate = (val: string | string[]) => {
+    date.value = val
+    emits("select", clone(val))
+  }
+
+  if (props.mode === "range") {
+    const valid = checkDateRange(val as [string, string])
+    if (!valid) {
+      setDate([(val as string[])[0], getDateByOffset((val as string[])[0], +props.maxRange - 1), "day"])
+      return
+    }
+  }
+
+  setDate(val)
+}
+
+function onClickDay(day: any) {
+  if (props.readonly) return
+  if (props.mode === "range") {
+    if (isEmpty(date.value)) {
+      select([day.date])
+      return
+    }
+    if (isArray(date.value)) {
+      const [start, end] = date.value
+      if (start && !end) {
+        // if (diffDate(day.date, start, "day") === 1) {
+        //   const disabledDay = getDisabledDate(disabledDays.value, startDay, date)
+        //   if (disabledDay) {
+        //     const endDay = getPrevDay(disabledDay)
+        //     if (compareDay(startDay, endDay) === -1) {
+        //       select([startDay, endDay])
+        //     } else {
+        //       select([date])
+        //     }
+        //   } else {
+        //     select([startDay, date], true)
+        //   }
+        // } else if (compareToStart === -1) {
+        //   select([date])
+        // } else if (props.allowSameDay) {
+        //   select([date, date], true)
+        // }
+      } else {
+        select([day.date])
+      }
+    } else {
+      select([day.date])
+    }
+  }
+  if (props.mode === "range") {
+  }
+}
+
+function onPanelChange(date: string) {
+  panelDate.value = date
+}
+
+// 校验日期区间
+function checkDateRange(date: [string, string]) {
+  const { maxRange } = props
+  if (maxRange && diffDate(date[0], date[1]) > +maxRange) {
+    emits("overRange")
+    return false
+  }
+  return true
 }
 
 function getDate(date: CalendarDate) {
   return dayjs(date).format("YYYY-MM-DD")
 }
 
-function getDays() {}
-
 function getToday() {
   return dayjs().format("YYYY-MM-DD")
 }
 
-function getPrevDay(date: CalendarDate) {
-  return dayjs(date).subtract(1, "day")
-}
-function getNextDay(date: CalendarDate) {
-  return dayjs(date).add(1, "day")
-}
+function getInitialDate(date = props.defaultDate) {
+  const today = getToday()
+  const { mode, allowSameDay } = props
 
-function getPrevMonth() {}
-function getNextMonth() {}
+  if (isEmpty(date)) return date
 
-function getPrevYear() {}
-function getNextYear() {}
-
-/**
- * 获取初始日期
- */
-function getInitialDate(defaultDate = props.defaultDate) {
-  // 如果defaultDate为空，则返回今天
-  if (isEmpty(defaultDate)) return getToday()
-  const now = getToday()
-  // 如果mode为range，则返回一个包含开始和结束日期的数组
-  if (props.mode === "range") {
-    // 如果defaultDate不是数组，则将其转换为数组
-    if (!isArray(defaultDate)) defaultDate = []
+  if (mode === "range") {
+    if (!isArray(date)) date = []
     const min = minDate.value
-    const max = minDate.value
-    // 获取开始日期
-    const start = getLimitDateRange(getDate(defaultDate[0]) || now, min, max ? (props.allowSameDay ? max : getDate(dayjs(max).subtract(1, "day"))) : undefined)
-    // 获取结束日期
-    const end = getLimitDateRange(
-      getDate(defaultDate[1]) || (props.allowSameDay ? now : getDate(dayjs(now).add(1, "day"))),
-      min ? (props.allowSameDay ? min : getDate(dayjs(min).add(1, "day"))) : undefined,
-    )
-    return [start, end]
+    const max = maxDate.value
+    const start = getDate(date[0]) || today
+    const end = getDate(date[1]) || (allowSameDay ? today : getDateByOffset(today, 1, "day"))
+    const startDate = getLimitDateRange(start, min, allowSameDay ? max : getDateByOffset(max, -1, "day"))
+    const endDate = getLimitDateRange(end, allowSameDay ? min : getDateByOffset(min, 1, "day"))
+    return [startDate, endDate]
   }
 
-  // 如果mode为multiple，则返回一个包含多个日期的数组
-  if (props.mode === "multiple") {
-    // 如果defaultDate是数组，则返回一个包含多个日期的数组
-    if (isArray(defaultDate)) {
-      return defaultDate.map((date) => getLimitDateRange(date))
-    }
-    // 否则返回一个包含今天日期的数组
-    return [getLimitDateRange(now)]
+  if (mode === "multiple") {
+    return isArray(date) ? date.map((date) => getLimitDateRange(date)) : [getLimitDateRange(today)]
   }
 
-  // 如果defaultDate不是数组，则将其转换为日期
-  if (!defaultDate || isArray(defaultDate)) {
-    defaultDate = now
-  }
-  // 返回一个包含日期的数组
-  return getLimitDateRange(defaultDate)
+  return getLimitDateRange(today)
 }
 
 function getInitialPanelDate() {
-  const date = isArray(currentDate.value) ? currentDate.value[0] : currentDate.value
-  return date ? date : getLimitDateRange(getToday())
+  const panel = isArray(date.value) ? date.value[0] : date.value
+  return panel ? panel : getLimitDateRange(getToday())
 }
 
 function getLimitDateRange(date: string | Date, min = minDate.value, max = maxDate.value) {
@@ -189,90 +178,8 @@ function getLimitDateRange(date: string | Date, min = minDate.value, max = maxDa
   return date
 }
 
-function getDayType(day: CalendarDate) {
-  if (diffDate(day, minDate.value, "day") < 0 || diffDate(day, maxDate.value, "day") > 0) {
-    return "disabled"
-  }
-
-  if (isEmpty(currentDate.value)) {
-    return ""
-  }
-
-  if (isArray(currentDate.value)) {
-    if (props.mode === "multiple") {
-      return getMultipleDayType(day)
-    }
-    if (props.mode === "range") {
-      return getRangeDayType(day)
-    }
-  } else if (props.mode === "single") {
-    return diffDate(day, currentDate.value, "day") === 0 ? "selected" : ""
-  }
-  return ""
-}
-
-/**
- * 获取多选模式下时间的选中类型
- */
-function getMultipleDayType(day: CalendarDate) {
-  // 判断当前日期是否被选中
-  const isSelected = (date: CalendarDate) => isArray(currentDate.value) && currentDate.value.some((item: Dayjs) => dayjs(item).isSame(dayjs(date), "day"))
-
-  // 如果当前日期被选中
-  if (isSelected(day)) {
-    // 获取前一天的日期
-    const prevDay = getPrevDay(day)
-    // 获取后一天的日期
-    const nextDay = getNextDay(day)
-    // 判断前一天是否被选中
-    const prevSelected = isSelected(prevDay)
-    // 判断后一天是否被选中
-    const nextSelected = isSelected(nextDay)
-    // 如果前一天的日期和后一天的日期都被选中，则返回"multiple-middle"
-    if (prevSelected && nextSelected) {
-      return "multiple-middle"
-    }
-    // 如果前一天的日期被选中，则返回"end"
-    if (prevSelected) {
-      return "end"
-    }
-    // 如果后一天的日期被选中，则返回"start"
-    if (nextSelected) {
-      return "start"
-    }
-    // 如果前一天的日期和后一天的日期都没有被选中，则返回"multiple-selected"
-    return "multiple-selected"
-  }
-  // 如果当前日期没有被选中，则返回空字符串
-  return ""
-}
-
-function getRangeDayType(day: CalendarDate) {
-  if (isArray(currentDate.value)) {
-    const [startDay, endDay] = currentDate.value
-
-    if (!startDay) return ""
-
-    if (!endDay) {
-      return dayjs(day).isSame(dayjs(startDay)) ? "start" : ""
-    }
-
-    if (props.allowSameDay && dayjs(day).isSame(dayjs(startDay)) && dayjs(day).isSame(dayjs(endDay))) {
-      return "start-end"
-    }
-    if (dayjs(day).isSame(dayjs(startDay))) {
-      return "start"
-    }
-    if (dayjs(day).isSame(dayjs(endDay))) {
-      return "end"
-    }
-    if (dayjs(day).isAfter(dayjs(startDay), "day") && dayjs(day).isAfter(dayjs(endDay), "day")) {
-      return "middle"
-    }
-  }
-  return ""
-}
-
+onMounted(() => init())
+linkChildren({ props, date, month, minDate, maxDate, panelDate })
 defineExpose({ name: "zm-calendar" })
 </script>
 <script lang="ts">
@@ -287,44 +194,6 @@ export default {
   display: flex;
   flex-direction: column;
 
-  &__header {
-    display: flex;
-    flex-direction: column;
-    border-bottom: 1rpx solid #eee;
-  }
-
-  &__switch {
-    height: 80rpx;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  &__action {
-    height: 100%;
-    display: flex;
-    min-width: 60rpx;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__weekdays {
-    display: flex;
-    justify-content: space-between;
-  }
-
-  &__weekday {
-    flex: 1;
-    text-align: center;
-    line-height: 60rpx;
-  }
-
-  &__subtitle {
-    flex: 1;
-    font-size: 28rpx;
-    text-align: center;
-  }
-
   &__body {
     flex: 1;
     position: relative;
@@ -338,38 +207,7 @@ export default {
     display: flex;
     position: absolute;
     overflow-anchor: none;
-  }
-
-  &__title {
-    height: 80rpx;
-    font-size: 28rpx;
-    text-align: center;
-    font-weight: bold;
-    line-height: 80rpx;
-  }
-
-  &__days {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-  }
-
-  &__day {
-    height: 120rpx;
-    display: flex;
-    font-size: 32rpx;
-    position: relative;
-    align-items: center;
-    justify-content: center;
-
-    &--selected {
-      color: #fff;
-      border-radius: 8rpx;
-      background-color: var(--primary-color);
-    }
-  }
-
-  &__footer {
-    padding: 12rpx 24rpx;
+    flex-direction: column;
   }
 }
 </style>
