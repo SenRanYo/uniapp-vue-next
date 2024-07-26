@@ -179,6 +179,7 @@ export const calendarHeaderProps = {
 
 export const calendarEmits = {
   select: (date: string | string[]) => true,
+  unselect: (date: string | string[]) => true,
   overRange: () => true,
   "update:modelValue": (value: string) => true,
 }

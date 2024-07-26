@@ -3,7 +3,7 @@
     <view class="zm-calendar__month__item">
       <view class="zm-calendar__month__title" v-if="title">{{ title }}</view>
       <view class="zm-calendar__month__days">
-        <view class="zm-calendar__month__day" :class="[dayClass(day)]" v-for="(day, index) in days" :key="index">{{ day.text }}</view>
+        <view class="zm-calendar__month__day" :style="[dayStyle(day, index)]" :class="[dayClass(day)]" v-for="(day, index) in days" :key="index">{{ day.text }}</view>
       </view>
     </view>
   </scroll-view>
@@ -13,13 +13,28 @@ import dayjs, { Dayjs, UnitType } from "dayjs"
 import { isArray, isEmpty } from "../utils/check"
 import { diffDate, getDateByOffset } from "../utils/date"
 import { useStyle, useColor, useUnit, useParent } from "../hooks"
-import { calendarKey, calendarMonthEmits, calendarMonthProps, CalendarDate } from "./index"
+import { calendarKey, calendarMonthEmits, calendarMonthProps, CalendarDate, CalendarDay } from "./index"
 
 defineOptions({ name: "zm-calendar" })
 
 const props = defineProps(calendarMonthProps)
 const emits = defineEmits(calendarMonthEmits)
 const { parent: calendar } = useParent(calendarKey)
+
+const dayStyle = computed(() => {
+  return (day: CalendarDay, index: number) => {
+    const style: any = {}
+    if (index === 0) {
+      const week = dayjs(day.date).day()
+      const weeks = [0, 1, 2, 3, 4, 5, 6]
+      const first = +calendar.props.firstDayOfWeek
+      const realWeeks = [...weeks.slice(first, 7), ...weeks.slice(0, first)]
+      const index = realWeeks.indexOf(week)
+      style.gridColumnStart = index + 1
+    }
+    return useStyle(style)
+  }
+})
 
 const dayClass = computed(() => {
   return (day: any) => {
@@ -50,24 +65,25 @@ const days = computed(() => {
 })
 
 function getDayType(day: CalendarDate) {
-  const { mode, minDate, maxDate, currentDate } = props
-  if (diffDate(day, minDate, "day") < 0 || diffDate(day, maxDate, "day") > 0) {
+  const { mode } = calendar.props
+  const { currentDate, minDate, maxDate } = calendar
+  if (diffDate(day, minDate.value, "day") < 0 || diffDate(day, maxDate.value, "day") > 0) {
     return "disabled"
   }
 
-  if (isEmpty(currentDate)) {
+  if (isEmpty(currentDate.value)) {
     return ""
   }
 
-  if (isArray(currentDate)) {
+  if (isArray(currentDate.value)) {
     if (mode === "multiple") {
       return getMultipleDayType(day)
     }
     if (mode === "range") {
       return getRangeDayType(day)
     }
-  } else if (props.mode === "single") {
-    return diffDate(day, currentDate, "day") === 0 ? "selected" : ""
+  } else if (mode === "single") {
+    return diffDate(day, currentDate.value, "day") === 0 ? "selected" : ""
   }
   return ""
 }
@@ -76,7 +92,7 @@ function getDayType(day: CalendarDate) {
  * 获取多选模式下时间的选中类型
  */
 function getMultipleDayType(day: CalendarDate) {
-  const { currentDate } = props
+  const { currentDate } = calendar
   // 判断当前日期是否被选中
   const isSelected = (date: CalendarDate) => isArray(currentDate) && currentDate.some((item: Dayjs) => dayjs(item).isSame(dayjs(date), "day"))
 
@@ -165,7 +181,7 @@ export default {
 
   &__days {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
+    grid-template-columns: repeat(7, 1fr);
   }
 
   &__day {

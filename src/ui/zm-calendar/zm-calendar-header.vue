@@ -33,7 +33,7 @@ const emits = defineEmits(calendarHeaderEmits)
 const { parent: calendar } = useParent(calendarKey)
 
 const title = computed(() => {
-  return calendar.props.showTitle ? dayjs(calendar.month.value).format("YYYY年M月") : ""
+  return calendar.props.showTitle ? dayjs(calendar.currentmonth.value).format("YYYY年M月") : ""
 })
 
 const weekdays = computed(() => {

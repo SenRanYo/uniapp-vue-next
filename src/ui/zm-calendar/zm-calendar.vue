@@ -10,25 +10,24 @@
   </view>
 </template>
 <script setup lang="ts">
-import zmCalendarMonth from "./zm-calendar-month.vue"
-import zmCalendarHeader from "./zm-calendar-header.vue"
-import zmCalendarFooter from "./zm-calendar-footer.vue"
 import dayjs from "dayjs"
 import { clone } from "../utils/utils"
 import { isArray, isEmpty } from "../utils/check"
+import { useStyle, useChildren } from "../hooks"
 import { diffDate, getDateByOffset } from "../utils/date"
-import { useStyle, useColor, useUnit, useParent, useChildren } from "../hooks"
-import { calendarKey, calendarEmits, calendarProps, CalendarDate } from "./index"
-
-defineOptions({ name: "zm-calendar" })
+import { calendarKey, calendarEmits, calendarProps, CalendarDate, CalendarDay } from "./index"
+import zmCalendarMonth from "./zm-calendar-month.vue"
+import zmCalendarHeader from "./zm-calendar-header.vue"
+import zmCalendarFooter from "./zm-calendar-footer.vue"
 
 const props = defineProps(calendarProps)
 const emits = defineEmits(calendarEmits)
 const { linkChildren } = useChildren(calendarKey)
 
-const date = ref<CalendarDate | CalendarDate[]>("")
-const month = ref<CalendarDate | CalendarDate[]>("")
-const panelDate = ref<CalendarDate | CalendarDate[]>("")
+const today = ref("")
+const currentDate = ref<CalendarDate | CalendarDate[]>("")
+const currentmonth = ref<CalendarDate | CalendarDate[]>("")
+const currentPanelDate = ref<CalendarDate>("")
 
 const style = computed(() => {
   const style: any = {}
@@ -37,138 +36,91 @@ const style = computed(() => {
 
 const months = computed(() => {
   const list: any[] = []
-  if (!minDate.value || !maxDate.value) return list
-  let cursor = dayjs(minDate.value).date(1)
-  do {
-    list.push(cursor.format("YYYY-MM-DD"))
-    cursor = cursor.month(cursor.month() + 1)
-  } while (cursor.diff(maxDate.value, "month") < 0)
+  if (props.switchMode === "default") {
+    let cursor = dayjs(minDate.value).date(1)
+    do {
+      list.push(cursor.format("YYYY-MM-DD"))
+      cursor = cursor.month(cursor.month() + 1)
+    } while (cursor.diff(maxDate.value, "month") < 0)
+  } else {
+    list.push(getDate(currentPanelDate.value))
+  }
   return list
 })
 
+// 最小日期
 const minDate = computed(() => {
-  if (isEmpty(props.minDate) && props.switchMode === "default") return getToday()
-  return getDate(props.minDate)
+  let date = getDate(props.minDate)
+  if (isEmpty(props.minDate) && props.switchMode === "default") date = today.value
+  return date
 })
 
+// 最大日期
 const maxDate = computed(() => {
-  if (isEmpty(props.maxDate) && props.switchMode === "default") return getDateByOffset(getToday(), 6, "month")
-  return getDate(props.maxDate)
+  let date = getDate(props.maxDate)
+  if (isEmpty(props.maxDate) && props.switchMode === "default") date = getDateByOffset(today.value, 6, "month")
+  return date
 })
 
-function init() {
-  date.value = getInitialDate()
-  month.value = getInitialDate()
-  panelDate.value = getInitialPanelDate()
-}
-
-function select(val: string | string[]) {
-  const setDate = (val: string | string[]) => {
-    date.value = val
-    emits("select", clone(val))
-  }
-
-  if (props.mode === "range") {
-    const valid = checkDateRange(val as [string, string])
-    if (!valid) {
-      setDate([(val as string[])[0], getDateByOffset((val as string[])[0], +props.maxRange - 1), "day"])
-      return
-    }
-  }
-
-  setDate(val)
-}
-
-function onClickDay(day: any) {
+// 点击日期
+function onClickDay(day: CalendarDay) {
   if (props.readonly) return
   if (props.mode === "range") {
-    if (isEmpty(date.value)) {
-      select([day.date])
-      return
-    }
-    if (isArray(date.value)) {
-      const [start, end] = date.value
-      if (start && !end) {
-        // if (diffDate(day.date, start, "day") === 1) {
-        //   const disabledDay = getDisabledDate(disabledDays.value, startDay, date)
-        //   if (disabledDay) {
-        //     const endDay = getPrevDay(disabledDay)
-        //     if (compareDay(startDay, endDay) === -1) {
-        //       select([startDay, endDay])
-        //     } else {
-        //       select([date])
-        //     }
-        //   } else {
-        //     select([startDay, date], true)
-        //   }
-        // } else if (compareToStart === -1) {
-        //   select([date])
-        // } else if (props.allowSameDay) {
-        //   select([date, date], true)
-        // }
-      } else {
-        select([day.date])
-      }
-    } else {
-      select([day.date])
-    }
-  }
-  if (props.mode === "range") {
+    rangeSelect(day)
+  } else if (props.mode === "multiple") {
+    multipleSelect(day)
+  } else {
+    singleSelect(day)
   }
 }
 
+// 面板日期改变
 function onPanelChange(date: string) {
-  panelDate.value = date
-}
-
-// 校验日期区间
-function checkDateRange(date: [string, string]) {
-  const { maxRange } = props
-  if (maxRange && diffDate(date[0], date[1]) > +maxRange) {
-    emits("overRange")
-    return false
-  }
-  return true
+  currentPanelDate.value = date
 }
 
 function getDate(date: CalendarDate) {
-  return dayjs(date).format("YYYY-MM-DD")
+  return date ? dayjs(date).format("YYYY-MM-DD") : ""
 }
 
-function getToday() {
-  return dayjs().format("YYYY-MM-DD")
+// 初始化
+function init() {
+  today.value = dayjs().format("YYYY-MM-DD")
+  currentDate.value = initDate()
+  currentmonth.value = initDate()
+  currentPanelDate.value = initPanelDate()
 }
 
-function getInitialDate(date = props.defaultDate) {
-  const today = getToday()
+// 初始化日期
+function initDate(date = props.defaultDate) {
+  if (date === null) return date
   const { mode, allowSameDay } = props
-
-  if (isEmpty(date)) return date
-
   if (mode === "range") {
     if (!isArray(date)) date = []
     const min = minDate.value
     const max = maxDate.value
-    const start = getDate(date[0]) || today
-    const end = getDate(date[1]) || (allowSameDay ? today : getDateByOffset(today, 1, "day"))
-    const startDate = getLimitDateRange(start, min, allowSameDay ? max : getDateByOffset(max, -1, "day"))
-    const endDate = getLimitDateRange(end, allowSameDay ? min : getDateByOffset(min, 1, "day"))
+    const start = getDate(date[0]) || today.value
+    const end = getDate(date[1]) || (allowSameDay ? today.value : getDateByOffset(today.value, 1, "day"))
+    const startDate = limitDateRange(start, min, allowSameDay ? max : getDateByOffset(max, -1, "day"))
+    const endDate = limitDateRange(end, allowSameDay ? min : getDateByOffset(min, 1, "day"))
     return [startDate, endDate]
   }
 
   if (mode === "multiple") {
-    return isArray(date) ? date.map((date) => getLimitDateRange(date)) : [getLimitDateRange(today)]
+    return isArray(date) ? date.map((date) => limitDateRange(date)) : [limitDateRange(today.value)]
   }
 
-  return getLimitDateRange(today)
+  return limitDateRange(today.value)
 }
 
-function getInitialPanelDate() {
-  const panel = isArray(date.value) ? date.value[0] : date.value
-  return panel ? panel : getLimitDateRange(getToday())
+// 初始化面板时间
+function initPanelDate() {
+  const panel = isArray(currentDate.value) ? currentDate.value[0] : currentDate.value
+  return panel ? panel : limitDateRange(today.value)
 }
 
-function getLimitDateRange(date: string | Date, min = minDate.value, max = maxDate.value) {
+// 日期区间限制
+function limitDateRange(date: string | Date, min = minDate.value, max = maxDate.value) {
   if (min && dayjs(date).isSame(dayjs(min), "day")) {
     return min
   }
@@ -178,9 +130,82 @@ function getLimitDateRange(date: string | Date, min = minDate.value, max = maxDa
   return date
 }
 
+// 单项选择
+function singleSelect(day: CalendarDay) {
+  currentDate.value = day.date
+  emits("select", clone(day.date))
+}
+
+// 区间选择
+function rangeSelect(day: CalendarDay) {
+  const { date } = day
+  const { maxRange, allowSameDay } = props
+
+  // 设置选中日期
+  const setDate = (val: CalendarDate[]) => {
+    const diff = diffDate(date[0], date[1])
+    if (maxRange && diff > +maxRange) {
+      currentDate.value = [val[0], getDateByOffset(val[0], +maxRange - 1), "day"]
+      emits("select", clone(currentDate.value))
+      emits("overRange")
+    } else {
+      currentDate.value = val
+      emits("select", clone(val))
+    }
+  }
+
+  if (isArray(currentDate.value)) {
+    const [start, end] = currentDate.value
+    // 如果只有开始日期
+    if (start && !end) {
+      // 比较点击日期和开始日期的天数
+      const diff = diffDate(date, start, "day")
+      if (diff > 0) {
+        setDate([start, date])
+      } else if (diff < 0) {
+        setDate([date])
+      } else if (allowSameDay) {
+        setDate([date, date])
+      }
+    } else {
+      setDate([date])
+    }
+  } else {
+    setDate([date])
+  }
+}
+
+// 多选选择
+function multipleSelect(day: CalendarDay) {
+  const { date } = day
+  // 设置选中日期
+  const setDate = (dates: CalendarDate[]) => {
+    if (props.maxRange && dates.length > +props.maxRange) {
+      emits("overRange")
+    } else {
+      currentDate.value = dates
+      emits("select", clone(dates))
+    }
+  }
+
+  if (isArray(currentDate.value)) {
+    const dates = currentDate.value
+    const selectedIndex = dates.findIndex((dateItem) => diffDate(dateItem, date) === 0)
+    if (selectedIndex > -1) {
+      const [unselectedDate] = dates.splice(selectedIndex, 1)
+      emits("unselect", clone(unselectedDate))
+    } else {
+      setDate([...dates, date])
+    }
+  } else {
+    setDate([date])
+  }
+}
+
 onMounted(() => init())
-linkChildren({ props, date, month, minDate, maxDate, panelDate })
+linkChildren({ props, currentDate, currentmonth, minDate, maxDate, currentPanelDate })
 defineExpose({ name: "zm-calendar" })
+defineOptions({ name: "zm-calendar" })
 </script>
 <script lang="ts">
 export default {
